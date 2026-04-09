@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>我們的沖繩冒險!🌴</title>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Varela+Round&family=M+PLUS+Rounded+1c:wght@400;500;700&display=swap" rel="stylesheet">
@@ -752,6 +755,19 @@
 </div>
 
 <script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyCg9vHK-FfwD3Lb55uJIaMKIYVA98m6D2I",
+    authDomain: "shiaoyuehoka-238e2.firebaseapp.com",
+    projectId: "shiaoyuehoka-238e2",
+    storageBucket: "shiaoyuehoka-238e2.firebasestorage.app",
+    messagingSenderId: "370372855410",
+    appId: "1:370372855410:web:4aa6c0f44692e3538224eb",
+    measurementId: "G-HPRND7ZE6C"
+  };
+  firebase.initializeApp(firebaseConfig);
+  try { firebase.analytics(); } catch(e) {}
+  const db = firebase.firestore();
+
   const { createApp, ref, computed, onMounted } = Vue;
 
   createApp({
@@ -807,14 +823,9 @@
       const fetchExchangeRate = async () => {
         try {
           const target = 'https://rate.bot.com.tw/xrt?Lang=zh-tw&redirect=true';
-          const proxies = [
-            'https://corsproxy.io/?' + encodeURIComponent(target),
-            'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(target),
-          ];
+          const proxies = ['https://corsproxy.io/?' + encodeURIComponent(target), 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(target)];
           let res = null;
-          for (const url of proxies) {
-            try { res = await fetch(url); if (res.ok) break; } catch(e) { res = null; }
-          }
+          for (const url of proxies) { try { res = await fetch(url); if (res.ok) break; } catch(e) { res = null; } }
           if (!res || !res.ok) return;
           const text = await res.text();
           // 找日圓那一列，現金賣出是第2個四位小數
@@ -1031,6 +1042,31 @@
       const planningSubTab = ref('essential'), newTodoText = ref('');
       const addTodo = () => { if(newTodoText.value){ todos.value.push({id:Date.now(), text:newTodoText.value, done:false, type:planningSubTab.value}); newTodoText.value=''; } };
       const removeTodo = (id) => { todos.value = todos.value.filter(t => t.id !== id); };
+
+      // ── Firestore 即時同步 ──
+      const FIRESTORE_DOC = db.collection('okinawa').doc('shared');
+
+      const saveToFirestore = async (field, value) => {
+        try {
+          await FIRESTORE_DOC.set({ [field]: JSON.parse(JSON.stringify(value)) }, { merge: true });
+        } catch(e) { console.warn('Firestore save failed:', e); }
+      };
+
+      let localUpdate = false;
+      FIRESTORE_DOC.onSnapshot(snap => {
+        if (!snap.exists || localUpdate) return;
+        const d = snap.data();
+        if (d.expenses)     expenses.value     = d.expenses;
+        if (d.todos)        todos.value        = d.todos;
+        if (d.itinerary)    itinerary.value    = d.itinerary;
+        if (d.groupMembers) groupMembers.value = d.groupMembers;
+      });
+
+      const { watch } = Vue;
+      watch(expenses,     v => { localUpdate=true; saveToFirestore('expenses',v).then(()=>setTimeout(()=>localUpdate=false,500)); }, { deep:true });
+      watch(todos,        v => { localUpdate=true; saveToFirestore('todos',v).then(()=>setTimeout(()=>localUpdate=false,500)); }, { deep:true });
+      watch(itinerary,    v => { localUpdate=true; saveToFirestore('itinerary',v).then(()=>setTimeout(()=>localUpdate=false,500)); }, { deep:true });
+      watch(groupMembers, v => { localUpdate=true; saveToFirestore('groupMembers',v).then(()=>setTimeout(()=>localUpdate=false,500)); }, { deep:true });
 
       onMounted(async () => {
         // 進度條動畫：分段推進
