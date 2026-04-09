@@ -806,9 +806,16 @@
       const rateUpdatedAt = ref('');
       const fetchExchangeRate = async () => {
         try {
-          const proxy = 'https://api.allorigins.win/raw?url=';
           const target = 'https://rate.bot.com.tw/xrt?Lang=zh-tw&redirect=true';
-          const res = await fetch(proxy + encodeURIComponent(target));
+          const proxies = [
+            'https://corsproxy.io/?' + encodeURIComponent(target),
+            'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(target),
+          ];
+          let res = null;
+          for (const url of proxies) {
+            try { res = await fetch(url); if (res.ok) break; } catch(e) { res = null; }
+          }
+          if (!res || !res.ok) return;
           const text = await res.text();
           // 找日圓那一列，現金賣出是第2個四位小數
           const m = text.match(/日圓[\s\S]{0,500}?(\d+\.\d{4})<\/td>\s*<td[^>]*>(\d+\.\d{4})/);
