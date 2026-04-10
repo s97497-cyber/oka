@@ -25,6 +25,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Varela+Round&family=M+PLUS+Rounded+1c:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1009,7 +1010,7 @@
           </div>
           <div class="mt-9 flex space-x-5">
             <button @click="showEditModal = false" class="flex-1 py-4 rounded-full font-black uppercase text-xs card-neo" style="color:var(--tan);">Cancel</button>
-            <button @click="saveEvent" class="flex-1 py-4 rounded-full font-black uppercase text-xs text-white" style="background:linear-gradient(145deg,#8ec4a1,#5a9070);box-shadow:-3px -3px 8px rgba(255,255,255,0.25),5px 5px 12px rgba(45,85,60,0.42);">Save</button>
+            <button @click="saveEvent" :disabled="photoUploading" class="flex-1 py-4 rounded-full font-black uppercase text-xs text-white" style="background:linear-gradient(145deg,#8ec4a1,#5a9070);box-shadow:-3px -3px 8px rgba(255,255,255,0.25),5px 5px 12px rgba(45,85,60,0.42);">{{ photoUploading ? '上傳中...' : 'Save' }}</button>
           </div>
         </div>
       </div>
@@ -1413,7 +1414,9 @@
       </div>
       <div style="display:flex;gap:12px;margin-top:16px;width:100%;max-width:360px;flex-shrink:0;">
         <button @click="showCropper=false;cropSrc=''" style="flex:1;padding:14px;border-radius:999px;background:rgba(255,255,255,0.12);color:white;font-size:11px;font-weight:900;border:none;cursor:pointer;letter-spacing:0.1em;" class="active:scale-95 transition">取消</button>
-        <button @click="confirmCrop" style="flex:1;padding:14px;border-radius:999px;background:linear-gradient(145deg,#8ec4a1,#5a9070);color:white;font-size:11px;font-weight:900;border:none;cursor:pointer;letter-spacing:0.1em;" class="active:scale-95 transition">確認裁切</button>
+        <button @click="confirmCrop" :disabled="photoUploading" style="flex:1;padding:14px;border-radius:999px;background:linear-gradient(145deg,#8ec4a1,#5a9070);color:white;font-size:11px;font-weight:900;border:none;cursor:pointer;letter-spacing:0.1em;" class="active:scale-95 transition">
+          {{ photoUploading ? '上傳中...' : '確認裁切' }}
+        </button>
       </div>
     </div>
 
@@ -1448,6 +1451,7 @@
   firebase.initializeApp(firebaseConfig);
   try { firebase.analytics(); } catch(e) {}
   const db = firebase.firestore();
+  const storage = firebase.storage();
 
   const { createApp, ref, computed, onMounted } = Vue;
 
@@ -1922,6 +1926,7 @@
         window.addEventListener('touchend', onUp);
       };
 
+      const photoUploading = Vue.ref(false);
       const confirmCrop = () => {
         const canvas = document.createElement('canvas');
         const scale = cropCanvas.value.natW / cropCanvas.value.dispW;
@@ -1929,7 +1934,6 @@
         const sy = Math.round(cropBox.value.y * scale);
         const sw = Math.round(cropBox.value.w * scale);
         const sh = Math.round(cropBox.value.h * scale);
-        // 限制最大輸出尺寸為 800px，避免 base64 超過 Firestore 1MB 文件限制
         const MAX = 800;
         const ratio = Math.min(MAX / sw, MAX / sh, 1);
         const outW = Math.round(sw * ratio);
@@ -1939,10 +1943,25 @@
         const img = new Image();
         img.onload = () => {
           ctx.drawImage(img, sx, sy, sw, sh, 0, 0, outW, outH);
-          // 品質 0.72，約 100~200KB，確保同步不超限
-          tempEvent.value.photo = canvas.toDataURL('image/jpeg', 0.72);
-          showCropper.value = false;
-          cropSrc.value = '';
+          canvas.toBlob(async (blob) => {
+            // 上傳到 Firebase Storage
+            const key = 'itinerary_photos/' + Date.now() + '_' + Math.random().toString(36).slice(2) + '.jpg';
+            const ref = storage.ref(key);
+            photoUploading.value = true;
+            try {
+              await ref.put(blob, { contentType: 'image/jpeg' });
+              const url = await ref.getDownloadURL();
+              tempEvent.value.photo = url;
+            } catch(e) {
+              console.warn('Photo upload failed:', e);
+              // 上傳失敗時 fallback 用 base64
+              tempEvent.value.photo = canvas.toDataURL('image/jpeg', 0.72);
+            } finally {
+              photoUploading.value = false;
+              showCropper.value = false;
+              cropSrc.value = '';
+            }
+          }, 'image/jpeg', 0.82);
         };
         img.src = cropSrc.value;
       };
@@ -2073,92 +2092,27 @@
       // ── Firestore 即時同步 ──
       const FIRESTORE_DOC = db.collection('okinawa').doc('shared');
 
-      // debounce helper
-      const debounce = (fn, ms) => {
-        let timer;
-        return (...args) => { clearTimeout(timer); timer = setTimeout(() => fn(...args), ms); };
+      const saveToFirestore = async (field, value) => {
+        try {
+          await FIRESTORE_DOC.set({ [field]: JSON.parse(JSON.stringify(value)) }, { merge: true });
+        } catch(e) { console.warn('Firestore save failed:', e); }
       };
 
-      // 批次寫入：累積同一個 tick 內的所有欄位，一次 set
-      let pendingFields = {};
-      let saveTimer = null;
       let localUpdate = false;
-
-      // 照片獨立存到 photos/{photoKey}，itinerary 只存 key
-      const PHOTOS_COL = db.collection('okinawa_photos');
-      const photoCache = {}; // key -> dataURL，避免重複拉取
-
-      const savePhotoIfNeeded = async (dataURL) => {
-        if (!dataURL || !dataURL.startsWith('data:')) return dataURL;
-        // 用內容 hash 作 key（取前 80 字元夠用）
-        const key = 'ph_' + btoa(dataURL.slice(0, 80)).replace(/[^a-zA-Z0-9]/g,'').slice(0, 24);
-        if (!photoCache[key]) {
-          photoCache[key] = dataURL;
-          try { await PHOTOS_COL.doc(key).set({ data: dataURL }); } catch(e) { console.warn('Photo save failed:', e); }
-        }
-        return key;
-      };
-
-      const resolvePhotos = async (itineraryVal) => {
-        // 把 itinerary 裡的 photo key 換回 dataURL
-        const days = JSON.parse(JSON.stringify(itineraryVal));
-        for (const day of days) {
-          for (const ev of (day.events || [])) {
-            if (ev.photo && ev.photo.startsWith('ph_') && !ev.photo.startsWith('data:')) {
-              if (photoCache[ev.photo]) {
-                ev.photo = photoCache[ev.photo];
-              } else {
-                try {
-                  const snap = await PHOTOS_COL.doc(ev.photo).get();
-                  if (snap.exists) { photoCache[ev.photo] = snap.data().data; ev.photo = snap.data().data; }
-                } catch(e) {}
-              }
-            }
-          }
-        }
-        return days;
-      };
-
-      const stripPhotos = async (itineraryVal) => {
-        // 把大 base64 抽出去存，itinerary 只留 key
-        const days = JSON.parse(JSON.stringify(itineraryVal));
-        for (const day of days) {
-          for (const ev of (day.events || [])) {
-            if (ev.photo && ev.photo.startsWith('data:')) {
-              ev.photo = await savePhotoIfNeeded(ev.photo);
-            }
-          }
-        }
-        return days;
-      };
-
-      const saveToFirestore = (field, value) => {
-        pendingFields[field] = JSON.parse(JSON.stringify(value));
-        clearTimeout(saveTimer);
-        saveTimer = setTimeout(async () => {
-          const payload = pendingFields;
-          pendingFields = {};
-          localUpdate = true;
-          try {
-            // itinerary 照片單獨存，避免超過 1MB 文件限制
-            if (payload.itinerary) {
-              payload.itinerary = await stripPhotos(payload.itinerary);
-            }
-            await FIRESTORE_DOC.set(payload, { merge: true });
-          } catch(e) { console.warn('Firestore save failed:', e); }
-          setTimeout(() => { localUpdate = false; }, 1500);
-        }, 800);
-      };
-
-      FIRESTORE_DOC.onSnapshot(async snap => {
+      FIRESTORE_DOC.onSnapshot(snap => {
         if (!snap.exists || localUpdate) return;
         const d = snap.data();
         if (d.expenses)     expenses.value     = d.expenses;
         if (d.allTodos)     allTodos.value     = d.allTodos;
         if (d.groupMembers) groupMembers.value = d.groupMembers;
         if (d.itinerary) {
-          // 把照片 key 換回 dataURL 再寫入
-          itinerary.value = await resolvePhotos(d.itinerary);
+          // 清掉舊的 ph_ key（舊版殘留），只保留正常 URL 或空值
+          const cleaned = JSON.parse(JSON.stringify(d.itinerary));
+          for (const day of cleaned)
+            for (const ev of (day.events || []))
+              if (ev.photo && (ev.photo.startsWith('ph_') || ev.photo.startsWith('data:')))
+                ev.photo = '';
+          itinerary.value = cleaned;
         }
       });
 
@@ -2193,10 +2147,10 @@
       watch(cropBox, _drawPreview, { deep: true });
       watch(cropSrc, () => { Vue.nextTick(_drawPreview); });
 
-      watch(expenses,     v => saveToFirestore('expenses',v),     { deep:true });
-      watch(allTodos,     v => saveToFirestore('allTodos',v),     { deep:true });
-      watch(itinerary,    v => saveToFirestore('itinerary',v),    { deep:true });
-      watch(groupMembers, v => saveToFirestore('groupMembers',v), { deep:true });
+      watch(expenses,     v => { localUpdate=true; saveToFirestore('expenses',v).then(()=>setTimeout(()=>localUpdate=false,500)); }, { deep:true });
+      watch(allTodos,     v => { localUpdate=true; saveToFirestore('allTodos',v).then(()=>setTimeout(()=>localUpdate=false,500)); }, { deep:true });
+      watch(itinerary,    v => { localUpdate=true; saveToFirestore('itinerary',v).then(()=>setTimeout(()=>localUpdate=false,500)); }, { deep:true });
+      watch(groupMembers, v => { localUpdate=true; saveToFirestore('groupMembers',v).then(()=>setTimeout(()=>localUpdate=false,500)); }, { deep:true });
 
       // 任何 modal 開啟時鎖定 body 滾動
       const anyModalOpen = computed(() =>
@@ -2293,7 +2247,7 @@
       return {
         appLoading, loadProgress, loadingMsg, currentUser, loginAs, loginDropOpen, loginSelected, loggingIn, loggingOut, pendingUser, doLogin, allTodos, onPickerScroll, scrollPickerTo, currentTab, navCollapsed, tabs, btabs, weather, weatherBg, timeObj, calcInput, calcMode, calcExpr, calcDisplayVal, calcPendingOp, switchCalcMode, pressCalc, pressCalcNum, pressCalcDot, pressCalcOp, pressCalcEqual, pressCalcClear, pressCalcBackspace, calcOutput, jpyRate, jpyBuyRate, jpySellRate, rateUpdatedAt, groupMembers, showMemberModal, newMember, showUserMenu, toggleUserMenu, closeUserMenu, showProfileModal, profileEdit, openProfile, handleProfileAvatarUpload, saveProfile, logout, handleAvatarUpload, addMember, getMemberAvatar, editingMember, openEditMember, handleEditAvatarUpload, saveEditMember, showAddMember, BLANK_AVATAR, expenseSubTab, expenses, memberStats, maxPaid, settlementAdvice, showExpenseModal, openExpenseModal, addExpense, newExpense, openEditExpense, editingExpenseIdx, expenseFilterMember, filteredExpenses, itinerary, activeDay, departureTrip, returnFlights, selectedReturnFlight, hotelData, carRental, showFlightDetail, activeFlight, triggerPasscode, showPasscodeModal, passcode, pressKey, passcodeMode, planningSubTab, filteredTodos: computed(() => (allTodos.value[currentUser.value]||[]).filter(t=>t.type===planningSubTab.value)), newTodoText, addTodo, removeTodo, categories, showEditModal, isNewEvent, tempEvent, openEditModal, openAddModal, deleteEvent, saveEvent, showConfirmModal, confirmItemName, confirmDelete, executeDelete, bookingSubTab, globalCurrency, toggleAllCurrency,
         previewCanvas,hotelPhotos,showHotelLightbox,openEditExpense,editingExpenseIdx,showCropper,cropSrc,cropCanvas,cropBox,openCropper,startCropDrag,confirmCrop,currentHotelPhoto,openHotelPhoto,lbTouchStart,lbTouchEnd,
-        showHotelModal, showCarModal, showAquariumModal, aquariumPhotos, handleAquariumPhoto, openHotelModal, openCarModal, isAdmin,
+        photoUploading, showHotelModal, showCarModal, showAquariumModal, aquariumPhotos, handleAquariumPhoto, openHotelModal, openCarModal, isAdmin,
         getCategoryColor: (t) => ({ transport: 'bg-[#D94F4F]', spot: 'bg-[#98BDE3]', food: 'bg-[#E3A97C]', other: 'bg-[#C4A8D4]' }[t] || 'bg-[#DCC3A0]'),
         categoryDot: (id) => ({ spot:'#98BDE3', food:'#E3A97C', transport:'#D94F4F', other:'#C4A8D4' }[id] || '#DCC3A0'),
         categoryStyle: (id, active) => {
