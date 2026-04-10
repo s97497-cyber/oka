@@ -1466,7 +1466,7 @@
 
       const BLANK_AVATAR = `data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIHZpZXdCb3g9IjAgMCA1MCA1MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIyNSIgY3k9IjI1IiByPSIyNSIgZmlsbD0iI0VBRTFEMCIvPjxwYXRoIGQ9Ik0yNSAzM0MxOS40ODAzIDMzIDE1IDM3LjI1NDggMTUgNDIuNVY0My41SDM1VjQyLjVDMzUgMzcuMjU0OCAzMC41MTk3IDMzIDI1IDMzWiIgZmlsbD0iI0RDQzNBMCIvPjxjaXJjbGUgY3g9IjI1IiBjeT0iMjEiIHI9IjgiIGZpbGw9IiNEQ0MzQTAiLz48L3N2Zz4=`;
 
-      const groupMembers = ref([{ name: 'Me', avatar: BLANK_AVATAR }, { name: '旅伴', avatar: BLANK_AVATAR }]);
+      const groupMembers = ref([]);
       const showMemberModal = ref(false), newMember = ref({ name: '', avatar: BLANK_AVATAR });
       const showUserMenu = ref(false);
       let _menuTouchFired = false;
@@ -1929,17 +1929,12 @@
         const sy = Math.round(cropBox.value.y * scale);
         const sw = Math.round(cropBox.value.w * scale);
         const sh = Math.round(cropBox.value.h * scale);
-        // 最大 480px，品質 0.6，約 30~60KB，確保不超過 Firestore 1MB 限制
-        const MAX = 480;
-        const ratio = Math.min(MAX / sw, MAX / sh, 1);
-        const outW = Math.round(sw * ratio);
-        const outH = Math.round(sh * ratio);
-        canvas.width = outW; canvas.height = outH;
+        canvas.width = sw; canvas.height = sh;
         const ctx = canvas.getContext('2d');
         const img = new Image();
         img.onload = () => {
-          ctx.drawImage(img, sx, sy, sw, sh, 0, 0, outW, outH);
-          tempEvent.value.photo = canvas.toDataURL('image/jpeg', 0.6);
+          ctx.drawImage(img, sx, sy, sw, sh, 0, 0, sw, sh);
+          tempEvent.value.photo = canvas.toDataURL('image/jpeg', 0.85);
           showCropper.value = false;
           cropSrc.value = '';
         };
@@ -2074,7 +2069,13 @@
 
       const saveToFirestore = async (field, value) => {
         try {
-          await FIRESTORE_DOC.set({ [field]: JSON.parse(JSON.stringify(value)) }, { merge: true });
+          const payload = { [field]: JSON.parse(JSON.stringify(value)) };
+          const size = JSON.stringify(payload).length;
+          if (size > 900000) {
+            console.warn('Firestore payload too large:', size, 'bytes');
+            return;
+          }
+          await FIRESTORE_DOC.set(payload, { merge: true });
         } catch(e) { console.warn('Firestore save failed:', e); }
       };
 
