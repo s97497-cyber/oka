@@ -3,7 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>我們的沖繩冒險!🌴</title>
+  <title>OKA2026🌴</title>
+
+  <!-- PWA / Add to Home Screen -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="OKA2026🌴">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="application-name" content="OKA2026🌴">
+  <meta name="theme-color" content="#5a9070">
+
+  <!-- iOS Apple Touch Icons -->
+  <link rel="apple-touch-icon" sizes="180x180" href="./images/apple-touch-icon-180.png">
+  <link rel="apple-touch-icon" sizes="167x167" href="./images/apple-touch-icon-167.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="./images/apple-touch-icon-152.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="./images/apple-touch-icon-120.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="./images/favicon.png">
+  <link rel="manifest" href="./manifest.json">
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
@@ -465,7 +483,7 @@
         <div class="relative pl-6 border-l-4 border-[#EAE1D0] ml-3 space-y-8 pb-10">
           <div v-for="(item, idx) in itinerary[activeDay].events" :key="idx" class="relative">
             <div :class="['absolute -left-[2.1rem] top-4 w-5 h-5 rounded-full border-[3px] shadow-sm transition-colors duration-500', getCategoryColor(item.type)]" :style="{borderColor:'var(--bg)'}"></div>
-            <div class="card-neo cursor-pointer relative overflow-hidden active:scale-95 transition" @click="openEditModal(item, activeDay, idx)" style="padding:0;">
+            <div :class="['card-neo relative overflow-hidden transition', isAdmin ? 'cursor-pointer active:scale-95' : '']" @click="isAdmin && openEditModal(item, activeDay, idx)" style="padding:0;">
               <!-- 封面照片 -->
               <div v-if="item.photo" style="width:100%;height:140px;overflow:hidden;border-radius:28px 28px 0 0;">
                 <img :src="item.photo" style="width:100%;height:100%;object-fit:cover;">
@@ -486,11 +504,11 @@
                     開啟連結
                   </a>
                 </div>
-                <div class="absolute right-4 top-4 opacity-20 text-lg">✏️</div>
+                <div v-if="isAdmin" class="absolute right-4 top-4 opacity-20 text-lg">✏️</div>
               </div>
             </div>
           </div>
-          <button @click="openAddModal(activeDay)" class="w-full py-6 rounded-3xl font-black text-xl active:scale-95 transition" style="border:3px dashed #D4C4A8;background:transparent;box-shadow:var(--neo-in);color:var(--tan);">＋ 新增行程</button>
+          <button v-if="isAdmin" @click="openAddModal(activeDay)" class="w-full py-6 rounded-3xl font-black text-xl active:scale-95 transition" style="border:3px dashed #D4C4A8;background:transparent;box-shadow:var(--neo-in);color:var(--tan);">＋ 新增行程</button>
         </div>
       </section>
 
@@ -502,7 +520,7 @@
         </div>
         <div v-if="bookingSubTab === 'flights'" class="space-y-8 font-black">
           <div @click="viewFlightDetail('departure')" class="card-neo p-7 relative active:scale-95 transition cursor-pointer text-center">
-            <div @click.stop="triggerPasscode()" class="absolute right-4 top-4 opacity-40 text-xl">✏️</div>
+            <div v-if="isAdmin" @click.stop="triggerPasscode()" class="absolute right-4 top-4 opacity-40 text-xl">✏️</div>
             <div class="flex justify-between items-center mb-4 text-[10px] text-[#DCC3A0] uppercase tracking-widest font-black"><span>{{ departureTrip.airline }}</span><span>Departure</span></div>
             <div class="flex justify-between items-center px-4 leading-none"><p class="text-4xl">TPE</p><span class="text-[#5C7A6A] text-3xl opacity-30">➔</span><p class="text-4xl">OKA</p></div>
             <p class="text-sm font-bold text-[#5C7A6A] mt-2 tracking-widest leading-none">{{ departureTrip.time }} ➔ {{ departureTrip.arrivalTime }}</p>
@@ -513,7 +531,7 @@
               <button v-for="(f, idx) in returnFlights" :key="idx" @click="selectedReturnFlight = idx" :class="['tab-btn text-xs', selectedReturnFlight === idx ? 'active' : 'inactive']">{{ f.destName }}</button>
             </div>
             <div @click="viewFlightDetail('return')" class="card-neo p-7 relative active:scale-95 transition cursor-pointer text-center font-bold">
-              <div @click.stop="triggerPasscode()" class="absolute right-4 top-4 opacity-40 text-xl">✏️</div>
+              <div v-if="isAdmin" @click.stop="triggerPasscode()" class="absolute right-4 top-4 opacity-40 text-xl">✏️</div>
               <div class="flex justify-between items-center mb-4 text-[10px] text-[#DCC3A0] uppercase tracking-widest font-black"><span>{{ returnFlights[selectedReturnFlight].airline }}</span><span>Return</span></div>
               <div class="flex justify-between items-center px-4 font-black leading-none"><p class="text-4xl">OKA</p><span class="text-[#5C7A6A] text-3xl opacity-30">➔</span><p class="text-4xl">{{ returnFlights[selectedReturnFlight].destCode }}</p></div>
               <p class="text-sm font-bold text-[#5C7A6A] mt-2 tracking-widest leading-none">{{ returnFlights[selectedReturnFlight].time }} ➔ {{ returnFlights[selectedReturnFlight].arrivalTime }}</p>
@@ -623,7 +641,7 @@
           </div>
 
           <!-- 美麗海水族館 卡片 -->
-          <div class="card-neo overflow-hidden" style="border-radius:32px;padding:0;">
+          <div class="card-neo overflow-hidden active:scale-[0.98] transition cursor-pointer" style="border-radius:32px;padding:0;" @click="showAquariumModal=true">
             <!-- 預覽圖 -->
             <div style="position:relative;width:100%;height:160px;overflow:hidden;">
               <img src="./images/car-preview2.jpg" style="width:100%;height:100%;object-fit:cover;object-position:center 30%;display:block;">
@@ -631,6 +649,10 @@
               <div style="position:absolute;top:12px;right:12px;background:rgba(0,0,0,0.35);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.3);border-radius:999px;padding:4px 12px;display:flex;align-items:center;gap:5px;">
                 <span style="font-size:10px;">🗓</span>
                 <span style="font-size:10px;font-weight:900;color:white;letter-spacing:0.05em;">6/5 &nbsp;14:00</span>
+              </div>
+              <!-- 點擊提示 -->
+              <div style="position:absolute;bottom:12px;left:12px;background:rgba(0,0,0,0.35);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.25);border-radius:999px;padding:4px 12px;">
+                <span style="font-size:9px;font-weight:900;color:white;letter-spacing:0.08em;">查看詳情 →</span>
               </div>
             </div>
             <!-- 資訊列 -->
@@ -646,15 +668,14 @@
                 </div>
               </div>
               <!-- 地址 -->
-              <a href="https://maps.google.com/?q=Okinawa+Churaumi+Aquarium,424+Ishikawa,Motobu,Okinawa" target="_blank"
-                style="display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:16px;background:rgba(92,122,106,0.08);border:1px solid rgba(92,122,106,0.15);text-decoration:none;margin-top:4px;">
+              <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:16px;background:rgba(92,122,106,0.08);border:1px solid rgba(92,122,106,0.15);margin-top:4px;">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="#5C7A6A"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
                 <div style="flex:1;">
                   <p style="font-size:10px;font-weight:900;color:var(--green);line-height:1.3;">424 Ishikawa, Motobu, Okinawa</p>
                   <p style="font-size:9px;opacity:0.4;">本部町石川 424・海洋博公園内 905-0206</p>
                 </div>
-                <span style="font-size:9px;opacity:0.4;font-weight:900;">地圖 →</span>
-              </a>
+                <span style="font-size:9px;opacity:0.4;font-weight:900;">🐋</span>
+              </div>
             </div>
           </div>
 
@@ -1042,6 +1063,179 @@
             </div>
           </div>
           <button @click="showCarModal = false" class="w-full py-4 rounded-full text-[10px] uppercase font-black active:scale-95 transition card-neo" style="color:var(--tan);">Close</button>
+        </div>
+      </div>
+
+      <!-- 水族館詳情彈窗 -->
+      <div v-if="showAquariumModal" class="fixed inset-0 z-[1500] flex flex-col justify-end font-black" style="padding-bottom:0;">
+        <div class="absolute inset-0" style="background:rgba(30,25,20,0.75);backdrop-filter:blur(6px);" @click="showAquariumModal=false"></div>
+        <div class="relative card-neo-xl overflow-hidden" style="border-radius:40px 40px 0 0;max-height:92vh;display:flex;flex-direction:column;">
+          <!-- Header 漸層 -->
+          <div style="background:linear-gradient(145deg,#1a6b8a,#0e4d6b);padding:28px 28px 22px;position:relative;flex-shrink:0;">
+            <!-- 關閉鈕 -->
+            <button @click="showAquariumModal=false" style="position:absolute;top:16px;right:16px;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.15);border:none;color:white;font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;">✕</button>
+            <p style="font-size:10px;letter-spacing:0.4em;text-transform:uppercase;color:rgba(255,255,255,0.6);margin-bottom:6px;">Okinawa Churaumi Aquarium</p>
+            <p style="font-size:26px;font-weight:900;color:white;line-height:1.1;letter-spacing:-0.01em;">美麗海水族館 🐋</p>
+            <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
+              <span style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:999px;padding:3px 12px;font-size:9px;color:rgba(255,255,255,0.9);letter-spacing:0.08em;">6/5 (週五)</span>
+              <span style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:999px;padding:3px 12px;font-size:9px;color:rgba(255,255,255,0.9);letter-spacing:0.08em;">📍 本部町・Motobu</span>
+            </div>
+          </div>
+
+          <!-- 滾動內容 -->
+          <div style="overflow-y:auto;padding:24px 24px 12px;flex:1;display:flex;flex-direction:column;gap:20px;">
+
+            <!-- 營業時間 & 入場時間 -->
+            <div style="background:var(--bg-raised);border-radius:24px;box-shadow:var(--neo-out);border:var(--br);padding:18px 20px;">
+              <p style="font-size:9px;text-transform:uppercase;letter-spacing:0.2em;color:var(--tan);margin-bottom:12px;">🕐 營業時間</p>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                <div>
+                  <p style="font-size:13px;font-weight:900;color:var(--text);">水族館主館</p>
+                  <p style="font-size:11px;color:var(--green);font-weight:900;margin-top:2px;">08:30 – 18:30</p>
+                  <p style="font-size:9px;opacity:0.45;margin-top:1px;">最後入館 17:30</p>
+                </div>
+                <div style="text-align:right;">
+                  <p style="font-size:9px;text-transform:uppercase;letter-spacing:0.1em;color:var(--tan);">我們預計入場</p>
+                  <p style="font-size:22px;font-weight:900;color:#1a6b8a;line-height:1.1;">14:00</p>
+                  <p style="font-size:9px;opacity:0.4;">6/5 週五</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- 門票費用 -->
+            <div style="background:var(--bg-raised);border-radius:24px;box-shadow:var(--neo-out);border:var(--br);padding:18px 20px;">
+              <p style="font-size:9px;text-transform:uppercase;letter-spacing:0.2em;color:var(--tan);margin-bottom:14px;">🎫 門票費用（成人）</p>
+              <div style="display:flex;gap:10px;">
+                <div style="flex:1;padding:14px;border-radius:18px;background:rgba(26,107,138,0.07);border:1.5px solid rgba(26,107,138,0.18);text-align:center;">
+                  <p style="font-size:9px;letter-spacing:0.08em;color:#1a6b8a;margin-bottom:6px;text-transform:uppercase;">官網 WEB 票</p>
+                  <p style="font-size:20px;font-weight:900;color:#1a6b8a;line-height:1;">¥2,180</p>
+                  <p style="font-size:8px;opacity:0.45;margin-top:3px;">JPY / 人</p>
+                </div>
+                <div style="flex:1;padding:14px;border-radius:18px;background:rgba(92,122,106,0.07);border:1.5px solid rgba(92,122,106,0.18);text-align:center;">
+                  <p style="font-size:9px;letter-spacing:0.08em;color:var(--green);margin-bottom:6px;text-transform:uppercase;">第三方平台</p>
+                  <p style="font-size:20px;font-weight:900;color:var(--green);line-height:1;">~NT$435</p>
+                  <p style="font-size:8px;opacity:0.45;margin-top:3px;">TWD / 人</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- 表演時刻表 - 左右滑動 -->
+            <div>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;">
+                <p style="font-size:9px;text-transform:uppercase;letter-spacing:0.2em;color:var(--tan);">🎭 表演與活動時刻表</p>
+                <p style="font-size:8px;opacity:0.35;">← 左右滑動</p>
+              </div>
+              <!-- 可左右滑動的時刻卡 -->
+              <div style="display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding:4px 4px 12px 4px;margin:0 -4px;" class="hide-scrollbar">
+
+                <!-- 海豚表演 -->
+                <div style="flex-shrink:0;width:240px;scroll-snap-align:start;background:linear-gradient(145deg,#1a6b8a,#0e4d6b);border-radius:24px;overflow:hidden;box-shadow:var(--neo-out-lg);">
+                  <!-- 圖片區（管理員可上傳） -->
+                  <div style="height:110px;background:rgba(255,255,255,0.08);position:relative;display:flex;align-items:center;justify-content:center;">
+                    <template v-if="aquariumPhotos[0]">
+                      <img :src="aquariumPhotos[0]" style="width:100%;height:100%;object-fit:cover;display:block;">
+                    </template>
+                    <template v-else>
+                      <span style="font-size:36px;opacity:0.6;">🐬</span>
+                    </template>
+                    <label v-if="currentUser === groupMembers[0]?.name" style="position:absolute;bottom:6px;right:6px;background:rgba(0,0,0,0.4);border-radius:999px;padding:3px 10px;cursor:pointer;font-size:8px;color:white;letter-spacing:0.08em;">
+                      ＋ 圖片
+                      <input type="file" accept="image/*" style="display:none;" @change="e=>handleAquariumPhoto(e,0)">
+                    </label>
+                  </div>
+                  <div style="padding:14px 16px 16px;">
+                    <p style="font-size:13px;font-weight:900;color:white;margin-bottom:8px;">海豚表演 🐬</p>
+                    <p style="font-size:8px;color:rgba(255,255,255,0.55);letter-spacing:0.08em;margin-bottom:8px;">每場約 20 分鐘</p>
+                    <div style="display:flex;flex-wrap:wrap;gap:5px;">
+                      <span v-for="t in ['10:30','11:30','13:00','15:00','17:00']" :key="t"
+                        style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:999px;padding:3px 10px;font-size:10px;font-weight:900;color:white;">{{ t }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 黑潮之海 -->
+                <div style="flex-shrink:0;width:240px;scroll-snap-align:start;background:linear-gradient(145deg,#0d3b52,#051e2e);border-radius:24px;overflow:hidden;box-shadow:var(--neo-out-lg);">
+                  <div style="height:110px;background:rgba(255,255,255,0.06);position:relative;display:flex;align-items:center;justify-content:center;">
+                    <template v-if="aquariumPhotos[1]">
+                      <img :src="aquariumPhotos[1]" style="width:100%;height:100%;object-fit:cover;display:block;">
+                    </template>
+                    <template v-else>
+                      <span style="font-size:36px;opacity:0.6;">🦈</span>
+                    </template>
+                    <label v-if="currentUser === groupMembers[0]?.name" style="position:absolute;bottom:6px;right:6px;background:rgba(0,0,0,0.4);border-radius:999px;padding:3px 10px;cursor:pointer;font-size:8px;color:white;letter-spacing:0.08em;">
+                      ＋ 圖片
+                      <input type="file" accept="image/*" style="display:none;" @change="e=>handleAquariumPhoto(e,1)">
+                    </label>
+                  </div>
+                  <div style="padding:14px 16px 16px;">
+                    <p style="font-size:13px;font-weight:900;color:white;margin-bottom:8px;">黑潮之海 🦈</p>
+                    <p style="font-size:8px;color:rgba(255,255,255,0.45);letter-spacing:0.08em;margin-bottom:8px;">鯨鯊餵食秀</p>
+                    <div style="display:flex;flex-wrap:wrap;gap:5px;">
+                      <span v-for="t in ['15:00','17:00']" :key="t"
+                        style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:999px;padding:3px 10px;font-size:10px;font-weight:900;color:white;">{{ t }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 熱帶魚之海 -->
+                <div style="flex-shrink:0;width:240px;scroll-snap-align:start;background:linear-gradient(145deg,#1a5e3a,#0f3d24);border-radius:24px;overflow:hidden;box-shadow:var(--neo-out-lg);">
+                  <div style="height:110px;background:rgba(255,255,255,0.07);position:relative;display:flex;align-items:center;justify-content:center;">
+                    <template v-if="aquariumPhotos[2]">
+                      <img :src="aquariumPhotos[2]" style="width:100%;height:100%;object-fit:cover;display:block;">
+                    </template>
+                    <template v-else>
+                      <span style="font-size:36px;opacity:0.6;">🐠</span>
+                    </template>
+                    <label v-if="currentUser === groupMembers[0]?.name" style="position:absolute;bottom:6px;right:6px;background:rgba(0,0,0,0.4);border-radius:999px;padding:3px 10px;cursor:pointer;font-size:8px;color:white;letter-spacing:0.08em;">
+                      ＋ 圖片
+                      <input type="file" accept="image/*" style="display:none;" @change="e=>handleAquariumPhoto(e,2)">
+                    </label>
+                  </div>
+                  <div style="padding:14px 16px 16px;">
+                    <p style="font-size:13px;font-weight:900;color:white;margin-bottom:8px;">熱帶魚之海 🐠</p>
+                    <p style="font-size:8px;color:rgba(255,255,255,0.45);letter-spacing:0.08em;margin-bottom:8px;">餵食展示</p>
+                    <div style="display:flex;flex-wrap:wrap;gap:5px;">
+                      <span v-for="t in ['13:00','15:30']" :key="t"
+                        style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:999px;padding:3px 10px;font-size:10px;font-weight:900;color:white;">{{ t }}</span>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- 停車資訊 + 地圖 -->
+            <div style="background:var(--bg-raised);border-radius:24px;box-shadow:var(--neo-out);border:var(--br);padding:18px 20px;">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+                <p style="font-size:9px;text-transform:uppercase;letter-spacing:0.2em;color:var(--tan);">🅿️ 停車資訊</p>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:16px;background:rgba(26,107,138,0.06);border:1px solid rgba(26,107,138,0.15);margin-bottom:14px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="#1a6b8a"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                <div>
+                  <p style="font-size:11px;font-weight:900;color:#1a6b8a;">P7 停車場（北口停車場）</p>
+                  <p style="font-size:9px;opacity:0.45;margin-top:1px;">導航目的地</p>
+                </div>
+              </div>
+              <!-- Google Map iframe -->
+              <div style="width:100%;height:200px;border-radius:20px;overflow:hidden;box-shadow:var(--neo-out);">
+                <iframe
+                  src="https://maps.google.com/maps?q=26.6939,127.8772&t=m&z=17&output=embed&iwloc=near"
+                  width="100%" height="100%" style="border:0;" loading="lazy" allowfullscreen>
+                </iframe>
+              </div>
+              <a href="https://maps.google.com/?q=P7+Parking+Okinawa+Churaumi+Aquarium&ll=26.6939,127.8772" target="_blank"
+                style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:10px;padding:10px;border-radius:14px;background:rgba(26,107,138,0.08);border:1px solid rgba(26,107,138,0.2);text-decoration:none;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="#1a6b8a"><path d="M19 19H5V5h7V3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
+                <span style="font-size:9px;font-weight:900;color:#1a6b8a;letter-spacing:0.08em;">在 Google Maps 中開啟</span>
+              </a>
+            </div>
+
+          </div>
+
+          <!-- 關閉按鈕 -->
+          <div style="padding:12px 24px 24px;flex-shrink:0;">
+            <button @click="showAquariumModal=false" class="w-full py-4 rounded-full text-[10px] uppercase font-black active:scale-95 transition card-neo" style="color:var(--tan);">Close</button>
+          </div>
         </div>
       </div>
     </transition>
@@ -1665,8 +1859,15 @@
       const showFlightDetail = ref(false), activeFlight = ref({}), showPasscodeModal = ref(false), passcode = ref("");
       const showHotelModal = ref(false);
       const showCarModal = ref(false);
+      const showAquariumModal = ref(false);
+      const aquariumPhotos = ref([null, null, null]);
+      const isAdmin = computed(() => groupMembers.value.length > 0 && currentUser.value === groupMembers.value[0]?.name);
       const openHotelModal = () => { showHotelModal.value = true; };
       const openCarModal = () => { showCarModal.value = true; };
+      const handleAquariumPhoto = (e, idx) => {
+        const f = e.target.files[0];
+        if (f) { const r = new FileReader(); r.onload = ev => { aquariumPhotos.value[idx] = ev.target.result; }; r.readAsDataURL(f); }
+      };
       const passcodeMode = ref('');
       const triggerPasscode = (mode = '') => { passcode.value = ''; passcodeMode.value = mode; showPasscodeModal.value = true; };
       const pressKey = (n) => {
@@ -1916,7 +2117,7 @@
       return {
         appLoading, loadProgress, loadingMsg, currentUser, loginAs, loginDropOpen, loginSelected, loggingIn, loggingOut, pendingUser, doLogin, allTodos, onPickerScroll, scrollPickerTo, currentTab, navCollapsed, tabs, btabs, weather, weatherBg, timeObj, calcInput, calcMode, calcExpr, switchCalcMode, pressCalc, pressCalcNum, pressCalcDot, pressCalcOp, pressCalcEqual, pressCalcClear, pressCalcBackspace, calcOutput, jpyRate, jpyBuyRate, jpySellRate, rateUpdatedAt, groupMembers, showMemberModal, newMember, showUserMenu, toggleUserMenu, closeUserMenu, showProfileModal, profileEdit, openProfile, handleProfileAvatarUpload, saveProfile, logout, handleAvatarUpload, addMember, getMemberAvatar, editingMember, openEditMember, handleEditAvatarUpload, saveEditMember, showAddMember, BLANK_AVATAR, expenseSubTab, expenses, memberStats, maxPaid, settlementAdvice, showExpenseModal, openExpenseModal, addExpense, newExpense, openEditExpense, editingExpenseIdx, expenseFilterMember, filteredExpenses, itinerary, activeDay, departureTrip, returnFlights, selectedReturnFlight, hotelData, carRental, showFlightDetail, activeFlight, triggerPasscode, showPasscodeModal, passcode, pressKey, passcodeMode, planningSubTab, filteredTodos: computed(() => (allTodos.value[currentUser.value]||[]).filter(t=>t.type===planningSubTab.value)), newTodoText, addTodo, removeTodo, categories, showEditModal, isNewEvent, tempEvent, openEditModal, openAddModal, deleteEvent, saveEvent, showConfirmModal, confirmItemName, confirmDelete, executeDelete, bookingSubTab, globalCurrency, toggleAllCurrency,
         previewCanvas,hotelPhotos,showHotelLightbox,openEditExpense,editingExpenseIdx,showCropper,cropSrc,cropCanvas,cropBox,openCropper,startCropDrag,confirmCrop,currentHotelPhoto,openHotelPhoto,lbTouchStart,lbTouchEnd,
-        showHotelModal, showCarModal, openHotelModal, openCarModal,
+        showHotelModal, showCarModal, showAquariumModal, aquariumPhotos, handleAquariumPhoto, openHotelModal, openCarModal, isAdmin,
         getCategoryColor: (t) => ({ transport: 'bg-[#D94F4F]', spot: 'bg-[#98BDE3]', food: 'bg-[#E3A97C]', other: 'bg-[#C4A8D4]' }[t] || 'bg-[#DCC3A0]'),
         categoryDot: (id) => ({ spot:'#98BDE3', food:'#E3A97C', transport:'#D94F4F', other:'#C4A8D4' }[id] || '#DCC3A0'),
         categoryStyle: (id, active) => {
