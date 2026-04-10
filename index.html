@@ -52,6 +52,7 @@
       85%  { transform: scale(1.05) translateY(-3px) rotate(-8deg); }
       100% { transform: scale(1) translateY(-40px) translateX(60px) rotate(-15deg); opacity:0; }
     }
+<<<<<<< HEAD
     @keyframes logoutPlane {
       0%   { transform: scale(1) translate(0,0) rotate(0deg); opacity:1; }
       20%  { transform: scale(1.1) translate(-6px,-4px) rotate(3deg); opacity:1; }
@@ -69,6 +70,8 @@
     .member-scroll-picker { overflow-y: scroll; scroll-snap-type: y mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
     .member-scroll-picker::-webkit-scrollbar { display: none; }
     .member-scroll-item { scroll-snap-align: center; }
+=======
+>>>>>>> 2d823a9555c897940b995f8d4049ef5d75084f10
     @keyframes fadeIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
     .slide-up-enter-active,.slide-up-leave-active { transition: all 0.3s cubic-bezier(0.32,0.72,0,1); }
     .slide-up-enter-from,.slide-up-leave-to { transform: translateY(100%); }
@@ -268,6 +271,7 @@
 
   <!-- 登入畫面 -->
   <transition name="login-fade">
+<<<<<<< HEAD
     <div v-if="!appLoading && !currentUser && !loggingIn && !loggingOut" class="fixed inset-0 z-[4000] flex flex-col items-center justify-center font-black" style="background:linear-gradient(160deg,#7bbf96 0%,#5a9070 60%,#4a7860 100%);padding:0 32px;box-sizing:border-box;">
       <div class="text-7xl mb-4" style="filter:drop-shadow(0 4px 12px rgba(0,0,0,0.2));">✈️</div>
       <h2 class="text-2xl tracking-[0.25em] uppercase text-white mb-1">Go Okinawa</h2>
@@ -306,6 +310,32 @@
         <button @click="loginSelected && doLogin(loginSelected)" class="w-full py-4 rounded-full font-black text-base tracking-widest uppercase transition active:scale-95" :style="loginSelected ? 'background:white;color:#4a7860;' : 'background:rgba(255,255,255,0.2);color:rgba(255,255,255,0.4);cursor:not-allowed;'">
           出發 ✈️
         </button>
+=======
+    <div v-if="!appLoading && !currentUser && !loggingIn" class="fixed inset-0 z-[4000] flex flex-col font-black" style="background:linear-gradient(160deg,#7bbf96 0%,#5a9070 60%,#4a7860 100%);overflow-y:auto;-webkit-overflow-scrolling:touch;">
+      <div class="flex flex-col items-center justify-center min-h-full py-10 px-8">
+        <div class="text-7xl mb-4" style="filter:drop-shadow(0 4px 12px rgba(0,0,0,0.2));">✈️</div>
+        <h2 class="text-2xl tracking-[0.25em] uppercase text-white mb-1">Go Okinawa</h2>
+        <p class="text-[10px] text-white opacity-50 tracking-widest mb-8">2026.06.03 — 06.07</p>
+        <div class="w-full max-w-xs space-y-4">
+          <p class="text-white text-[11px] tracking-widest uppercase text-center opacity-70">選擇你的身份</p>
+          <!-- 成員列表：最多顯示 4 格高，超過可滾動 -->
+          <div class="font-black overflow-y-auto" style="background:rgba(255,255,255,0.15);backdrop-filter:blur(12px);border:1.5px solid rgba(255,255,255,0.35);border-radius:24px;max-height:248px;">
+            <div v-for="(m, idx) in groupMembers" :key="m.name"
+              @click="loginSelected = m.name"
+              class="flex items-center gap-3 cursor-pointer transition active:bg-white/10"
+              :style="'padding:13px 20px;' + (idx < groupMembers.length-1 ? 'border-bottom:1px solid rgba(255,255,255,0.15);' : '')">
+              <img :src="getMemberAvatar(m.name)" style="width:38px;height:38px;border-radius:50%;border:2px solid rgba(255,255,255,0.5);object-fit:cover;">
+              <span class="text-white font-black tracking-wide flex-1">{{ m.name }}</span>
+              <div style="width:22px;height:22px;border-radius:50%;border:2px solid rgba(255,255,255,0.5);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.15s;" :style="loginSelected===m.name ? 'background:white;border-color:white;' : ''">
+                <svg v-if="loginSelected===m.name" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4a7860" stroke-width="3.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+            </div>
+          </div>
+          <button @click="loginSelected && doLogin(loginSelected)" class="w-full py-4 rounded-full font-black text-base tracking-widest uppercase transition active:scale-95" :style="loginSelected ? 'background:white;color:#4a7860;' : 'background:rgba(255,255,255,0.25);color:rgba(255,255,255,0.5);cursor:not-allowed;'">
+            出發 ✈️
+          </button>
+        </div>
+>>>>>>> 2d823a9555c897940b995f8d4049ef5d75084f10
       </div>
     </div>
   </transition>
@@ -320,6 +350,7 @@
     </div>
   </transition>
 
+<<<<<<< HEAD
   <!-- 登出動畫過場 -->
   <transition name="logout-fade">
     <div v-if="loggingOut" class="fixed inset-0 z-[4002] flex flex-col items-center justify-center font-black" style="background:linear-gradient(160deg,#7bbf96 0%,#5a9070 60%,#4a7860 100%);">
@@ -330,18 +361,25 @@
     </div>
   </transition>
 
+=======
+>>>>>>> 2d823a9555c897940b995f8d4049ef5d75084f10
   <div class="max-w-md mx-auto min-h-[100dvh] relative overflow-x-hidden">
     <!-- Header -->
     <header class="px-7 pb-3 flex justify-between items-center sticky top-0 z-[100]" style="padding-top:calc(1.75rem + var(--safe-top));background:rgba(237,232,222,0.92);backdrop-filter:blur(18px);">
       <div><h1 class="text-3xl font-black">Okinawa! 🌴</h1><p class="text-[10px] text-[#DCC3A0] tracking-widest uppercase mt-1 leading-none">2026.06.03 - 06.07</p></div>
       <div class="flex items-center gap-2" style="position:relative;">
+<<<<<<< HEAD
         <button v-if="currentUser" @click.stop="toggleUserMenu" @touchend.stop.prevent="toggleUserMenu" class="flex items-center gap-2 card-neo px-3 py-2 transition" :style="'border-radius:999px;' + (showUserMenu ? 'box-shadow:var(--neo-in);transform:scale(0.97);' : '')">
+=======
+        <button v-if="currentUser" @click.stop="showUserMenu = !showUserMenu" class="flex items-center gap-2 card-neo px-3 py-2 transition" :style="'border-radius:999px;' + (showUserMenu ? 'box-shadow:var(--neo-in);transform:scale(0.97);' : '')">
+>>>>>>> 2d823a9555c897940b995f8d4049ef5d75084f10
           <img :src="getMemberAvatar(currentUser)" style="width:24px;height:24px;border-radius:50%;object-fit:cover;">
           <span style="font-size:10px;font-weight:900;color:var(--green);">{{ currentUser }}</span>
           <span style="font-size:8px;opacity:0.35;transition:transform 0.2s;" :style="showUserMenu ? 'transform:rotate(180deg)' : ''">▼</span>
         </button>
         <transition name="fade">
           <div v-if="showUserMenu" class="absolute right-0 font-black" style="top:calc(100% + 8px);min-width:170px;background:var(--bg);border-radius:20px;box-shadow:-4px -4px 12px rgba(255,255,255,0.7),6px 6px 18px rgba(160,140,115,0.4),0 0 0 1px rgba(255,255,255,0.5);z-index:9999;overflow:hidden;">
+<<<<<<< HEAD
             <button @click.stop="openProfile(); closeUserMenu()" class="w-full flex items-center gap-3 px-5 py-3 text-left text-sm font-black transition" style="border-bottom:1px solid rgba(220,195,160,0.25);">
               <span>✏️</span><span>個人資料</span>
             </button>
@@ -349,10 +387,23 @@
               <span>👥</span><span>成員</span>
             </button>
             <button @click.stop="logout(); closeUserMenu()" class="w-full flex items-center gap-3 px-5 py-3 text-left text-sm font-black text-red-400 transition">
+=======
+            <button @click.stop="openProfile(); showUserMenu=false" class="w-full flex items-center gap-3 px-5 py-3 text-left text-sm font-black transition" style="border-bottom:1px solid rgba(220,195,160,0.25);">
+              <span>✏️</span><span>個人資料</span>
+            </button>
+            <button v-if="groupMembers.length > 0 && currentUser === groupMembers[0].name" @click.stop="showMemberModal=true; showUserMenu=false" class="w-full flex items-center gap-3 px-5 py-3 text-left text-sm font-black transition" style="border-bottom:1px solid rgba(220,195,160,0.25);">
+              <span>👥</span><span>成員</span>
+            </button>
+            <button @click.stop="logout(); showUserMenu=false" class="w-full flex items-center gap-3 px-5 py-3 text-left text-sm font-black text-red-400 transition">
+>>>>>>> 2d823a9555c897940b995f8d4049ef5d75084f10
               <span>🚪</span><span>登出</span>
             </button>
           </div>
         </transition>
+<<<<<<< HEAD
+=======
+        <div v-if="showUserMenu" class="fixed inset-0" style="z-index:9998;" @click="showUserMenu=false" @touchstart="showUserMenu=false"></div>
+>>>>>>> 2d823a9555c897940b995f8d4049ef5d75084f10
       </div>
     </header>
 
@@ -1030,10 +1081,16 @@
 
 
     <!-- Image Cropper Modal -->
+<<<<<<< HEAD
     <div v-if="showCropper" class="cropper-wrap" @touchmove.prevent style="gap:0;justify-content:center;overflow-y:auto;">
       <p style="color:white;font-size:11px;font-weight:900;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:12px;opacity:0.7;flex-shrink:0;">拖曳移動 · 拉取角落調整大小</p>
       <!-- 裁切操作區 -->
       <div class="cropper-canvas-wrap" :style="{width: cropCanvas.dispW+'px', height: cropCanvas.dispH+'px',flexShrink:0}">
+=======
+    <div v-if="showCropper" class="cropper-wrap" @touchmove.prevent>
+      <p style="color:white;font-size:11px;font-weight:900;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:12px;opacity:0.7;">拖曳移動 · 拉取角落調整大小</p>
+      <div class="cropper-canvas-wrap" :style="{width: cropCanvas.dispW+'px', height: cropCanvas.dispH+'px'}">
+>>>>>>> 2d823a9555c897940b995f8d4049ef5d75084f10
         <img :src="cropSrc" :style="{width:cropCanvas.dispW+'px',height:cropCanvas.dispH+'px',display:'block',borderRadius:'8px',userSelect:'none',pointerEvents:'none'}" draggable="false">
         <div class="crop-box" :style="{left:cropBox.x+'px',top:cropBox.y+'px',width:cropBox.w+'px',height:cropBox.h+'px'}"
           @mousedown.prevent="startCropDrag($event,'move')"
@@ -1044,6 +1101,7 @@
           <div class="crop-handle" style="bottom:-9px;right:-9px;cursor:se-resize;" @mousedown.stop.prevent="startCropDrag($event,'se')" @touchstart.stop.prevent="startCropDrag($event,'se')"></div>
         </div>
       </div>
+<<<<<<< HEAD
       <!-- 即時預覽：模擬卡片外觀 -->
       <div style="margin-top:16px;width:100%;max-width:360px;flex-shrink:0;">
         <p style="color:rgba(255,255,255,0.5);font-size:10px;font-weight:900;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:8px;text-align:center;">卡片預覽</p>
@@ -1068,6 +1126,9 @@
         </div>
       </div>
       <div style="display:flex;gap:12px;margin-top:16px;width:100%;max-width:360px;flex-shrink:0;">
+=======
+      <div style="display:flex;gap:12px;margin-top:20px;width:100%;max-width:360px;">
+>>>>>>> 2d823a9555c897940b995f8d4049ef5d75084f10
         <button @click="showCropper=false;cropSrc=''" style="flex:1;padding:14px;border-radius:999px;background:rgba(255,255,255,0.12);color:white;font-size:11px;font-weight:900;border:none;cursor:pointer;letter-spacing:0.1em;" class="active:scale-95 transition">取消</button>
         <button @click="confirmCrop" style="flex:1;padding:14px;border-radius:999px;background:linear-gradient(145deg,#8ec4a1,#5a9070);color:white;font-size:11px;font-weight:900;border:none;cursor:pointer;letter-spacing:0.1em;" class="active:scale-95 transition">確認裁切</button>
       </div>
@@ -1125,6 +1186,7 @@
       const groupMembers = ref([{ name: 'Me', avatar: BLANK_AVATAR }, { name: '旅伴', avatar: BLANK_AVATAR }]);
       const showMemberModal = ref(false), newMember = ref({ name: '', avatar: BLANK_AVATAR });
       const showUserMenu = ref(false);
+<<<<<<< HEAD
       let _menuTouchFired = false;
       let _globalCloseHandlers = null;
 
@@ -1188,6 +1250,11 @@
       // 保留 onPickerScroll / scrollPickerTo 以防其他地方引用
       const onPickerScroll = () => {};
       const scrollPickerTo = () => {};
+=======
+      const loginDropOpen = ref(false);
+      const loginSelected = ref(null);
+      const logout = () => { currentUser.value = null; localStorage.removeItem('okinawa_user'); };
+>>>>>>> 2d823a9555c897940b995f8d4049ef5d75084f10
       const showProfileModal = ref(false);
       const profileEdit = ref({ name: '', avatar: '' });
       const openProfile = () => {
@@ -1488,8 +1555,12 @@
       let _cropDragMode = '', _cropDragStart = {x:0,y:0}, _cropBoxStart = {x:0,y:0,w:0,h:0};
 
       // 卡片顯示比例 width:100% height:140px → 近似 16:11
+<<<<<<< HEAD
       // 比例與行程卡片照片區相同：寬100% 高140px，卡片寬約408px → 408:140 = 102:35
       const CROP_AW = 102, CROP_AH = 35;
+=======
+      const CROP_AW = 16, CROP_AH = 11;
+>>>>>>> 2d823a9555c897940b995f8d4049ef5d75084f10
       const openCropper = (e) => {
         const f = e.target.files[0]; if(!f) return;
         const r = new FileReader();
@@ -1802,7 +1873,11 @@
       });
 
       return {
+<<<<<<< HEAD
         appLoading, loadProgress, loadingMsg, currentUser, loginAs, loginDropOpen, loginSelected, loggingIn, loggingOut, pendingUser, doLogin, allTodos, onPickerScroll, scrollPickerTo, currentTab, navCollapsed, tabs, btabs, weather, weatherBg, timeObj, calcInput, calcMode, calcExpr, switchCalcMode, pressCalc, pressCalcNum, pressCalcDot, pressCalcOp, pressCalcEqual, pressCalcClear, pressCalcBackspace, calcOutput, jpyRate, jpyBuyRate, jpySellRate, rateUpdatedAt, groupMembers, showMemberModal, newMember, showUserMenu, toggleUserMenu, closeUserMenu, showProfileModal, profileEdit, openProfile, handleProfileAvatarUpload, saveProfile, logout, handleAvatarUpload, addMember, getMemberAvatar, editingMember, openEditMember, handleEditAvatarUpload, saveEditMember, showAddMember, BLANK_AVATAR, expenseSubTab, expenses, memberStats, maxPaid, settlementAdvice, showExpenseModal, openExpenseModal, addExpense, newExpense, openEditExpense, editingExpenseIdx, expenseFilterMember, filteredExpenses, itinerary, activeDay, departureTrip, returnFlights, selectedReturnFlight, hotelData, carRental, showFlightDetail, activeFlight, triggerPasscode, showPasscodeModal, passcode, pressKey, passcodeMode, planningSubTab, filteredTodos: computed(() => (allTodos.value[currentUser.value]||[]).filter(t=>t.type===planningSubTab.value)), newTodoText, addTodo, removeTodo, categories, showEditModal, isNewEvent, tempEvent, openEditModal, openAddModal, deleteEvent, saveEvent, showConfirmModal, confirmItemName, confirmDelete, executeDelete, bookingSubTab, globalCurrency, toggleAllCurrency,
+=======
+        appLoading, loadProgress, loadingMsg, currentUser, loginAs, loginDropOpen, loginSelected, loggingIn, pendingUser, doLogin, allTodos, currentTab, navCollapsed, tabs, btabs, weather, weatherBg, timeObj, calcInput, calcMode, calcExpr, switchCalcMode, pressCalc, pressCalcNum, pressCalcDot, pressCalcOp, pressCalcEqual, pressCalcClear, pressCalcBackspace, calcOutput, jpyRate, jpyBuyRate, jpySellRate, rateUpdatedAt, groupMembers, showMemberModal, newMember, showUserMenu, showProfileModal, profileEdit, openProfile, handleProfileAvatarUpload, saveProfile, logout, handleAvatarUpload, addMember, getMemberAvatar, editingMember, openEditMember, handleEditAvatarUpload, saveEditMember, showAddMember, BLANK_AVATAR, expenseSubTab, expenses, memberStats, maxPaid, settlementAdvice, showExpenseModal, openExpenseModal, addExpense, newExpense, openEditExpense, editingExpenseIdx, expenseFilterMember, filteredExpenses, itinerary, activeDay, departureTrip, returnFlights, selectedReturnFlight, hotelData, carRental, showFlightDetail, activeFlight, triggerPasscode, showPasscodeModal, passcode, pressKey, passcodeMode, planningSubTab, filteredTodos: computed(() => (allTodos.value[currentUser.value]||[]).filter(t=>t.type===planningSubTab.value)), newTodoText, addTodo, removeTodo, categories, showEditModal, isNewEvent, tempEvent, openEditModal, openAddModal, deleteEvent, saveEvent, showConfirmModal, confirmItemName, confirmDelete, executeDelete, bookingSubTab, globalCurrency, toggleAllCurrency,
+>>>>>>> 2d823a9555c897940b995f8d4049ef5d75084f10
         hotelPhotos,showHotelLightbox,openEditExpense,editingExpenseIdx,showCropper,cropSrc,cropCanvas,cropBox,openCropper,startCropDrag,confirmCrop,currentHotelPhoto,openHotelPhoto,lbTouchStart,lbTouchEnd,
         getCategoryColor: (t) => ({ transport: 'bg-[#D94F4F]', spot: 'bg-[#98BDE3]', food: 'bg-[#E3A97C]', other: 'bg-[#C4A8D4]' }[t] || 'bg-[#DCC3A0]'),
         categoryDot: (id) => ({ spot:'#98BDE3', food:'#E3A97C', transport:'#D94F4F', other:'#C4A8D4' }[id] || '#DCC3A0'),
