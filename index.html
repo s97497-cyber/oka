@@ -443,32 +443,82 @@
         </div>
 
         <!-- 計算機 -->
-        <div class="card-neo-xl p-7 font-black">
-          <div class="flex justify-between items-center mb-4"><h3 class="text-sm text-[#4A7DAE]">💱 幣值計算機</h3><span class="text-[9px] bg-[#DCC3A0]/30 px-2 py-1 rounded-lg">現金賣出 1 JPY = {{ jpySellRate }} TWD <span class="opacity-50">{{ rateUpdatedAt }}</span></span></div>
-          <div class="inset-well p-4 mb-6 text-right">
-            <div class="flex justify-between items-center opacity-60 text-[9px] mb-1 font-black"><span :class="calcMode === 'JPY_TO_TWD' ? 'text-[#4A7DAE] opacity-100' : ''">日幣 → 台幣</span><span :class="calcMode === 'TWD_TO_JPY' ? 'text-[#4A7DAE] opacity-100' : ''">台幣 → 日幣</span></div>
-            <div class="text-2xl leading-none mb-2 overflow-hidden">{{ calcInput || '0' }} <span class="text-xs opacity-40">{{ calcMode === 'JPY_TO_TWD' ? '¥' : '$' }}</span></div>
-            <div class="text-[#4A7DAE] text-sm border-t border-[#DCC3A0]/20 pt-2 font-black">= {{ calcOutput }} <span class="text-[10px] font-black">{{ calcMode === 'JPY_TO_TWD' ? 'TWD' : 'JPY' }}</span></div>
+        <div class="card-neo-xl font-black overflow-hidden" style="border-radius:40px;padding:0;transition:all 0.4s;">
+
+          <!-- 模式切換 header -->
+          <div :style="calcMode==='JPY_TO_TWD' ? 'background:linear-gradient(135deg,#1a3a6b,#2a5298);' : 'background:linear-gradient(135deg,#7a1a1a,#c0392b);'" style="padding:16px 20px 14px;transition:background 0.4s;">
+            <!-- 旗幟與切換 -->
+            <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;margin-bottom:12px;">
+              <!-- 來源貨幣 -->
+              <div style="display:flex;flex-direction:column;align-items:center;gap:4px;width:100%;">
+                <span style="font-size:28px;line-height:1;">{{ calcMode==='JPY_TO_TWD' ? '🇯🇵' : '🇹🇼' }}</span>
+                <span style="font-size:10px;font-weight:900;color:rgba(255,255,255,0.7);letter-spacing:0.12em;">{{ calcMode==='JPY_TO_TWD' ? 'JPY' : 'TWD' }}</span>
+              </div>
+              <!-- 切換按鈕 -->
+              <button @click="switchCalcMode()"
+                style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 16px;border-radius:20px;border:none;cursor:pointer;transition:all 0.2s;background:rgba(255,255,255,0.15);backdrop-filter:blur(4px);box-shadow:0 2px 8px rgba(0,0,0,0.2);">
+                <span style="font-size:18px;color:white;">⇄</span>
+                <span style="font-size:8px;font-weight:900;color:rgba(255,255,255,0.6);letter-spacing:0.1em;">SWAP</span>
+              </button>
+              <!-- 目標貨幣 -->
+              <div style="display:flex;flex-direction:column;align-items:center;gap:4px;width:100%;">
+                <span style="font-size:28px;line-height:1;">{{ calcMode==='JPY_TO_TWD' ? '🇹🇼' : '🇯🇵' }}</span>
+                <span style="font-size:10px;font-weight:900;color:rgba(255,255,255,0.7);letter-spacing:0.12em;">{{ calcMode==='JPY_TO_TWD' ? 'TWD' : 'JPY' }}</span>
+              </div>
+            </div>
+            <!-- 匯率提示 -->
+            <div style="text-align:center;">
+              <span style="font-size:9px;font-weight:900;color:rgba(255,255,255,0.45);letter-spacing:0.1em;text-transform:uppercase;">
+                1 JPY = {{ jpySellRate }} TWD &nbsp;·&nbsp; {{ rateUpdatedAt }}
+              </span>
+            </div>
           </div>
-          <div class="grid grid-cols-4 gap-3">
-            <button @click="pressCalcClear()" class="calc-btn text-red-400 text-sm">C</button>
-            <button @click="pressCalcBackspace()" class="calc-btn text-[#4A7DAE]">←</button>
-            <button @click="pressCalcOp('%')" class="calc-btn text-[#4A7DAE]">%</button>
-            <button @click="pressCalcOp('÷')" class="calc-btn text-[#4A7DAE] text-lg">÷</button>
-            <button v-for="n in [7,8,9]" @click="pressCalcNum(n)" class="calc-btn">{{ n }}</button>
-            <button @click="pressCalcOp('×')" class="calc-btn text-[#4A7DAE] text-lg">×</button>
-            <button v-for="n in [4,5,6]" @click="pressCalcNum(n)" class="calc-btn">{{ n }}</button>
-            <button @click="pressCalcOp('−')" class="calc-btn text-[#4A7DAE] text-xl">−</button>
-            <button v-for="n in [1,2,3]" @click="pressCalcNum(n)" class="calc-btn">{{ n }}</button>
-            <button @click="pressCalcOp('+')" class="calc-btn text-[#4A7DAE] text-xl">+</button>
-            <button @click="pressCalcNum(0)" class="calc-btn col-span-2 font-black" style="aspect-ratio:unset;padding:0 1rem;">0</button>
-            <button @click="pressCalcDot()" class="calc-btn">.</button>
-            <button @click="pressCalcEqual()" class="calc-btn text-white text-lg font-black" style="background:linear-gradient(145deg,#6db8e0,#4A7DAE);box-shadow:-3px -3px 8px rgba(255,255,255,0.5),4px 4px 10px rgba(60,100,160,0.4);">=</button>
+
+          <!-- 顯示區 -->
+          <div :style="calcMode==='JPY_TO_TWD' ? 'background:#dce8f5;' : 'background:#f5dcdc;'" style="padding:16px 24px 14px;box-shadow:inset 2px 2px 8px rgba(0,0,0,0.08),inset -1px -1px 4px rgba(255,255,255,0.7);transition:background 0.4s;">
+            <!-- 算式行 -->
+            <div style="min-height:18px;text-align:right;margin-bottom:4px;">
+              <span style="font-size:11px;color:#aaa;letter-spacing:0.05em;font-weight:700;">{{ calcExpr }}</span>
+            </div>
+            <!-- 主數字（輸入） -->
+            <div style="text-align:right;display:flex;align-items:baseline;justify-content:flex-end;gap:6px;margin-bottom:8px;">
+              <span style="font-size:12px;font-weight:900;color:#999;letter-spacing:0.05em;">{{ calcMode==='JPY_TO_TWD' ? '¥' : 'NT$' }}</span>
+              <span style="font-size:28px;font-weight:900;color:#555;line-height:1;letter-spacing:-1px;">{{ calcDisplayVal }}</span>
+            </div>
+            <!-- 換算結果（大字） -->
+            <div :style="calcMode==='JPY_TO_TWD' ? 'border-top:2px solid rgba(42,82,152,0.15);' : 'border-top:2px solid rgba(192,57,43,0.15);'" style="padding-top:10px;display:flex;align-items:baseline;justify-content:flex-end;gap:8px;">
+              <span :style="calcMode==='JPY_TO_TWD' ? 'color:#2a5298;' : 'color:#c0392b;'" style="font-size:16px;font-weight:900;letter-spacing:0.05em;transition:color 0.4s;">{{ calcMode==='JPY_TO_TWD' ? 'NT$' : '¥' }}</span>
+              <span :style="calcMode==='JPY_TO_TWD' ? 'color:#2a5298;' : 'color:#c0392b;'" style="font-size:42px;font-weight:900;line-height:1;letter-spacing:-1px;transition:color 0.4s;">{{ calcOutput }}</span>
+            </div>
           </div>
-          <div class="mt-4">
-            <button @click="switchCalcMode" class="w-full py-3 rounded-2xl text-xs font-black tracking-widest uppercase text-white" style="background:linear-gradient(145deg,#6db8e0,#4A7DAE);box-shadow:var(--neo-out);">
-              切換模式：{{ calcMode === 'JPY_TO_TWD' ? '日幣 → 台幣' : '台幣 → 日幣' }}
-            </button>
+
+          <!-- 按鍵區 -->
+          <div style="padding:16px;background:var(--bg-raised);">
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;">
+
+              <!-- Row 1: C  ←  ÷ -->
+              <button @click="pressCalcClear()" class="calc-btn" style="color:#e05555;font-size:13px;">C</button>
+              <button @click="pressCalcBackspace()" class="calc-btn col-span-2" :style="calcMode==='JPY_TO_TWD' ? 'color:#2a5298;font-size:18px;aspect-ratio:unset;padding:0;' : 'color:#c0392b;font-size:18px;aspect-ratio:unset;padding:0;'">←</button>
+              <button @click="pressCalcOp('÷')" class="calc-btn" :style="calcPendingOp==='÷' ? (calcMode==='JPY_TO_TWD' ? 'background:linear-gradient(145deg,#4a82d8,#2a5298);color:white;box-shadow:-2px -2px 6px rgba(255,255,255,0.3),3px 3px 10px rgba(42,82,152,0.45);' : 'background:linear-gradient(145deg,#e06060,#c0392b);color:white;box-shadow:-2px -2px 6px rgba(255,255,255,0.3),3px 3px 10px rgba(192,57,43,0.45);') : (calcMode==='JPY_TO_TWD' ? 'color:#2a5298;font-size:20px;' : 'color:#c0392b;font-size:20px;')">÷</button>
+
+              <!-- Row 2: 7 8 9 × -->
+              <button v-for="n in [7,8,9]" :key="n" @click="pressCalcNum(n)" class="calc-btn">{{ n }}</button>
+              <button @click="pressCalcOp('×')" class="calc-btn" :style="calcPendingOp==='×' ? (calcMode==='JPY_TO_TWD' ? 'background:linear-gradient(145deg,#4a82d8,#2a5298);color:white;box-shadow:-2px -2px 6px rgba(255,255,255,0.3),3px 3px 10px rgba(42,82,152,0.45);' : 'background:linear-gradient(145deg,#e06060,#c0392b);color:white;box-shadow:-2px -2px 6px rgba(255,255,255,0.3),3px 3px 10px rgba(192,57,43,0.45);') : (calcMode==='JPY_TO_TWD' ? 'color:#2a5298;font-size:20px;' : 'color:#c0392b;font-size:20px;')">×</button>
+
+              <!-- Row 3: 4 5 6 − -->
+              <button v-for="n in [4,5,6]" :key="n" @click="pressCalcNum(n)" class="calc-btn">{{ n }}</button>
+              <button @click="pressCalcOp('−')" class="calc-btn" :style="calcPendingOp==='−' ? (calcMode==='JPY_TO_TWD' ? 'background:linear-gradient(145deg,#4a82d8,#2a5298);color:white;box-shadow:-2px -2px 6px rgba(255,255,255,0.3),3px 3px 10px rgba(42,82,152,0.45);' : 'background:linear-gradient(145deg,#e06060,#c0392b);color:white;box-shadow:-2px -2px 6px rgba(255,255,255,0.3),3px 3px 10px rgba(192,57,43,0.45);') : (calcMode==='JPY_TO_TWD' ? 'color:#2a5298;font-size:22px;' : 'color:#c0392b;font-size:22px;')">−</button>
+
+              <!-- Row 4: 1 2 3 + -->
+              <button v-for="n in [1,2,3]" :key="n" @click="pressCalcNum(n)" class="calc-btn">{{ n }}</button>
+              <button @click="pressCalcOp('+')" class="calc-btn" :style="calcPendingOp==='+' ? (calcMode==='JPY_TO_TWD' ? 'background:linear-gradient(145deg,#4a82d8,#2a5298);color:white;box-shadow:-2px -2px 6px rgba(255,255,255,0.3),3px 3px 10px rgba(42,82,152,0.45);' : 'background:linear-gradient(145deg,#e06060,#c0392b);color:white;box-shadow:-2px -2px 6px rgba(255,255,255,0.3),3px 3px 10px rgba(192,57,43,0.45);') : (calcMode==='JPY_TO_TWD' ? 'color:#2a5298;font-size:22px;' : 'color:#c0392b;font-size:22px;')">+</button>
+
+              <!-- Row 5: 0(wide)  .  = -->
+              <button @click="pressCalcNum(0)" class="calc-btn col-span-2" style="aspect-ratio:unset;padding:0 1.5rem;font-size:1.2rem;">0</button>
+              <button @click="pressCalcDot()" class="calc-btn" style="font-size:1.4rem;">.</button>
+              <button @click="pressCalcEqual()" class="calc-btn" :style="calcMode==='JPY_TO_TWD' ? 'background:linear-gradient(145deg,#4a82d8,#2a5298);color:white;font-size:1.4rem;box-shadow:-3px -3px 8px rgba(255,255,255,0.5),4px 4px 12px rgba(42,82,152,0.5);' : 'background:linear-gradient(145deg,#e06060,#c0392b);color:white;font-size:1.4rem;box-shadow:-3px -3px 8px rgba(255,255,255,0.5),4px 4px 12px rgba(192,57,43,0.5);'">=</button>
+
+            </div>
           </div>
         </div>
       </section>
@@ -908,7 +958,7 @@
     <transition name="slide-up">
       <div v-if="showEditModal" class="fixed inset-0 z-[1000] flex flex-col justify-end font-black">
         <div class="absolute inset-0" style="background:rgba(50,40,30,0.5);backdrop-filter:blur(2px);" @click="showEditModal = false"></div>
-        <div class="relative rounded-t-[40px] p-8 max-h-[90dvh] overflow-y-auto font-black" style="background:var(--bg);box-shadow:-4px -8px 30px rgba(155,135,110,0.35);border-top:1px solid rgba(255,255,255,0.7);">
+        <div class="relative rounded-t-[40px] p-8 max-h-[90dvh] overflow-y-auto overflow-x-hidden font-black" style="background:var(--bg);box-shadow:-4px -8px 30px rgba(155,135,110,0.35);border-top:1px solid rgba(255,255,255,0.7);touch-action:pan-y;">
           <div class="w-16 h-2 rounded-full mx-auto mb-7" style="background:rgba(220,195,160,0.6);box-shadow:inset 1px 1px 3px rgba(150,130,100,0.4);"></div>
           <div class="flex justify-between items-center mb-6">
             <h3 class="text-2xl text-[#5C7A6A] font-black uppercase leading-none">Edit Event</h3>
@@ -1181,18 +1231,8 @@
 
                 <!-- 海豚表演 -->
                 <div style="flex-shrink:0;width:240px;scroll-snap-align:start;background:linear-gradient(145deg,#1a6b8a,#0e4d6b);border-radius:24px;overflow:hidden;box-shadow:var(--neo-out-lg);">
-                  <!-- 圖片區（管理員可上傳） -->
-                  <div style="height:110px;background:rgba(255,255,255,0.08);position:relative;display:flex;align-items:center;justify-content:center;">
-                    <template v-if="aquariumPhotos[0]">
-                      <img :src="aquariumPhotos[0]" style="width:100%;height:100%;object-fit:cover;display:block;">
-                    </template>
-                    <template v-else>
-                      <span style="font-size:36px;opacity:0.6;">🐬</span>
-                    </template>
-                    <label v-if="currentUser === groupMembers[0]?.name" style="position:absolute;bottom:6px;right:6px;background:rgba(0,0,0,0.4);border-radius:999px;padding:3px 10px;cursor:pointer;font-size:8px;color:white;letter-spacing:0.08em;">
-                      ＋ 圖片
-                      <input type="file" accept="image/*" style="display:none;" @change="e=>handleAquariumPhoto(e,0)">
-                    </label>
+                  <div style="height:110px;background:rgba(255,255,255,0.08);position:relative;overflow:hidden;">
+                    <img src="./images/aquarium-dolphin.jpg" style="width:100%;height:100%;object-fit:cover;display:block;">
                   </div>
                   <div style="padding:14px 16px 16px;">
                     <p style="font-size:13px;font-weight:900;color:white;margin-bottom:8px;">海豚表演 🐬</p>
@@ -1206,17 +1246,8 @@
 
                 <!-- 黑潮之海 -->
                 <div style="flex-shrink:0;width:240px;scroll-snap-align:start;background:linear-gradient(145deg,#0d3b52,#051e2e);border-radius:24px;overflow:hidden;box-shadow:var(--neo-out-lg);">
-                  <div style="height:110px;background:rgba(255,255,255,0.06);position:relative;display:flex;align-items:center;justify-content:center;">
-                    <template v-if="aquariumPhotos[1]">
-                      <img :src="aquariumPhotos[1]" style="width:100%;height:100%;object-fit:cover;display:block;">
-                    </template>
-                    <template v-else>
-                      <span style="font-size:36px;opacity:0.6;">🦈</span>
-                    </template>
-                    <label v-if="currentUser === groupMembers[0]?.name" style="position:absolute;bottom:6px;right:6px;background:rgba(0,0,0,0.4);border-radius:999px;padding:3px 10px;cursor:pointer;font-size:8px;color:white;letter-spacing:0.08em;">
-                      ＋ 圖片
-                      <input type="file" accept="image/*" style="display:none;" @change="e=>handleAquariumPhoto(e,1)">
-                    </label>
+                  <div style="height:110px;position:relative;overflow:hidden;">
+                    <img src="./images/aquarium-kuroshio.jpg" style="width:100%;height:100%;object-fit:cover;display:block;">
                   </div>
                   <div style="padding:14px 16px 16px;">
                     <p style="font-size:13px;font-weight:900;color:white;margin-bottom:8px;">黑潮之海 🦈</p>
@@ -1230,17 +1261,8 @@
 
                 <!-- 熱帶魚之海 -->
                 <div style="flex-shrink:0;width:240px;scroll-snap-align:start;background:linear-gradient(145deg,#1a5e3a,#0f3d24);border-radius:24px;overflow:hidden;box-shadow:var(--neo-out-lg);">
-                  <div style="height:110px;background:rgba(255,255,255,0.07);position:relative;display:flex;align-items:center;justify-content:center;">
-                    <template v-if="aquariumPhotos[2]">
-                      <img :src="aquariumPhotos[2]" style="width:100%;height:100%;object-fit:cover;display:block;">
-                    </template>
-                    <template v-else>
-                      <span style="font-size:36px;opacity:0.6;">🐠</span>
-                    </template>
-                    <label v-if="currentUser === groupMembers[0]?.name" style="position:absolute;bottom:6px;right:6px;background:rgba(0,0,0,0.4);border-radius:999px;padding:3px 10px;cursor:pointer;font-size:8px;color:white;letter-spacing:0.08em;">
-                      ＋ 圖片
-                      <input type="file" accept="image/*" style="display:none;" @change="e=>handleAquariumPhoto(e,2)">
-                    </label>
+                  <div style="height:110px;position:relative;overflow:hidden;">
+                    <img src="./images/aquarium-tropical.jpg" style="width:100%;height:100%;object-fit:cover;display:block;">
                   </div>
                   <div style="padding:14px 16px 16px;">
                     <p style="font-size:13px;font-weight:900;color:white;margin-bottom:8px;">熱帶魚之海 🐠</p>
@@ -1591,29 +1613,25 @@
         } catch(e) {}
       }
       const calcInput = ref(""); const calcMode = ref("JPY_TO_TWD");
-      const calcExpr = ref(""); // 算式顯示
-      let calcPrevNum = null, calcPendingOp = null, calcJustEvaled = false;
+      const calcExpr = ref("");
+      let calcPrevNum = null; const calcPendingOp = ref(null); let calcJustEvaled = false;
       const switchCalcMode = () => { calcMode.value = (calcMode.value === 'JPY_TO_TWD' ? 'TWD_TO_JPY' : 'JPY_TO_TWD'); };
+
+      // 當前顯示的數字（input 有值用 input，否則用 prevNum，否則 0）
+      const calcDisplayVal = computed(() => {
+        if (calcInput.value !== '') return calcInput.value;
+        if (calcPrevNum !== null) return String(calcPrevNum);
+        return '0';
+      });
+
       const pressCalcNum = (k) => {
         if(calcJustEvaled) { calcInput.value = ''; calcExpr.value = ''; calcJustEvaled = false; }
-        if(calcInput.value === '0' && k !== '.') calcInput.value = String(k);
+        if(calcInput.value === '0') calcInput.value = String(k);
         else if(calcInput.value.length < 12) calcInput.value += String(k);
       };
       const pressCalcDot = () => {
         if(calcJustEvaled) { calcInput.value = '0'; calcExpr.value = ''; calcJustEvaled = false; }
         if(!calcInput.value.includes('.')) calcInput.value = (calcInput.value || '0') + '.';
-      };
-      const pressCalcOp = (op) => {
-        if(op === '%') { calcInput.value = String(parseFloat(calcInput.value||'0') / 100); return; }
-        const cur = parseFloat(calcInput.value) || 0;
-        if(calcPrevNum !== null && calcPendingOp && !calcJustEvaled) {
-          calcInput.value = String(doCalc(calcPrevNum, cur, calcPendingOp));
-        }
-        calcPrevNum = parseFloat(calcInput.value) || 0;
-        calcPendingOp = op;
-        calcExpr.value = calcInput.value + ' ' + op;
-        calcInput.value = '';
-        calcJustEvaled = false;
       };
       const doCalc = (a, b, op) => {
         let r;
@@ -1624,30 +1642,46 @@
         else r = b;
         return Math.round(r * 1e8) / 1e8;
       };
-      const pressCalcEqual = () => {
-        if(calcPrevNum === null || !calcPendingOp) return;
-        const cur = parseFloat(calcInput.value) || 0;
-        const result = doCalc(calcPrevNum, cur, calcPendingOp);
-        calcExpr.value = calcPrevNum + ' ' + calcPendingOp + ' ' + cur + ' =';
-        calcInput.value = String(result);
-        calcPrevNum = null; calcPendingOp = null; calcJustEvaled = true;
+      const pressCalcOp = (op) => {
+        const cur = parseFloat(calcInput.value);
+        if(calcPrevNum !== null && calcPendingOp.value && calcInput.value !== '') {
+          const mid = doCalc(calcPrevNum, cur, calcPendingOp.value);
+          calcPrevNum = mid;
+          calcExpr.value = String(mid) + ' ' + op;
+          calcInput.value = '';
+        } else {
+          if(calcInput.value !== '') calcPrevNum = parseFloat(calcInput.value);
+          calcExpr.value = String(calcPrevNum ?? 0) + ' ' + op;
+          calcInput.value = '';
+        }
+        calcPendingOp.value = op;
+        calcJustEvaled = false;
       };
-      const pressCalcClear = () => { calcInput.value = ''; calcExpr.value = ''; calcPrevNum = null; calcPendingOp = null; calcJustEvaled = false; };
+      const pressCalcEqual = () => {
+        if(calcPrevNum === null || !calcPendingOp.value) return;
+        const cur = parseFloat(calcInput.value) ?? 0;
+        const result = doCalc(calcPrevNum, cur, calcPendingOp.value);
+        calcExpr.value = String(calcPrevNum) + ' ' + calcPendingOp.value + ' ' + String(cur) + ' =';
+        calcInput.value = String(result);
+        calcPrevNum = null; calcPendingOp.value = null; calcJustEvaled = true;
+      };
+      const pressCalcClear = () => { calcInput.value = ''; calcExpr.value = ''; calcPrevNum = null; calcPendingOp.value = null; calcJustEvaled = false; };
       const pressCalcBackspace = () => {
         if(calcJustEvaled) { pressCalcClear(); return; }
         calcInput.value = calcInput.value.slice(0, -1);
       };
-      // 舊 pressCalc 相容（備用）
       const pressCalc = (k) => pressCalcNum(k);
       const calcOutput = computed(() => {
-        const val = parseFloat(calcInput.value) || 0;
-        if (!val) return 0;
+        // 用當前顯示的數值換算
+        const raw = calcInput.value !== '' ? parseFloat(calcInput.value) :
+                    (calcPrevNum !== null ? calcPrevNum : 0);
+        const val = raw || 0;
+        if (!val) return '0';
         if (calcMode.value === 'JPY_TO_TWD') {
-          // 日幣 → 台幣：現金賣出匯率
-          return parseFloat((val * jpySellRate.value).toFixed(4));
+          const r = val * jpySellRate.value;
+          return r < 1 ? r.toFixed(4) : parseFloat(r.toFixed(2)).toLocaleString();
         } else {
-          // 台幣 → 日幣：現金賣出匯率
-          return Math.round(val / jpySellRate.value);
+          return Math.round(val / jpySellRate.value).toLocaleString();
         }
       });
 
@@ -2085,6 +2119,18 @@
       watch(itinerary,    v => { localUpdate=true; saveToFirestore('itinerary',v).then(()=>setTimeout(()=>localUpdate=false,500)); }, { deep:true });
       watch(groupMembers, v => { localUpdate=true; saveToFirestore('groupMembers',v).then(()=>setTimeout(()=>localUpdate=false,500)); }, { deep:true });
 
+      // 任何 modal 開啟時鎖定 body 滾動
+      const anyModalOpen = computed(() =>
+        showHotelModal.value || showCarModal.value || showAquariumModal.value ||
+        showFlightDetail.value || showPasscodeModal.value || showMemberModal.value ||
+        showExpenseModal.value || showProfileModal.value || showConfirmModal.value ||
+        showEditModal.value || showCropper.value || showHotelLightbox.value
+      );
+      watch(anyModalOpen, v => {
+        document.body.style.overflow = v ? 'hidden' : '';
+        document.body.style.touchAction = v ? 'none' : '';
+      });
+
       onMounted(async () => {
         // 進度條動畫：分段推進
         loadProgress.value = 10;
@@ -2166,7 +2212,7 @@
       });
 
       return {
-        appLoading, loadProgress, loadingMsg, currentUser, loginAs, loginDropOpen, loginSelected, loggingIn, loggingOut, pendingUser, doLogin, allTodos, onPickerScroll, scrollPickerTo, currentTab, navCollapsed, tabs, btabs, weather, weatherBg, timeObj, calcInput, calcMode, calcExpr, switchCalcMode, pressCalc, pressCalcNum, pressCalcDot, pressCalcOp, pressCalcEqual, pressCalcClear, pressCalcBackspace, calcOutput, jpyRate, jpyBuyRate, jpySellRate, rateUpdatedAt, groupMembers, showMemberModal, newMember, showUserMenu, toggleUserMenu, closeUserMenu, showProfileModal, profileEdit, openProfile, handleProfileAvatarUpload, saveProfile, logout, handleAvatarUpload, addMember, getMemberAvatar, editingMember, openEditMember, handleEditAvatarUpload, saveEditMember, showAddMember, BLANK_AVATAR, expenseSubTab, expenses, memberStats, maxPaid, settlementAdvice, showExpenseModal, openExpenseModal, addExpense, newExpense, openEditExpense, editingExpenseIdx, expenseFilterMember, filteredExpenses, itinerary, activeDay, departureTrip, returnFlights, selectedReturnFlight, hotelData, carRental, showFlightDetail, activeFlight, triggerPasscode, showPasscodeModal, passcode, pressKey, passcodeMode, planningSubTab, filteredTodos: computed(() => (allTodos.value[currentUser.value]||[]).filter(t=>t.type===planningSubTab.value)), newTodoText, addTodo, removeTodo, categories, showEditModal, isNewEvent, tempEvent, openEditModal, openAddModal, deleteEvent, saveEvent, showConfirmModal, confirmItemName, confirmDelete, executeDelete, bookingSubTab, globalCurrency, toggleAllCurrency,
+        appLoading, loadProgress, loadingMsg, currentUser, loginAs, loginDropOpen, loginSelected, loggingIn, loggingOut, pendingUser, doLogin, allTodos, onPickerScroll, scrollPickerTo, currentTab, navCollapsed, tabs, btabs, weather, weatherBg, timeObj, calcInput, calcMode, calcExpr, calcDisplayVal, calcPendingOp, switchCalcMode, pressCalc, pressCalcNum, pressCalcDot, pressCalcOp, pressCalcEqual, pressCalcClear, pressCalcBackspace, calcOutput, jpyRate, jpyBuyRate, jpySellRate, rateUpdatedAt, groupMembers, showMemberModal, newMember, showUserMenu, toggleUserMenu, closeUserMenu, showProfileModal, profileEdit, openProfile, handleProfileAvatarUpload, saveProfile, logout, handleAvatarUpload, addMember, getMemberAvatar, editingMember, openEditMember, handleEditAvatarUpload, saveEditMember, showAddMember, BLANK_AVATAR, expenseSubTab, expenses, memberStats, maxPaid, settlementAdvice, showExpenseModal, openExpenseModal, addExpense, newExpense, openEditExpense, editingExpenseIdx, expenseFilterMember, filteredExpenses, itinerary, activeDay, departureTrip, returnFlights, selectedReturnFlight, hotelData, carRental, showFlightDetail, activeFlight, triggerPasscode, showPasscodeModal, passcode, pressKey, passcodeMode, planningSubTab, filteredTodos: computed(() => (allTodos.value[currentUser.value]||[]).filter(t=>t.type===planningSubTab.value)), newTodoText, addTodo, removeTodo, categories, showEditModal, isNewEvent, tempEvent, openEditModal, openAddModal, deleteEvent, saveEvent, showConfirmModal, confirmItemName, confirmDelete, executeDelete, bookingSubTab, globalCurrency, toggleAllCurrency,
         previewCanvas,hotelPhotos,showHotelLightbox,openEditExpense,editingExpenseIdx,showCropper,cropSrc,cropCanvas,cropBox,openCropper,startCropDrag,confirmCrop,currentHotelPhoto,openHotelPhoto,lbTouchStart,lbTouchEnd,
         showHotelModal, showCarModal, showAquariumModal, aquariumPhotos, handleAquariumPhoto, openHotelModal, openCarModal, isAdmin,
         getCategoryColor: (t) => ({ transport: 'bg-[#D94F4F]', spot: 'bg-[#98BDE3]', food: 'bg-[#E3A97C]', other: 'bg-[#C4A8D4]' }[t] || 'bg-[#DCC3A0]'),
