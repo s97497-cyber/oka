@@ -25,7 +25,6 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Varela+Round&family=M+PLUS+Rounded+1c:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1010,7 +1009,7 @@
           </div>
           <div class="mt-9 flex space-x-5">
             <button @click="showEditModal = false" class="flex-1 py-4 rounded-full font-black uppercase text-xs card-neo" style="color:var(--tan);">Cancel</button>
-            <button @click="saveEvent" :disabled="photoUploading" class="flex-1 py-4 rounded-full font-black uppercase text-xs text-white" style="background:linear-gradient(145deg,#8ec4a1,#5a9070);box-shadow:-3px -3px 8px rgba(255,255,255,0.25),5px 5px 12px rgba(45,85,60,0.42);">{{ photoUploading ? '上傳中...' : 'Save' }}</button>
+            <button @click="saveEvent" class="flex-1 py-4 rounded-full font-black uppercase text-xs text-white" style="background:linear-gradient(145deg,#8ec4a1,#5a9070);box-shadow:-3px -3px 8px rgba(255,255,255,0.25),5px 5px 12px rgba(45,85,60,0.42);">Save</button>
           </div>
         </div>
       </div>
@@ -1414,9 +1413,7 @@
       </div>
       <div style="display:flex;gap:12px;margin-top:16px;width:100%;max-width:360px;flex-shrink:0;">
         <button @click="showCropper=false;cropSrc=''" style="flex:1;padding:14px;border-radius:999px;background:rgba(255,255,255,0.12);color:white;font-size:11px;font-weight:900;border:none;cursor:pointer;letter-spacing:0.1em;" class="active:scale-95 transition">取消</button>
-        <button @click="confirmCrop" :disabled="photoUploading" style="flex:1;padding:14px;border-radius:999px;background:linear-gradient(145deg,#8ec4a1,#5a9070);color:white;font-size:11px;font-weight:900;border:none;cursor:pointer;letter-spacing:0.1em;" class="active:scale-95 transition">
-          {{ photoUploading ? '上傳中...' : '確認裁切' }}
-        </button>
+        <button @click="confirmCrop" style="flex:1;padding:14px;border-radius:999px;background:linear-gradient(145deg,#8ec4a1,#5a9070);color:white;font-size:11px;font-weight:900;border:none;cursor:pointer;letter-spacing:0.1em;" class="active:scale-95 transition">確認裁切</button>
       </div>
     </div>
 
@@ -1451,7 +1448,6 @@
   firebase.initializeApp(firebaseConfig);
   try { firebase.analytics(); } catch(e) {}
   const db = firebase.firestore();
-  const storage = firebase.storage();
 
   const { createApp, ref, computed, onMounted } = Vue;
 
@@ -1926,7 +1922,6 @@
         window.addEventListener('touchend', onUp);
       };
 
-      const photoUploading = Vue.ref(false);
       const confirmCrop = () => {
         const canvas = document.createElement('canvas');
         const scale = cropCanvas.value.natW / cropCanvas.value.dispW;
@@ -1934,7 +1929,8 @@
         const sy = Math.round(cropBox.value.y * scale);
         const sw = Math.round(cropBox.value.w * scale);
         const sh = Math.round(cropBox.value.h * scale);
-        const MAX = 800;
+        // 最大 480px，品質 0.6，約 30~60KB，確保不超過 Firestore 1MB 限制
+        const MAX = 480;
         const ratio = Math.min(MAX / sw, MAX / sh, 1);
         const outW = Math.round(sw * ratio);
         const outH = Math.round(sh * ratio);
@@ -1943,25 +1939,9 @@
         const img = new Image();
         img.onload = () => {
           ctx.drawImage(img, sx, sy, sw, sh, 0, 0, outW, outH);
-          canvas.toBlob(async (blob) => {
-            // 上傳到 Firebase Storage
-            const key = 'itinerary_photos/' + Date.now() + '_' + Math.random().toString(36).slice(2) + '.jpg';
-            const ref = storage.ref(key);
-            photoUploading.value = true;
-            try {
-              await ref.put(blob, { contentType: 'image/jpeg' });
-              const url = await ref.getDownloadURL();
-              tempEvent.value.photo = url;
-            } catch(e) {
-              console.warn('Photo upload failed:', e);
-              // 上傳失敗時 fallback 用 base64
-              tempEvent.value.photo = canvas.toDataURL('image/jpeg', 0.72);
-            } finally {
-              photoUploading.value = false;
-              showCropper.value = false;
-              cropSrc.value = '';
-            }
-          }, 'image/jpeg', 0.82);
+          tempEvent.value.photo = canvas.toDataURL('image/jpeg', 0.6);
+          showCropper.value = false;
+          cropSrc.value = '';
         };
         img.src = cropSrc.value;
       };
@@ -2104,16 +2084,8 @@
         const d = snap.data();
         if (d.expenses)     expenses.value     = d.expenses;
         if (d.allTodos)     allTodos.value     = d.allTodos;
+        if (d.itinerary)    itinerary.value    = d.itinerary;
         if (d.groupMembers) groupMembers.value = d.groupMembers;
-        if (d.itinerary) {
-          // 清掉舊的 ph_ key（舊版殘留），只保留正常 URL 或空值
-          const cleaned = JSON.parse(JSON.stringify(d.itinerary));
-          for (const day of cleaned)
-            for (const ev of (day.events || []))
-              if (ev.photo && (ev.photo.startsWith('ph_') || ev.photo.startsWith('data:')))
-                ev.photo = '';
-          itinerary.value = cleaned;
-        }
       });
 
       const { watch } = Vue;
@@ -2247,7 +2219,7 @@
       return {
         appLoading, loadProgress, loadingMsg, currentUser, loginAs, loginDropOpen, loginSelected, loggingIn, loggingOut, pendingUser, doLogin, allTodos, onPickerScroll, scrollPickerTo, currentTab, navCollapsed, tabs, btabs, weather, weatherBg, timeObj, calcInput, calcMode, calcExpr, calcDisplayVal, calcPendingOp, switchCalcMode, pressCalc, pressCalcNum, pressCalcDot, pressCalcOp, pressCalcEqual, pressCalcClear, pressCalcBackspace, calcOutput, jpyRate, jpyBuyRate, jpySellRate, rateUpdatedAt, groupMembers, showMemberModal, newMember, showUserMenu, toggleUserMenu, closeUserMenu, showProfileModal, profileEdit, openProfile, handleProfileAvatarUpload, saveProfile, logout, handleAvatarUpload, addMember, getMemberAvatar, editingMember, openEditMember, handleEditAvatarUpload, saveEditMember, showAddMember, BLANK_AVATAR, expenseSubTab, expenses, memberStats, maxPaid, settlementAdvice, showExpenseModal, openExpenseModal, addExpense, newExpense, openEditExpense, editingExpenseIdx, expenseFilterMember, filteredExpenses, itinerary, activeDay, departureTrip, returnFlights, selectedReturnFlight, hotelData, carRental, showFlightDetail, activeFlight, triggerPasscode, showPasscodeModal, passcode, pressKey, passcodeMode, planningSubTab, filteredTodos: computed(() => (allTodos.value[currentUser.value]||[]).filter(t=>t.type===planningSubTab.value)), newTodoText, addTodo, removeTodo, categories, showEditModal, isNewEvent, tempEvent, openEditModal, openAddModal, deleteEvent, saveEvent, showConfirmModal, confirmItemName, confirmDelete, executeDelete, bookingSubTab, globalCurrency, toggleAllCurrency,
         previewCanvas,hotelPhotos,showHotelLightbox,openEditExpense,editingExpenseIdx,showCropper,cropSrc,cropCanvas,cropBox,openCropper,startCropDrag,confirmCrop,currentHotelPhoto,openHotelPhoto,lbTouchStart,lbTouchEnd,
-        photoUploading, showHotelModal, showCarModal, showAquariumModal, aquariumPhotos, handleAquariumPhoto, openHotelModal, openCarModal, isAdmin,
+        showHotelModal, showCarModal, showAquariumModal, aquariumPhotos, handleAquariumPhoto, openHotelModal, openCarModal, isAdmin,
         getCategoryColor: (t) => ({ transport: 'bg-[#D94F4F]', spot: 'bg-[#98BDE3]', food: 'bg-[#E3A97C]', other: 'bg-[#C4A8D4]' }[t] || 'bg-[#DCC3A0]'),
         categoryDot: (id) => ({ spot:'#98BDE3', food:'#E3A97C', transport:'#D94F4F', other:'#C4A8D4' }[id] || '#DCC3A0'),
         categoryStyle: (id, active) => {
