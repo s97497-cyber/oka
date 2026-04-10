@@ -38,6 +38,20 @@
     .fade-leave-active { transition: opacity 0.1s ease, transform 0.1s ease; }
     .fade-enter-from { opacity:0; transform: translateY(-6px); }
     .fade-leave-to   { opacity:0; transform: translateY(-6px); }
+    .login-drop-enter-active { transition: opacity 0.18s ease, transform 0.18s ease; }
+    .login-drop-leave-active { transition: opacity 0.12s ease, transform 0.12s ease; }
+    .login-drop-enter-from { opacity:0; transform: translateY(-8px); }
+    .login-drop-leave-to   { opacity:0; transform: translateY(-8px); }
+    .login-fade-leave-active { transition: opacity 0.35s ease; }
+    .login-fade-leave-to { opacity: 0; }
+    .login-enter-leave-active { transition: opacity 0.3s ease; }
+    @keyframes loginPlane {
+      0%   { transform: scale(0.7) translateY(20px); opacity:0; }
+      40%  { transform: scale(1.15) translateY(-8px); opacity:1; }
+      70%  { transform: scale(0.95) translateY(2px); }
+      85%  { transform: scale(1.05) translateY(-3px) rotate(-8deg); }
+      100% { transform: scale(1) translateY(-40px) translateX(60px) rotate(-15deg); opacity:0; }
+    }
     @keyframes fadeIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
     .slide-up-enter-active,.slide-up-leave-active { transition: all 0.3s cubic-bezier(0.32,0.72,0,1); }
     .slide-up-enter-from,.slide-up-leave-to { transform: translateY(100%); }
@@ -236,32 +250,54 @@
 
 
   <!-- 登入畫面 -->
-  <div v-if="!appLoading && !currentUser" class="fixed inset-0 z-[4000] flex flex-col items-center justify-center font-black" style="background:linear-gradient(160deg,#7bbf96 0%,#5a9070 60%,#4a7860 100%);padding:32px;">
-    <div class="text-7xl mb-4" style="filter:drop-shadow(0 4px 12px rgba(0,0,0,0.2));">✈️</div>
-    <h2 class="text-2xl tracking-[0.25em] uppercase text-white mb-1">Go Okinawa</h2>
-    <p class="text-[10px] text-white opacity-50 tracking-widest mb-10">2026.06.03 — 06.07</p>
-    <div class="w-full max-w-xs space-y-3">
-      <p class="text-white text-[11px] tracking-widest uppercase text-center opacity-70 mb-4">選擇你的身份</p>
-      <div v-for="m in groupMembers" :key="m.name"
-        @click="loginAs(m.name)"
-        class="flex items-center gap-4 active:scale-95 transition cursor-pointer"
-        style="background:rgba(255,255,255,0.18);backdrop-filter:blur(12px);border:1.5px solid rgba(255,255,255,0.35);border-radius:24px;padding:14px 20px;">
-        <img :src="getMemberAvatar(m.name)" style="width:44px;height:44px;border-radius:50%;border:2px solid rgba(255,255,255,0.6);object-fit:cover;">
-        <span class="text-white text-lg font-black tracking-wide">{{ m.name }}</span>
-        <svg class="ml-auto" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+  <transition name="login-fade">
+    <div v-if="!appLoading && !currentUser && !loggingIn" class="fixed inset-0 z-[4000] flex flex-col font-black" style="background:linear-gradient(160deg,#7bbf96 0%,#5a9070 60%,#4a7860 100%);overflow-y:auto;-webkit-overflow-scrolling:touch;">
+      <div class="flex flex-col items-center justify-center min-h-full py-10 px-8">
+        <div class="text-7xl mb-4" style="filter:drop-shadow(0 4px 12px rgba(0,0,0,0.2));">✈️</div>
+        <h2 class="text-2xl tracking-[0.25em] uppercase text-white mb-1">Go Okinawa</h2>
+        <p class="text-[10px] text-white opacity-50 tracking-widest mb-8">2026.06.03 — 06.07</p>
+        <div class="w-full max-w-xs space-y-4">
+          <p class="text-white text-[11px] tracking-widest uppercase text-center opacity-70">選擇你的身份</p>
+          <!-- 成員列表：最多顯示 4 格高，超過可滾動 -->
+          <div class="font-black overflow-y-auto" style="background:rgba(255,255,255,0.15);backdrop-filter:blur(12px);border:1.5px solid rgba(255,255,255,0.35);border-radius:24px;max-height:248px;">
+            <div v-for="(m, idx) in groupMembers" :key="m.name"
+              @click="loginSelected = m.name"
+              class="flex items-center gap-3 cursor-pointer transition active:bg-white/10"
+              :style="'padding:13px 20px;' + (idx < groupMembers.length-1 ? 'border-bottom:1px solid rgba(255,255,255,0.15);' : '')">
+              <img :src="getMemberAvatar(m.name)" style="width:38px;height:38px;border-radius:50%;border:2px solid rgba(255,255,255,0.5);object-fit:cover;">
+              <span class="text-white font-black tracking-wide flex-1">{{ m.name }}</span>
+              <div style="width:22px;height:22px;border-radius:50%;border:2px solid rgba(255,255,255,0.5);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.15s;" :style="loginSelected===m.name ? 'background:white;border-color:white;' : ''">
+                <svg v-if="loginSelected===m.name" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4a7860" stroke-width="3.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+            </div>
+          </div>
+          <button @click="loginSelected && doLogin(loginSelected)" class="w-full py-4 rounded-full font-black text-base tracking-widest uppercase transition active:scale-95" :style="loginSelected ? 'background:white;color:#4a7860;' : 'background:rgba(255,255,255,0.25);color:rgba(255,255,255,0.5);cursor:not-allowed;'">
+            出發 ✈️
+          </button>
+        </div>
       </div>
     </div>
-  </div>
+  </transition>
+
+  <!-- 登入動畫過場 -->
+  <transition name="login-enter">
+    <div v-if="loggingIn" class="fixed inset-0 z-[4001] flex flex-col items-center justify-center font-black" style="background:linear-gradient(160deg,#7bbf96 0%,#5a9070 60%,#4a7860 100%);">
+      <div style="animation:loginPlane 0.9s ease forwards;">
+        <div class="text-7xl" style="filter:drop-shadow(0 4px 16px rgba(0,0,0,0.25));">✈️</div>
+      </div>
+      <p class="text-white text-sm tracking-[0.3em] uppercase mt-6 opacity-80">{{ pendingUser }}</p>
+    </div>
+  </transition>
 
   <div class="max-w-md mx-auto min-h-[100dvh] relative overflow-x-hidden">
     <!-- Header -->
     <header class="px-7 pb-3 flex justify-between items-center sticky top-0 z-[100]" style="padding-top:calc(1.75rem + var(--safe-top));background:rgba(237,232,222,0.92);backdrop-filter:blur(18px);">
       <div><h1 class="text-3xl font-black">Okinawa! 🌴</h1><p class="text-[10px] text-[#DCC3A0] tracking-widest uppercase mt-1 leading-none">2026.06.03 - 06.07</p></div>
       <div class="flex items-center gap-2" style="position:relative;">
-        <button v-if="currentUser" @click.stop="showUserMenu = !showUserMenu" class="flex items-center gap-2 card-neo px-3 py-2 active:scale-95 transition" style="border-radius:999px;">
+        <button v-if="currentUser" @click.stop="showUserMenu = !showUserMenu" class="flex items-center gap-2 card-neo px-3 py-2 transition" :style="'border-radius:999px;' + (showUserMenu ? 'box-shadow:var(--neo-in);transform:scale(0.97);' : '')">
           <img :src="getMemberAvatar(currentUser)" style="width:24px;height:24px;border-radius:50%;object-fit:cover;">
           <span style="font-size:10px;font-weight:900;color:var(--green);">{{ currentUser }}</span>
-          <span style="font-size:8px;opacity:0.35;">▼</span>
+          <span style="font-size:8px;opacity:0.35;transition:transform 0.2s;" :style="showUserMenu ? 'transform:rotate(180deg)' : ''">▼</span>
         </button>
         <transition name="fade">
           <div v-if="showUserMenu" class="absolute right-0 font-black" style="top:calc(100% + 8px);min-width:170px;background:var(--bg);border-radius:20px;box-shadow:-4px -4px 12px rgba(255,255,255,0.7),6px 6px 18px rgba(160,140,115,0.4),0 0 0 1px rgba(255,255,255,0.5);z-index:9999;overflow:hidden;">
@@ -276,7 +312,7 @@
             </button>
           </div>
         </transition>
-        <div v-if="showUserMenu" class="fixed inset-0" style="z-index:9998;" @click.stop="showUserMenu=false" @touchstart.stop="showUserMenu=false"></div>
+        <div v-if="showUserMenu" class="fixed inset-0" style="z-index:9998;" @click="showUserMenu=false" @touchstart="showUserMenu=false"></div>
       </div>
     </header>
 
@@ -357,16 +393,24 @@
             <div class="text-[#4A7DAE] text-sm border-t border-[#DCC3A0]/20 pt-2 font-black">= {{ calcOutput }} <span class="text-[10px] font-black">{{ calcMode === 'JPY_TO_TWD' ? 'TWD' : 'JPY' }}</span></div>
           </div>
           <div class="grid grid-cols-4 gap-3">
-            <button v-for="n in [1,2,3]" @click="pressCalc(n)" class="calc-btn">{{ n }}</button>
-            <button @click="switchCalcMode" class="calc-btn bg-[#4A7DAE] text-white text-xs">切換</button>
-            <button v-for="n in [4,5,6]" @click="pressCalc(n)" class="calc-btn">{{ n }}</button>
-            <button @click="calcInput = calcInput.slice(0, -1)" class="calc-btn text-[#4A7DAE]">←</button>
-            <button v-for="n in [7,8,9]" @click="pressCalc(n)" class="calc-btn">{{ n }}</button>
-            <button @click="calcInput = ''" class="calc-btn text-red-400">C</button>
-            <button @click="pressCalc('.')" class="calc-btn">.</button>
-            <button @click="pressCalc(0)" class="calc-btn font-black">0</button>
-            <div class="calc-btn opacity-0 pointer-events-none"></div>
-            <div class="calc-btn opacity-0 pointer-events-none"></div>
+            <button @click="pressCalcClear()" class="calc-btn text-red-400 text-sm">C</button>
+            <button @click="pressCalcBackspace()" class="calc-btn text-[#4A7DAE]">←</button>
+            <button @click="pressCalcOp('%')" class="calc-btn text-[#4A7DAE]">%</button>
+            <button @click="pressCalcOp('÷')" class="calc-btn text-[#4A7DAE] text-lg">÷</button>
+            <button v-for="n in [7,8,9]" @click="pressCalcNum(n)" class="calc-btn">{{ n }}</button>
+            <button @click="pressCalcOp('×')" class="calc-btn text-[#4A7DAE] text-lg">×</button>
+            <button v-for="n in [4,5,6]" @click="pressCalcNum(n)" class="calc-btn">{{ n }}</button>
+            <button @click="pressCalcOp('−')" class="calc-btn text-[#4A7DAE] text-xl">−</button>
+            <button v-for="n in [1,2,3]" @click="pressCalcNum(n)" class="calc-btn">{{ n }}</button>
+            <button @click="pressCalcOp('+')" class="calc-btn text-[#4A7DAE] text-xl">+</button>
+            <button @click="pressCalcNum(0)" class="calc-btn col-span-2 font-black" style="aspect-ratio:unset;padding:0 1rem;">0</button>
+            <button @click="pressCalcDot()" class="calc-btn">.</button>
+            <button @click="pressCalcEqual()" class="calc-btn text-white text-lg font-black" style="background:linear-gradient(145deg,#6db8e0,#4A7DAE);box-shadow:-3px -3px 8px rgba(255,255,255,0.5),4px 4px 10px rgba(60,100,160,0.4);">=</button>
+          </div>
+          <div class="mt-4">
+            <button @click="switchCalcMode" class="w-full py-3 rounded-2xl text-xs font-black tracking-widest uppercase text-white" style="background:linear-gradient(145deg,#6db8e0,#4A7DAE);box-shadow:var(--neo-out);">
+              切換模式：{{ calcMode === 'JPY_TO_TWD' ? '日幣 → 台幣' : '台幣 → 日幣' }}
+            </button>
           </div>
         </div>
       </section>
@@ -1016,6 +1060,8 @@
       const groupMembers = ref([{ name: 'Me', avatar: BLANK_AVATAR }, { name: '旅伴', avatar: BLANK_AVATAR }]);
       const showMemberModal = ref(false), newMember = ref({ name: '', avatar: BLANK_AVATAR });
       const showUserMenu = ref(false);
+      const loginDropOpen = ref(false);
+      const loginSelected = ref(null);
       const logout = () => { currentUser.value = null; localStorage.removeItem('okinawa_user'); };
       const showProfileModal = ref(false);
       const profileEdit = ref({ name: '', avatar: '' });
@@ -1098,8 +1144,54 @@
         } catch(e) {}
       }
       const calcInput = ref(""); const calcMode = ref("JPY_TO_TWD");
+      const calcExpr = ref(""); // 算式顯示
+      let calcPrevNum = null, calcPendingOp = null, calcJustEvaled = false;
       const switchCalcMode = () => { calcMode.value = (calcMode.value === 'JPY_TO_TWD' ? 'TWD_TO_JPY' : 'JPY_TO_TWD'); };
-      const pressCalc = (k) => { if(calcInput.value.length < 10) calcInput.value += String(k); };
+      const pressCalcNum = (k) => {
+        if(calcJustEvaled) { calcInput.value = ''; calcExpr.value = ''; calcJustEvaled = false; }
+        if(calcInput.value === '0' && k !== '.') calcInput.value = String(k);
+        else if(calcInput.value.length < 12) calcInput.value += String(k);
+      };
+      const pressCalcDot = () => {
+        if(calcJustEvaled) { calcInput.value = '0'; calcExpr.value = ''; calcJustEvaled = false; }
+        if(!calcInput.value.includes('.')) calcInput.value = (calcInput.value || '0') + '.';
+      };
+      const pressCalcOp = (op) => {
+        if(op === '%') { calcInput.value = String(parseFloat(calcInput.value||'0') / 100); return; }
+        const cur = parseFloat(calcInput.value) || 0;
+        if(calcPrevNum !== null && calcPendingOp && !calcJustEvaled) {
+          calcInput.value = String(doCalc(calcPrevNum, cur, calcPendingOp));
+        }
+        calcPrevNum = parseFloat(calcInput.value) || 0;
+        calcPendingOp = op;
+        calcExpr.value = calcInput.value + ' ' + op;
+        calcInput.value = '';
+        calcJustEvaled = false;
+      };
+      const doCalc = (a, b, op) => {
+        let r;
+        if(op === '+') r = a + b;
+        else if(op === '−') r = a - b;
+        else if(op === '×') r = a * b;
+        else if(op === '÷') r = b !== 0 ? a / b : 0;
+        else r = b;
+        return Math.round(r * 1e8) / 1e8;
+      };
+      const pressCalcEqual = () => {
+        if(calcPrevNum === null || !calcPendingOp) return;
+        const cur = parseFloat(calcInput.value) || 0;
+        const result = doCalc(calcPrevNum, cur, calcPendingOp);
+        calcExpr.value = calcPrevNum + ' ' + calcPendingOp + ' ' + cur + ' =';
+        calcInput.value = String(result);
+        calcPrevNum = null; calcPendingOp = null; calcJustEvaled = true;
+      };
+      const pressCalcClear = () => { calcInput.value = ''; calcExpr.value = ''; calcPrevNum = null; calcPendingOp = null; calcJustEvaled = false; };
+      const pressCalcBackspace = () => {
+        if(calcJustEvaled) { pressCalcClear(); return; }
+        calcInput.value = calcInput.value.slice(0, -1);
+      };
+      // 舊 pressCalc 相容（備用）
+      const pressCalc = (k) => pressCalcNum(k);
       const calcOutput = computed(() => {
         const val = parseFloat(calcInput.value) || 0;
         if (!val) return 0;
@@ -1430,6 +1522,18 @@
 
       const navCollapsed = ref(false);
       const currentUser = ref(localStorage.getItem('okinawa_user') || null);
+      const loggingIn = ref(false);
+      const pendingUser = ref('');
+      const doLogin = (name) => {
+        if(!name) return;
+        pendingUser.value = name;
+        loggingIn.value = true;
+        setTimeout(() => {
+          currentUser.value = name;
+          localStorage.setItem('okinawa_user', name);
+          loggingIn.value = false;
+        }, 1100);
+      };
       const loginAs = (name) => { currentUser.value = name; localStorage.setItem('okinawa_user', name); };
 
       // 每人專屬 todos：結構 { memberName: [ {id, text, done, type}, ... ] }
@@ -1518,8 +1622,6 @@
         // 滾動時收納導覽列，到頂/底或停止時展開
         // 滾動/觸控時同時關閉用戶選單
         window.addEventListener('scroll', () => { showUserMenu.value = false; }, { passive: true });
-        document.addEventListener('click', () => { showUserMenu.value = false; }, { passive: true });
-        document.addEventListener('touchstart', () => { showUserMenu.value = false; }, { passive: true });
         let lastY = 0;
         let scrollRafId = null;
         let atBottomStopped = false;
@@ -1574,7 +1676,7 @@
       });
 
       return {
-        appLoading, loadProgress, loadingMsg, currentUser, loginAs, allTodos, currentTab, navCollapsed, tabs, btabs, weather, weatherBg, timeObj, calcInput, calcMode, switchCalcMode, pressCalc, calcOutput, jpyRate, jpyBuyRate, jpySellRate, rateUpdatedAt, groupMembers, showMemberModal, newMember, showUserMenu, showProfileModal, profileEdit, openProfile, handleProfileAvatarUpload, saveProfile, logout, handleAvatarUpload, addMember, getMemberAvatar, editingMember, openEditMember, handleEditAvatarUpload, saveEditMember, showAddMember, BLANK_AVATAR, expenseSubTab, expenses, memberStats, maxPaid, settlementAdvice, showExpenseModal, openExpenseModal, addExpense, newExpense, openEditExpense, editingExpenseIdx, expenseFilterMember, filteredExpenses, itinerary, activeDay, departureTrip, returnFlights, selectedReturnFlight, hotelData, carRental, showFlightDetail, activeFlight, triggerPasscode, showPasscodeModal, passcode, pressKey, passcodeMode, planningSubTab, filteredTodos: computed(() => (allTodos.value[currentUser.value]||[]).filter(t=>t.type===planningSubTab.value)), newTodoText, addTodo, removeTodo, categories, showEditModal, isNewEvent, tempEvent, openEditModal, openAddModal, deleteEvent, saveEvent, showConfirmModal, confirmItemName, confirmDelete, executeDelete, bookingSubTab, globalCurrency, toggleAllCurrency,
+        appLoading, loadProgress, loadingMsg, currentUser, loginAs, loginDropOpen, loginSelected, loggingIn, pendingUser, doLogin, allTodos, currentTab, navCollapsed, tabs, btabs, weather, weatherBg, timeObj, calcInput, calcMode, calcExpr, switchCalcMode, pressCalc, pressCalcNum, pressCalcDot, pressCalcOp, pressCalcEqual, pressCalcClear, pressCalcBackspace, calcOutput, jpyRate, jpyBuyRate, jpySellRate, rateUpdatedAt, groupMembers, showMemberModal, newMember, showUserMenu, showProfileModal, profileEdit, openProfile, handleProfileAvatarUpload, saveProfile, logout, handleAvatarUpload, addMember, getMemberAvatar, editingMember, openEditMember, handleEditAvatarUpload, saveEditMember, showAddMember, BLANK_AVATAR, expenseSubTab, expenses, memberStats, maxPaid, settlementAdvice, showExpenseModal, openExpenseModal, addExpense, newExpense, openEditExpense, editingExpenseIdx, expenseFilterMember, filteredExpenses, itinerary, activeDay, departureTrip, returnFlights, selectedReturnFlight, hotelData, carRental, showFlightDetail, activeFlight, triggerPasscode, showPasscodeModal, passcode, pressKey, passcodeMode, planningSubTab, filteredTodos: computed(() => (allTodos.value[currentUser.value]||[]).filter(t=>t.type===planningSubTab.value)), newTodoText, addTodo, removeTodo, categories, showEditModal, isNewEvent, tempEvent, openEditModal, openAddModal, deleteEvent, saveEvent, showConfirmModal, confirmItemName, confirmDelete, executeDelete, bookingSubTab, globalCurrency, toggleAllCurrency,
         hotelPhotos,showHotelLightbox,openEditExpense,editingExpenseIdx,showCropper,cropSrc,cropCanvas,cropBox,openCropper,startCropDrag,confirmCrop,currentHotelPhoto,openHotelPhoto,lbTouchStart,lbTouchEnd,
         getCategoryColor: (t) => ({ transport: 'bg-[#D94F4F]', spot: 'bg-[#98BDE3]', food: 'bg-[#E3A97C]', other: 'bg-[#C4A8D4]' }[t] || 'bg-[#DCC3A0]'),
         categoryDot: (id) => ({ spot:'#98BDE3', food:'#E3A97C', transport:'#D94F4F', other:'#C4A8D4' }[id] || '#DCC3A0'),
