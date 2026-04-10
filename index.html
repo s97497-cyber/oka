@@ -545,8 +545,8 @@
             <div style="position:relative;height:220px;overflow:hidden;">
               <img :src="hotelPhotos[0].src" style="width:100%;height:100%;object-fit:cover;">
               <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 60%);"></div>
-              <!-- 日期時間 badge - 右上角 -->
               <div style="position:absolute;top:12px;right:12px;background:rgba(0,0,0,0.35);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.3);border-radius:999px;padding:4px 12px;display:flex;align-items:center;gap:5px;">
+                <span style="font-size:10px;">🗓</span>
                 <span style="font-size:10px;font-weight:900;color:white;letter-spacing:0.05em;">6/3 - 6/7</span>
               </div>
             </div>
@@ -554,28 +554,32 @@
             <div style="padding:18px 20px 16px;">
               <div class="flex justify-between items-start mb-3">
                 <div>
-                  <p style="font-size:16px;font-weight:900;line-height:1.2;">{{ hotelData.name }}</p>
-                  <p style="font-size:9px;opacity:0.45;margin-top:3px;letter-spacing:0.08em;text-transform:uppercase;">{{ hotelData.checkInTime }} ➔ {{ hotelData.checkOutTime }}</p>
+                  <p style="font-size:16px;font-weight:900;line-height:1.2;">Airbnb 民宿</p>
+                  <p style="font-size:9px;opacity:0.45;margin-top:3px;letter-spacing:0.08em;text-transform:uppercase;">Accommodation · Naha</p>
+                </div>
+                <div style="text-align:right;">
+                  <p style="font-size:9px;opacity:0.4;letter-spacing:0.08em;text-transform:uppercase;">入住日期</p>
+                  <p style="font-size:13px;font-weight:900;color:var(--green);">6/3 – 6/7</p>
                 </div>
               </div>
-              <!-- 地址 -->
-              <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:16px;background:rgba(92,122,106,0.08);border:1px solid rgba(92,122,106,0.15);margin-top:4px;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="#5C7A6A"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+              <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:16px;background:rgba(102,126,234,0.08);border:1px solid rgba(102,126,234,0.15);margin-top:4px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="#667eea"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
                 <div style="flex:1;">
-                  <p style="font-size:10px;font-weight:900;color:var(--green);line-height:1.3;">{{ hotelData.building }}</p>
-                  <p style="font-size:9px;opacity:0.4;">那霸</p>
+                  <p style="font-size:10px;font-weight:900;color:#667eea;line-height:1.3;">2 Chome-1-17 Kumoji, Naha, Okinawa 900-0015</p>
+                  <p style="font-size:9px;opacity:0.4;">日本</p>
                 </div>
-                <span style="font-size:9px;opacity:0.4;font-weight:900;">點擊查看 →</span>
+                <span style="font-size:9px;opacity:0.4;font-weight:900;">🏨</span>
               </div>
             </div>
           </div>
         </div>
+
         <div v-if="bookingSubTab === 'car'" class="space-y-4 font-black">
           <!-- 租車卡片 -->
           <div @click="openCarModal" class="card-neo overflow-hidden relative active:scale-95 transition cursor-pointer" style="border-radius:32px;padding:0;">
             <!-- 圖片區 -->
-            <div style="position:relative;height:220px;overflow:hidden;background-image:url('./images/hotel-cover.jpg');background-size:cover;background-position:center;">
-              <!-- 日期時間 badge - 右上角 -->
+            <div style="position:relative;height:220px;overflow:hidden;">
+              <img src="./images/hotel-cover.jpg" style="width:100%;height:100%;object-fit:cover;object-position:center;display:block;">
               <div style="position:absolute;top:12px;right:12px;background:rgba(0,0,0,0.35);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.3);border-radius:999px;padding:4px 12px;display:flex;align-items:center;gap:5px;">
                 <span style="font-size:10px;font-weight:900;color:white;letter-spacing:0.05em;">6/5 - 6/7</span>
               </div>
@@ -584,18 +588,21 @@
             <div style="padding:18px 20px 16px;">
               <div class="flex justify-between items-start mb-3">
                 <div>
-                  <p style="font-size:16px;font-weight:900;line-height:1.2;">{{ carRental.shop }}</p>
-                  <p style="font-size:9px;opacity:0.45;margin-top:3px;letter-spacing:0.08em;text-transform:uppercase;">{{ carRental.pickTime }} ➔ {{ carRental.returnTime }}</p>
+                  <p style="font-size:16px;font-weight:900;line-height:1.2;">Budget 租車</p>
+                  <p style="font-size:9px;opacity:0.45;margin-top:3px;letter-spacing:0.08em;text-transform:uppercase;">Rental Car · Naha Airport</p>
+                </div>
+                <div style="text-align:right;">
+                  <p style="font-size:9px;opacity:0.4;letter-spacing:0.08em;text-transform:uppercase;">取車時間</p>
+                  <p style="font-size:13px;font-weight:900;color:#667eea;">6/5 – 6/7</p>
                 </div>
               </div>
-              <!-- 車型資訊 -->
               <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:16px;background:rgba(102,126,234,0.08);border:1px solid rgba(102,126,234,0.15);margin-top:4px;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="#667eea"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/></svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="#667eea"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
                 <div style="flex:1;">
-                  <p style="font-size:10px;font-weight:900;color:#667eea;line-height:1.3;">7人座車型</p>
-                  <p style="font-size:9px;opacity:0.4;">Step Wagon / Serena / Noah</p>
+                  <p style="font-size:10px;font-weight:900;color:#667eea;line-height:1.3;">3-2 Senaga, Tomigusuku, Okinawa 901-0233</p>
+                  <p style="font-size:9px;opacity:0.4;">日本</p>
                 </div>
-                <span style="font-size:9px;opacity:0.4;font-weight:900;">點擊查看 →</span>
+                <span style="font-size:9px;opacity:0.4;font-weight:900;">🚗</span>
               </div>
             </div>
           </div>
@@ -607,7 +614,7 @@
           <!-- Churasun6 卡片 -->
           <div class="card-neo overflow-hidden" style="border-radius:32px;padding:0;">
             <!-- 預覽圖 -->
-            <div style="position:relative;width:100%;height:160px;overflow:hidden;">
+            <div style="position:relative;width:100%;height:220px;overflow:hidden;">
               <img src="./images/car-preview.jpg" style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block;">
               <!-- 前往時間 badge -->
               <div style="position:absolute;top:12px;right:12px;background:rgba(0,0,0,0.45);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.25);border-radius:999px;padding:4px 12px;display:flex;align-items:center;gap:5px;">
@@ -629,10 +636,10 @@
               </div>
               <!-- 地址 -->
               <a href="https://maps.google.com/?q=Churasun6,3-6-2+Makishi,Naha,Okinawa" target="_blank"
-                style="display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:16px;background:rgba(92,122,106,0.08);border:1px solid rgba(92,122,106,0.15);text-decoration:none;margin-top:4px;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="#5C7A6A"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                style="display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:16px;background:rgba(102,126,234,0.08);border:1px solid rgba(102,126,234,0.15);text-decoration:none;margin-top:4px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="#667eea"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
                 <div style="flex:1;">
-                  <p style="font-size:10px;font-weight:900;color:var(--green);line-height:1.3;">3-6-2 Makishi, Naha</p>
+                  <p style="font-size:10px;font-weight:900;color:#667eea;line-height:1.3;">3-6-2 Makishi, Naha</p>
                   <p style="font-size:9px;opacity:0.4;">牧志公設市場 2F・那霸市牧志 900-0013</p>
                 </div>
                 <span style="font-size:9px;opacity:0.4;font-weight:900;">地圖 →</span>
@@ -643,16 +650,12 @@
           <!-- 美麗海水族館 卡片 -->
           <div class="card-neo overflow-hidden active:scale-[0.98] transition cursor-pointer" style="border-radius:32px;padding:0;" @click="showAquariumModal=true">
             <!-- 預覽圖 -->
-            <div style="position:relative;width:100%;height:160px;overflow:hidden;">
+            <div style="position:relative;width:100%;height:220px;overflow:hidden;">
               <img src="./images/car-preview2.jpg" style="width:100%;height:100%;object-fit:cover;object-position:center 30%;display:block;">
               <!-- 前往時間 badge -->
               <div style="position:absolute;top:12px;right:12px;background:rgba(0,0,0,0.35);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.3);border-radius:999px;padding:4px 12px;display:flex;align-items:center;gap:5px;">
                 <span style="font-size:10px;">🗓</span>
                 <span style="font-size:10px;font-weight:900;color:white;letter-spacing:0.05em;">6/5 &nbsp;14:00</span>
-              </div>
-              <!-- 點擊提示 -->
-              <div style="position:absolute;bottom:12px;left:12px;background:rgba(0,0,0,0.35);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.25);border-radius:999px;padding:4px 12px;">
-                <span style="font-size:9px;font-weight:900;color:white;letter-spacing:0.08em;">查看詳情 →</span>
               </div>
             </div>
             <!-- 資訊列 -->
@@ -668,10 +671,10 @@
                 </div>
               </div>
               <!-- 地址 -->
-              <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:16px;background:rgba(92,122,106,0.08);border:1px solid rgba(92,122,106,0.15);margin-top:4px;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="#5C7A6A"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+              <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:16px;background:rgba(102,126,234,0.08);border:1px solid rgba(102,126,234,0.15);margin-top:4px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="#667eea"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
                 <div style="flex:1;">
-                  <p style="font-size:10px;font-weight:900;color:var(--green);line-height:1.3;">424 Ishikawa, Motobu, Okinawa</p>
+                  <p style="font-size:10px;font-weight:900;color:#667eea;line-height:1.3;">424 Ishikawa, Motobu, Okinawa</p>
                   <p style="font-size:9px;opacity:0.4;">本部町石川 424・海洋博公園内 905-0206</p>
                 </div>
                 <span style="font-size:9px;opacity:0.4;font-weight:900;">🐋</span>
@@ -985,84 +988,132 @@
       </div>
 
       <!-- 住宿詳情彈窗 -->
-      <div v-if="showHotelModal" class="fixed inset-0 z-[1500] flex flex-col justify-center px-6 font-black">
-        <div class="absolute inset-0" style="background:rgba(50,40,30,0.75);backdrop-filter:blur(5px);" @click="showHotelModal = false"></div>
-        <div class="relative rounded-[40px] overflow-hidden card-neo-xl" style="max-height:85vh;display:flex;flex-direction:column;">
-          <div class="-m-0 p-8 text-white text-center font-black" style="background:linear-gradient(145deg,#7bbf96,#5a9070);box-shadow:0 4px 16px rgba(45,85,60,0.4);">
-            <p class="text-3xl font-black mb-1 leading-none tracking-tight">{{ hotelData.name }}</p>
-            <p class="text-[10px] opacity-70 tracking-[0.4em] uppercase font-black leading-none">Accommodation</p>
+      <div v-if="showHotelModal" class="fixed inset-0 z-[1500] flex flex-col justify-end font-black" style="padding-bottom:0;">
+        <div class="absolute inset-0" style="background:rgba(30,25,20,0.75);backdrop-filter:blur(6px);" @click="showHotelModal=false"></div>
+        <div class="relative card-neo-xl overflow-hidden" style="border-radius:40px 40px 0 0;max-height:92vh;display:flex;flex-direction:column;">
+          <!-- Header -->
+          <div style="background:linear-gradient(145deg,#7bbf96,#5a9070);padding:28px 28px 22px;position:relative;flex-shrink:0;">
+            <button @click="showHotelModal=false" style="position:absolute;top:16px;right:16px;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.15);border:none;color:white;font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;">✕</button>
+            <p style="font-size:10px;letter-spacing:0.4em;text-transform:uppercase;color:rgba(255,255,255,0.6);margin-bottom:6px;">Accommodation</p>
+            <p style="font-size:26px;font-weight:900;color:white;line-height:1.1;letter-spacing:-0.01em;">{{ hotelData.name }} 🏨</p>
+            <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
+              <span style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:999px;padding:3px 12px;font-size:9px;color:rgba(255,255,255,0.9);letter-spacing:0.08em;">6/3 – 6/7</span>
+              <span style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:999px;padding:3px 12px;font-size:9px;color:rgba(255,255,255,0.9);letter-spacing:0.08em;">{{ hotelData.nights }} 晚</span>
+            </div>
           </div>
-          <div style="overflow-y:auto;padding:2rem;flex:1;" class="space-y-6">
-            <!-- 入住資訊 -->
-            <div class="grid grid-cols-2 gap-6 font-black uppercase tracking-tighter text-[#4A4232]">
-              <div><p class="text-[10px] text-[#DCC3A0] tracking-widest leading-none">Check-in</p><p class="text-2xl leading-none mt-2">6/3 週三</p><p class="text-sm text-[#5C7A6A] mt-1">{{ hotelData.checkInTime }}</p></div>
-              <div><p class="text-[10px] text-[#DCC3A0] tracking-widest leading-none">Check-out</p><p class="text-2xl leading-none mt-2">6/7 週日</p><p class="text-sm text-[#5C7A6A] mt-1">{{ hotelData.checkOutTime }}</p></div>
-            </div>
-            <div class="border-t border-[#DCC3A0]/30 pt-4">
-              <p class="text-[10px] text-[#DCC3A0] tracking-widest leading-none mb-2">Nights</p>
-              <p class="text-xl text-[#5C7A6A]">{{ hotelData.nights }} 晚</p>
-            </div>
-            <!-- 地址資訊 -->
-            <div class="border-t border-[#DCC3A0]/30 pt-4">
-              <p class="text-[10px] text-[#DCC3A0] tracking-widest leading-none mb-2">Address</p>
-              <p class="text-sm leading-relaxed">{{ hotelData.building }}</p>
-              <p class="text-xs opacity-50 mt-1">{{ hotelData.address }}</p>
-            </div>
-            <!-- 照片輪播 -->
-            <div class="border-t border-[#DCC3A0]/30 pt-4">
-              <p class="text-[10px] text-[#DCC3A0] tracking-widest leading-none mb-3">Photos</p>
-              <div style="display:flex;overflow-x:auto;gap:8px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding-bottom:8px;">
-                <div v-for="(photo,idx) in hotelPhotos" :key="idx" @click="openHotelPhoto(idx)"
-                  style="flex-shrink:0;width:200px;height:140px;border-radius:18px;overflow:hidden;cursor:pointer;scroll-snap-align:start;box-shadow:var(--neo-out);">
-                  <img :src="photo.src" style="width:100%;height:100%;object-fit:cover;">
+          <!-- 滾動內容 -->
+          <div style="overflow-y:auto;padding:24px 24px 12px;flex:1;display:flex;flex-direction:column;gap:20px;">
+            <!-- 入住退房 -->
+            <div style="background:var(--bg-raised);border-radius:24px;box-shadow:var(--neo-out);border:var(--br);padding:18px 20px;">
+              <p style="font-size:9px;text-transform:uppercase;letter-spacing:0.2em;color:var(--tan);margin-bottom:14px;">📅 入住 / 退房</p>
+              <div style="display:flex;justify-content:space-between;">
+                <div>
+                  <p style="font-size:9px;letter-spacing:0.1em;color:var(--tan);text-transform:uppercase;margin-bottom:4px;">Check-in</p>
+                  <p style="font-size:22px;font-weight:900;color:var(--text);line-height:1;">6/3 週三</p>
+                  <p style="font-size:11px;color:var(--green);font-weight:900;margin-top:3px;">{{ hotelData.checkInTime }}</p>
+                </div>
+                <div style="width:1px;background:rgba(220,195,160,0.3);"></div>
+                <div style="text-align:right;">
+                  <p style="font-size:9px;letter-spacing:0.1em;color:var(--tan);text-transform:uppercase;margin-bottom:4px;">Check-out</p>
+                  <p style="font-size:22px;font-weight:900;color:var(--text);line-height:1;">6/7 週日</p>
+                  <p style="font-size:11px;color:var(--green);font-weight:900;margin-top:3px;">{{ hotelData.checkOutTime }}</p>
                 </div>
               </div>
             </div>
-            <!-- 地圖按鈕 -->
-            <!-- 地圖嵌入 -->
-            <div class="border-t border-[#DCC3A0]/30 pt-4">
-              <p class="text-[10px] text-[#DCC3A0] tracking-widest leading-none mb-3">Location</p>
-              <div class="w-full h-64 overflow-hidden rounded-3xl" style="box-shadow:var(--neo-out);">
+            <!-- 地址 -->
+            <div style="background:var(--bg-raised);border-radius:24px;box-shadow:var(--neo-out);border:var(--br);padding:18px 20px;">
+              <p style="font-size:9px;text-transform:uppercase;letter-spacing:0.2em;color:var(--tan);margin-bottom:10px;">📍 地址</p>
+              <p style="font-size:13px;font-weight:900;color:var(--text);line-height:1.4;">{{ hotelData.building }}</p>
+              <p style="font-size:11px;opacity:0.45;margin-top:4px;">{{ hotelData.address }}</p>
+            </div>
+            <!-- 照片輪播 -->
+            <div style="background:var(--bg-raised);border-radius:24px;box-shadow:var(--neo-out);border:var(--br);padding:18px 20px;">
+              <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px;">
+                <p style="font-size:9px;text-transform:uppercase;letter-spacing:0.2em;color:var(--tan);">📷 Photos</p>
+                <p style="font-size:8px;opacity:0.35;">← 左右滑動</p>
+              </div>
+              <div style="display:flex;overflow-x:auto;gap:12px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding:4px 4px 12px 4px;margin:0 -4px;" class="hide-scrollbar">
+                <div v-for="(photo,idx) in hotelPhotos" :key="idx" @click="openHotelPhoto(idx)"
+                  style="flex-shrink:0;width:220px;height:150px;border-radius:20px;overflow:hidden;cursor:pointer;scroll-snap-align:start;box-shadow:var(--neo-out-lg);position:relative;">
+                  <img :src="photo.src" style="width:100%;height:100%;object-fit:cover;">
+                  <div style="position:absolute;bottom:0;left:0;right:0;padding:8px 12px;background:linear-gradient(to top,rgba(0,0,0,0.5),transparent);">
+                    <p style="font-size:9px;font-weight:900;color:white;letter-spacing:0.05em;">{{ photo.label }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- 地圖 -->
+            <div style="background:var(--bg-raised);border-radius:24px;box-shadow:var(--neo-out);border:var(--br);padding:18px 20px;">
+              <p style="font-size:9px;text-transform:uppercase;letter-spacing:0.2em;color:var(--tan);margin-bottom:14px;">🗺 Location</p>
+              <div style="width:100%;height:200px;border-radius:20px;overflow:hidden;box-shadow:var(--neo-out);">
                 <iframe :src="hotelData.mapUrl" width="100%" height="100%" style="border:0;" loading="lazy"></iframe>
               </div>
             </div>
           </div>
-          <div style="padding:0 2rem 2rem;">
-            <button @click="showHotelModal = false" class="w-full py-4 rounded-full text-[10px] uppercase font-black active:scale-95 transition card-neo" style="color:var(--tan);">Close</button>
+          <!-- 關閉 -->
+          <div style="padding:12px 24px 24px;flex-shrink:0;">
+            <button @click="showHotelModal=false" class="w-full py-4 rounded-full text-[10px] uppercase font-black active:scale-95 transition card-neo" style="color:var(--tan);">Close</button>
           </div>
         </div>
       </div>
 
       <!-- 租車詳情彈窗 -->
-      <div v-if="showCarModal" class="fixed inset-0 z-[1500] flex flex-col justify-center px-6 font-black">
-        <div class="absolute inset-0" style="background:rgba(50,40,30,0.75);backdrop-filter:blur(5px);" @click="showCarModal = false"></div>
-        <div class="relative rounded-[40px] overflow-hidden p-8 space-y-8 card-neo-xl">
-          <div class="-m-8 p-8 text-white text-center font-black" style="background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);box-shadow:0 4px 16px rgba(102,126,234,0.4);">
-            <p class="text-3xl font-black mb-1 leading-none tracking-tight">{{ carRental.shop }}</p>
-            <p class="text-[10px] opacity-70 tracking-[0.4em] uppercase font-black leading-none">Rental Car</p>
-          </div>
-          <div class="grid grid-cols-2 gap-y-8 pt-6 font-black uppercase tracking-tighter text-[#4A4232]">
-            <div><p class="text-[10px] text-[#DCC3A0] tracking-widest leading-none">Pick-up</p><p class="text-2xl leading-none mt-1">6/5 週五</p></div>
-            <div><p class="text-[10px] text-[#DCC3A0] tracking-widest leading-none">Return</p><p class="text-2xl leading-none mt-1">6/7 週日</p></div>
-          </div>
-          <div class="border-t border-[#DCC3A0]/30 pt-6">
-            <p class="text-[10px] text-[#DCC3A0] tracking-widest leading-none mb-2">Vehicle Type</p>
-            <p class="text-xl text-[#667eea] mb-2">7人座車型</p>
-            <p class="text-sm opacity-60">Step Wagon / Serena / Noah</p>
-          </div>
-          <div class="border-t border-[#DCC3A0]/30 pt-6">
-            <p class="text-[10px] text-[#DCC3A0] tracking-widest leading-none mb-2">Location</p>
-            <p class="text-sm leading-relaxed">Budget Rent a Car Naha Airport</p>
-            <p class="text-xs opacity-50 mt-1">豐見城市瀨長 3-2</p>
-          </div>
-          <!-- 地圖嵌入 -->
-          <div class="border-t border-[#DCC3A0]/30 pt-6">
-            <p class="text-[10px] text-[#DCC3A0] tracking-widest leading-none mb-3">Map</p>
-            <div class="w-full h-64 overflow-hidden rounded-3xl" style="box-shadow:var(--neo-out);">
-              <iframe src="https://maps.google.com/maps?q=3-2+Senaga+Tomigusuku+Okinawa+901-0233+Japan&t=m&z=17&output=embed&iwloc=near" width="100%" height="100%" style="border:0;" loading="lazy"></iframe>
+      <div v-if="showCarModal" class="fixed inset-0 z-[1500] flex flex-col justify-end font-black" style="padding-bottom:0;">
+        <div class="absolute inset-0" style="background:rgba(30,25,20,0.75);backdrop-filter:blur(6px);" @click="showCarModal=false"></div>
+        <div class="relative card-neo-xl overflow-hidden" style="border-radius:40px 40px 0 0;max-height:92vh;display:flex;flex-direction:column;">
+          <!-- Header -->
+          <div style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);padding:28px 28px 22px;position:relative;flex-shrink:0;">
+            <button @click="showCarModal=false" style="position:absolute;top:16px;right:16px;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.15);border:none;color:white;font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;">✕</button>
+            <p style="font-size:10px;letter-spacing:0.4em;text-transform:uppercase;color:rgba(255,255,255,0.6);margin-bottom:6px;">Rental Car</p>
+            <p style="font-size:26px;font-weight:900;color:white;line-height:1.1;letter-spacing:-0.01em;">{{ carRental.shop }} 🚗</p>
+            <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
+              <span style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:999px;padding:3px 12px;font-size:9px;color:rgba(255,255,255,0.9);letter-spacing:0.08em;">6/5 – 6/7</span>
+              <span style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:999px;padding:3px 12px;font-size:9px;color:rgba(255,255,255,0.9);letter-spacing:0.08em;">7人座</span>
             </div>
           </div>
-          <button @click="showCarModal = false" class="w-full py-4 rounded-full text-[10px] uppercase font-black active:scale-95 transition card-neo" style="color:var(--tan);">Close</button>
+          <!-- 滾動內容 -->
+          <div style="overflow-y:auto;padding:24px 24px 12px;flex:1;display:flex;flex-direction:column;gap:20px;">
+            <!-- 取還車時間 -->
+            <div style="background:var(--bg-raised);border-radius:24px;box-shadow:var(--neo-out);border:var(--br);padding:18px 20px;">
+              <p style="font-size:9px;text-transform:uppercase;letter-spacing:0.2em;color:var(--tan);margin-bottom:14px;">📅 取車 / 還車</p>
+              <div style="display:flex;justify-content:space-between;">
+                <div>
+                  <p style="font-size:9px;letter-spacing:0.1em;color:var(--tan);text-transform:uppercase;margin-bottom:4px;">Pick-up</p>
+                  <p style="font-size:22px;font-weight:900;color:var(--text);line-height:1;">6/5 週五</p>
+                  <p style="font-size:11px;color:#667eea;font-weight:900;margin-top:3px;">{{ carRental.pickTime }}</p>
+                </div>
+                <div style="width:1px;background:rgba(220,195,160,0.3);"></div>
+                <div style="text-align:right;">
+                  <p style="font-size:9px;letter-spacing:0.1em;color:var(--tan);text-transform:uppercase;margin-bottom:4px;">Return</p>
+                  <p style="font-size:22px;font-weight:900;color:var(--text);line-height:1;">6/7 週日</p>
+                  <p style="font-size:11px;color:#667eea;font-weight:900;margin-top:3px;">{{ carRental.returnTime }}</p>
+                </div>
+              </div>
+            </div>
+            <!-- 車型 -->
+            <div style="background:var(--bg-raised);border-radius:24px;box-shadow:var(--neo-out);border:var(--br);padding:18px 20px;">
+              <p style="font-size:9px;text-transform:uppercase;letter-spacing:0.2em;color:var(--tan);margin-bottom:10px;">🚙 車型</p>
+              <p style="font-size:20px;font-weight:900;color:#667eea;line-height:1.2;">7人座車型</p>
+              <p style="font-size:11px;opacity:0.5;margin-top:5px;">Step Wagon / Serena / Noah</p>
+            </div>
+            <!-- 取車地點 -->
+            <div style="background:var(--bg-raised);border-radius:24px;box-shadow:var(--neo-out);border:var(--br);padding:18px 20px;">
+              <p style="font-size:9px;text-transform:uppercase;letter-spacing:0.2em;color:var(--tan);margin-bottom:10px;">📍 取車地點</p>
+              <p style="font-size:13px;font-weight:900;color:var(--text);line-height:1.4;">Budget Rent a Car Naha Airport</p>
+              <p style="font-size:11px;opacity:0.45;margin-top:4px;">豐見城市瀨長 3-2</p>
+            </div>
+            <!-- 地圖 -->
+            <div style="background:var(--bg-raised);border-radius:24px;box-shadow:var(--neo-out);border:var(--br);padding:18px 20px;">
+              <p style="font-size:9px;text-transform:uppercase;letter-spacing:0.2em;color:var(--tan);margin-bottom:14px;">🗺 Map</p>
+              <div style="width:100%;height:200px;border-radius:20px;overflow:hidden;box-shadow:var(--neo-out);">
+                <iframe src="https://maps.google.com/maps?q=3-2+Senaga+Tomigusuku+Okinawa+901-0233+Japan&t=m&z=17&output=embed&iwloc=near" width="100%" height="100%" style="border:0;" loading="lazy"></iframe>
+              </div>
+            </div>
+          </div>
+          <!-- 關閉 -->
+          <div style="padding:12px 24px 24px;flex-shrink:0;">
+            <button @click="showCarModal=false" class="w-full py-4 rounded-full text-[10px] uppercase font-black active:scale-95 transition card-neo" style="color:var(--tan);">Close</button>
+          </div>
         </div>
       </div>
 
@@ -1120,8 +1171,8 @@
             </div>
 
             <!-- 表演時刻表 - 左右滑動 -->
-            <div>
-              <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;">
+            <div style="background:var(--bg-raised);border-radius:24px;box-shadow:var(--neo-out);border:var(--br);padding:18px 20px;">
+              <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px;">
                 <p style="font-size:9px;text-transform:uppercase;letter-spacing:0.2em;color:var(--tan);">🎭 表演與活動時刻表</p>
                 <p style="font-size:8px;opacity:0.35;">← 左右滑動</p>
               </div>
