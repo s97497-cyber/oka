@@ -2085,8 +2085,16 @@
         const d = snap.data();
         if (d.expenses)     expenses.value     = d.expenses;
         if (d.allTodos)     allTodos.value     = d.allTodos;
-        if (d.itinerary)    itinerary.value    = d.itinerary;
         if (d.groupMembers) groupMembers.value = d.groupMembers;
+        if (d.itinerary) {
+          // 清除舊的 Storage URL 和 ph_ key 殘留
+          const cleaned = JSON.parse(JSON.stringify(d.itinerary));
+          for (const day of cleaned)
+            for (const ev of (day.events || []))
+              if (ev.photo && !ev.photo.startsWith('data:'))
+                ev.photo = '';
+          itinerary.value = cleaned;
+        }
       });
 
       const { watch } = Vue;
