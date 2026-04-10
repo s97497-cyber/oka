@@ -2122,7 +2122,7 @@
 
       watch(expenses,     v => { localUpdate=true; saveToFirestore('expenses',v).then(()=>setTimeout(()=>localUpdate=false,500)); }, { deep:true });
       watch(allTodos,     v => { localUpdate=true; saveToFirestore('allTodos',v).then(()=>setTimeout(()=>localUpdate=false,500)); }, { deep:true });
-      watch(itinerary,    v => { localUpdate=true; saveToFirestore('itinerary',v).then(()=>setTimeout(()=>localUpdate=false,500)); }, { deep:true });
+      watch(itinerary,    v => { localUpdate=true; saveToFirestore('itinerary',v).then(()=>setTimeout(()=>localUpdate=false,3000)); }, { deep:true });
       watch(groupMembers, v => { localUpdate=true; saveToFirestore('groupMembers',v).then(()=>setTimeout(()=>localUpdate=false,500)); }, { deep:true });
 
       // 任何 modal 開啟時鎖定 body 滾動
