@@ -1413,8 +1413,8 @@
                 <button @click="kokusaiForm.photo=''" style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.5);color:white;border:none;border-radius:50%;width:24px;height:24px;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
               </div>
               <label class="card-neo w-full py-3 flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition" style="border-radius:16px;display:flex;">
-                <span style="font-size:12px;font-weight:900;color:var(--green);">📷 上傳圖片</span>
-                <input type="file" accept="image/*" style="display:none;" @change="handleKokusaiPhoto">
+                <span style="font-size:12px;font-weight:900;color:var(--green);">{{ kokusaiUploading ? '⏳ 上傳中...' : '📷 上傳圖片' }}</span>
+                <input type="file" accept="image/*" style="display:none;" @change="handleKokusaiPhoto" :disabled="kokusaiUploading">
               </label>
             </div>
 
@@ -2798,7 +2798,13 @@
         const img = new Image();
         img.onload = () => {
           ctx.drawImage(img, sx, sy, sw, sh, 0, 0, sw, sh);
-          tempEvent.value.photo = canvas.toDataURL('image/jpeg', 0.85);
+          // 壓縮後上傳 Cloudinary
+          const base64 = canvas.toDataURL('image/jpeg', 0.82);
+          uploadToCloudinary(base64).then(url => {
+            tempEvent.value.photo = url;
+          }).catch(() => {
+            tempEvent.value.photo = base64; // fallback base64
+          });
           showCropper.value = false;
           cropSrc.value = '';
         };
@@ -2952,11 +2958,58 @@
         }
       };
 
+      // Cloudinary 設定
+      const CLOUDINARY_CLOUD = 'dmic75elp';
+      const CLOUDINARY_PRESET = 'u1oajdye';
+
+      // 上傳圖片到 Cloudinary，回傳網址
+      const uploadToCloudinary = async (base64) => {
+        const fd = new FormData();
+        fd.append('file', base64);
+        fd.append('upload_preset', CLOUDINARY_PRESET);
+        fd.append('folder', 'okinawa');
+        const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, {
+          method: 'POST',
+          body: fd
+        });
+        const data = await res.json();
+        if (data.secure_url) return data.secure_url;
+        throw new Error('Upload failed: ' + JSON.stringify(data));
+      };
+
+      // 共用圖片壓縮函式：最大 1200px，品質 0.82
+      const compressImage = (src, maxSize=1200, quality=0.82) => new Promise(resolve => {
+        const img = new Image();
+        img.onload = () => {
+          const ratio = Math.min(maxSize / img.width, maxSize / img.height, 1);
+          const w = Math.round(img.width * ratio);
+          const h = Math.round(img.height * ratio);
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        };
+        img.src = src;
+      });
+
+      const kokusaiUploading = Vue.ref(false);
       const handleKokusaiPhoto = (e) => {
         const file = e.target.files[0];
         if (!file) return;
         const reader = new FileReader();
-        reader.onload = (ev) => { kokusaiForm.value.photo = ev.target.result; };
+        reader.onload = async (ev) => {
+          kokusaiUploading.value = true;
+          try {
+            const compressed = await compressImage(ev.target.result);
+            const url = await uploadToCloudinary(compressed);
+            kokusaiForm.value.photo = url;
+          } catch(err) {
+            // fallback: 存 base64
+            kokusaiForm.value.photo = await compressImage(ev.target.result, 600, 0.7);
+          } finally {
+            kokusaiUploading.value = false;
+          }
+        };
         reader.readAsDataURL(file);
       };
       const showEsimModal = ref(false);
@@ -3252,7 +3305,7 @@
       return {
         appLoading, loadProgress, loadingMsg, currentUser, loginAs, loginDropOpen, loginSelected, loggingIn, loggingOut, pendingUser, doLogin, allTodos, onPickerScroll, scrollPickerTo, currentTab, navCollapsed, tabs, btabs, weather, weatherBg, timeObj, calcInput, calcMode, calcExpr, calcDisplayVal, calcPendingOp, switchCalcMode, pressCalc, pressCalcNum, pressCalcDot, pressCalcOp, pressCalcEqual, pressCalcClear, pressCalcBackspace, calcOutput, jpyRate, jpyBuyRate, jpySellRate, rateUpdatedAt, groupMembers, showMemberModal, newMember, showUserMenu, toggleUserMenu, closeUserMenu, showProfileModal, profileEdit, openProfile, handleProfileAvatarUpload, saveProfile, logout, handleAvatarUpload, addMember, getMemberAvatar, editingMember, openEditMember, handleEditAvatarUpload, saveEditMember, showAddMember, BLANK_AVATAR, expenseSubTab, expenses, memberStats, maxPaid, settlementAdvice, showExpenseModal, openExpenseModal, addExpense, newExpense, openEditExpense, editingExpenseIdx, expenseFilterMember, filteredExpenses, itinerary, activeDay, departureTrip, returnFlights, selectedReturnFlight, hotelData, carRental, showFlightDetail, activeFlight, triggerPasscode, showPasscodeModal, passcode, pressKey, passcodeMode, scheduleSubTab, planningSubTab, filteredTodos: computed(() => { const key = planningSubTab.value === 'essential' ? '_shared' : currentUser.value; return (allTodos.value[key]||[]).filter(t=>t.type===planningSubTab.value); }), newTodoText, addTodo, removeTodo, categories, showEditModal, isNewEvent, tempEvent, openEditModal, openAddModal, deleteEvent, saveEvent, showConfirmModal, confirmItemName, confirmDelete, executeDelete, bookingSubTab, globalCurrency, toggleAllCurrency,
         previewCanvas,hotelPhotos,showHotelLightbox,openEditExpense,editingExpenseIdx,showCropper,cropSrc,cropCanvas,cropBox,openCropper,startCropDrag,confirmCrop,currentHotelPhoto,openHotelPhoto,lbTouchStart,lbTouchEnd,
-        editMode, canEdit, showHotelModal, showCarModal, showAquariumModal, showChurasunModal, showCalcModal, showCouponModal, couponZoom, showVjwModal, showKokusaiModal, showKokusaiEdit, showKokusaiDetail, kokusaiSelected, kokusaiSelectedIdx, kokusaiTab, kokusaiPlaces, kokusaiEditIdx, kokusaiForm, openAddKokusai, openEditKokusai, saveKokusai, removeKokusai, handleKokusaiPhoto, showEsimModal, showSmokingModal, smokingLat, smokingLng, smokingLocating, smokingMapSrc, openSmokingFinder, getSmokingLocation, aquariumPhotos, handleAquariumPhoto, openHotelModal, openCarModal, isAdmin,
+        editMode, canEdit, showHotelModal, showCarModal, showAquariumModal, showChurasunModal, showCalcModal, showCouponModal, couponZoom, showVjwModal, showKokusaiModal, showKokusaiEdit, showKokusaiDetail, kokusaiSelected, kokusaiSelectedIdx, kokusaiTab, kokusaiPlaces, kokusaiEditIdx, kokusaiForm, openAddKokusai, openEditKokusai, saveKokusai, removeKokusai, handleKokusaiPhoto, kokusaiUploading, showEsimModal, showSmokingModal, smokingLat, smokingLng, smokingLocating, smokingMapSrc, openSmokingFinder, getSmokingLocation, aquariumPhotos, handleAquariumPhoto, openHotelModal, openCarModal, isAdmin,
         getCategoryColor: (t) => ({ transport: 'bg-[#D94F4F]', spot: 'bg-[#98BDE3]', food: 'bg-[#E3A97C]', other: 'bg-[#C4A8D4]' }[t] || 'bg-[#DCC3A0]'),
         categoryDot: (id) => ({ spot:'#98BDE3', food:'#E3A97C', transport:'#D94F4F', other:'#C4A8D4' }[id] || '#DCC3A0'),
         categoryStyle: (id, active) => {
