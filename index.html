@@ -2862,16 +2862,23 @@
       };
       const saveKokusai = () => {
         if (!kokusaiForm.value.name) return;
-        const p = { ...kokusaiForm.value, id: Date.now() };
         if (kokusaiEditIdx.value === -1) {
-          kokusaiPlaces.value.push(p);
+          // 新增：產生新 id
+          const p = { ...kokusaiForm.value, id: Date.now() };
+          kokusaiPlaces.value = [...kokusaiPlaces.value, p];
         } else {
-          kokusaiPlaces.value[kokusaiEditIdx.value] = p;
+          // 編輯：保留原本的 id，整個陣列重新賦值觸發 watch
+          const updated = [...kokusaiPlaces.value];
+          updated[kokusaiEditIdx.value] = {
+            ...kokusaiForm.value,
+            id: kokusaiPlaces.value[kokusaiEditIdx.value]?.id || Date.now()
+          };
+          kokusaiPlaces.value = updated;
         }
         showKokusaiEdit.value = false;
       };
       const removeKokusai = (idx) => {
-        kokusaiPlaces.value.splice(idx, 1);
+        kokusaiPlaces.value = kokusaiPlaces.value.filter((_, i) => i !== idx);
       };
       const fetchHoursWithGemini = null;
       const fetchingHours = Vue.ref(false);
