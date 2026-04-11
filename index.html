@@ -362,6 +362,11 @@
             <button v-if="groupMembers.length > 0 && currentUser === groupMembers[0].name" @click.stop="showMemberModal=true; closeUserMenu()" class="w-full flex items-center gap-3 px-5 py-3 text-left text-sm font-black transition" style="border-bottom:1px solid rgba(220,195,160,0.25);">
               <span>👥</span><span>成員</span>
             </button>
+            <button v-if="isAdmin" @click.stop="editMode=!editMode; closeUserMenu()" class="w-full flex items-center gap-3 px-5 py-3 text-left text-sm font-black transition" style="border-bottom:1px solid rgba(220,195,160,0.25);">
+              <span>{{ editMode ? '🔓' : '🔒' }}</span>
+              <span>{{ editMode ? '編輯模式（開啟中）' : '編輯模式（關閉）' }}</span>
+              <span v-if="editMode" style="margin-left:auto;width:8px;height:8px;border-radius:50%;background:#5a9070;box-shadow:0 0 6px #5a9070;flex-shrink:0;"></span>
+            </button>
             <button @click.stop="logout(); closeUserMenu()" class="w-full flex items-center gap-3 px-5 py-3 text-left text-sm font-black text-red-400 transition">
               <span>🚪</span><span>登出</span>
             </button>
@@ -504,7 +509,7 @@
         <div class="relative pl-6 border-l-4 border-[#EAE1D0] ml-3 space-y-8 pb-10">
           <div v-for="(item, idx) in itinerary[activeDay].events" :key="idx" class="relative">
             <div :class="['absolute -left-[2.1rem] top-4 w-5 h-5 rounded-full border-[3px] shadow-sm transition-colors duration-500', getCategoryColor(item.type)]" :style="{borderColor:'var(--bg)'}"></div>
-            <div :class="['card-neo relative overflow-hidden transition', isAdmin ? 'cursor-pointer active:scale-95' : '']" @click="isAdmin && openEditModal(item, activeDay, idx)" style="padding:0;">
+            <div :class="['card-neo relative overflow-hidden transition', canEdit ? 'cursor-pointer active:scale-95' : '']" @click="canEdit && openEditModal(item, activeDay, idx)" style="padding:0;">
               <!-- 封面照片 -->
               <div v-if="item.photo" style="width:100%;height:140px;overflow:hidden;border-radius:28px 28px 0 0;">
                 <img :src="item.photo" style="width:100%;height:100%;object-fit:cover;">
@@ -525,11 +530,11 @@
                     開啟連結
                   </a>
                 </div>
-                <div v-if="isAdmin" class="absolute right-4 top-4 opacity-20 text-lg">✏️</div>
+                <div v-if="canEdit" class="absolute right-4 top-4 opacity-20 text-lg">✏️</div>
               </div>
             </div>
           </div>
-          <button v-if="isAdmin" @click="openAddModal(activeDay)" class="w-full py-6 rounded-3xl font-black text-xl active:scale-95 transition" style="border:3px dashed #D4C4A8;background:transparent;box-shadow:var(--neo-in);color:var(--tan);">＋ 新增行程</button>
+          <button v-if="canEdit" @click="openAddModal(activeDay)" class="w-full py-6 rounded-3xl font-black text-xl active:scale-95 transition" style="border:3px dashed #D4C4A8;background:transparent;box-shadow:var(--neo-in);color:var(--tan);">＋ 新增行程</button>
         </div>
         </div><!-- end itinerary -->
 
@@ -548,10 +553,7 @@
                   <p style="font-size:16px;font-weight:900;line-height:1.2;">國際通</p>
                   <p style="font-size:9px;opacity:0.45;margin-top:3px;letter-spacing:0.08em;text-transform:uppercase;">Kokusai-dori · 那霸購物大街</p>
                 </div>
-                <div style="text-align:right;">
-                  <p style="font-size:9px;opacity:0.4;letter-spacing:0.08em;text-transform:uppercase;">分類</p>
-                  <p style="font-size:12px;font-weight:900;color:var(--green);">美食・購物・機位</p>
-                </div>
+
               </div>
             </div>
           </div>
@@ -568,7 +570,7 @@
         </div>
         <div v-if="bookingSubTab === 'flights'" class="space-y-8 font-black">
           <div @click="viewFlightDetail('departure')" class="card-neo overflow-hidden relative active:scale-95 transition cursor-pointer" style="border-radius:32px;padding:0;">
-            <div v-if="isAdmin" @click.stop="triggerPasscode()" class="absolute right-4 top-4 z-10 opacity-40 text-xl">✏️</div>
+            <div v-if="canEdit" @click.stop="triggerPasscode()" class="absolute right-4 top-4 z-10 opacity-40 text-xl">✏️</div>
             <div style="position:relative;height:220px;overflow:hidden;">
               <img src="./images/airport-tpe.jpg" style="width:100%;height:100%;object-fit:cover;object-position:center;">
               <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.55) 0%,transparent 60%);"></div>
@@ -587,7 +589,7 @@
               <button v-for="(f, idx) in returnFlights" :key="idx" @click="selectedReturnFlight = idx" :class="['tab-btn text-xs', selectedReturnFlight === idx ? 'active' : 'inactive']">{{ f.destName }}</button>
             </div>
             <div @click="viewFlightDetail('return')" class="card-neo overflow-hidden relative active:scale-95 transition cursor-pointer font-bold" style="border-radius:32px;padding:0;">
-              <div v-if="isAdmin" @click.stop="triggerPasscode()" class="absolute right-4 top-4 z-10 opacity-40 text-xl">✏️</div>
+              <div v-if="canEdit" @click.stop="triggerPasscode()" class="absolute right-4 top-4 z-10 opacity-40 text-xl">✏️</div>
               <div style="position:relative;height:220px;overflow:hidden;">
                 <img src="./images/airport-oka.jpg" style="width:100%;height:100%;object-fit:cover;object-position:center top;">
                 <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.55) 0%,transparent 60%);"></div>
@@ -899,14 +901,14 @@
           </div>
         </div>
 
-        <div v-if="planningSubTab==='essential' ? isAdmin : !!currentUser" class="card-neo p-4 flex gap-3 font-black"><input v-model="newTodoText" @keyup.enter="addTodo" type="text" placeholder="Add..." class="flex-1 px-4 py-2 outline-none text-sm border-none bg-transparent font-black"><button @click="addTodo" class="w-10 h-10 text-white rounded-xl text-xl font-bold active:scale-90 transition" style="background:linear-gradient(145deg,#8ec4a1,#5a9070);box-shadow:var(--neo-out);">＋</button></div>
+        <div v-if="planningSubTab==='essential' ? canEdit : !!currentUser" class="card-neo p-4 flex gap-3 font-black"><input v-model="newTodoText" @keyup.enter="addTodo" type="text" placeholder="Add..." class="flex-1 px-4 py-2 outline-none text-sm border-none bg-transparent font-black"><button @click="addTodo" class="w-10 h-10 text-white rounded-xl text-xl font-bold active:scale-90 transition" style="background:linear-gradient(145deg,#8ec4a1,#5a9070);box-shadow:var(--neo-out);">＋</button></div>
         <div class="space-y-4">
           <div v-for="task in filteredTodos" :key="task.id" class="card-neo p-5 flex items-center justify-between font-black">
             <label class="flex items-center space-x-4 flex-1 font-black" :class="planningSubTab==='personal' ? 'cursor-pointer' : 'cursor-default'">
               <input v-if="planningSubTab==='personal'" type="checkbox" v-model="task.done" class="w-5 h-5 accent-[#5C7A6A] shadow-inner">
               <span :class="['text-lg', task.done && planningSubTab==='personal' ? 'line-through text-[#DCC3A0] opacity-50' : '']">{{ task.text }}</span>
             </label>
-            <button v-if="planningSubTab==='essential' ? isAdmin : !!currentUser" @click="confirmDelete(task.text, () => removeTodo(task.id))" style="color:rgba(200,100,100,0.5);background:none;border:none;cursor:pointer;padding:6px;line-height:1;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+            <button v-if="planningSubTab==='essential' ? canEdit : !!currentUser" @click="confirmDelete(task.text, () => removeTodo(task.id))" style="color:rgba(200,100,100,0.5);background:none;border:none;cursor:pointer;padding:6px;line-height:1;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
           </div>
         </div>
 
@@ -1310,7 +1312,7 @@
           <div style="overflow-y:auto;padding:16px 16px 12px;flex:1;display:flex;flex-direction:column;gap:12px;">
 
             <!-- 管理員新增按鈕 -->
-            <button v-if="isAdmin" @click="openAddKokusai()" class="w-full py-4 rounded-2xl font-black text-sm active:scale-95 transition" style="border:2px dashed rgba(45,122,74,0.4);background:rgba(45,122,74,0.05);color:var(--green);">＋ 新增店家</button>
+            <button v-if="canEdit" @click="openAddKokusai()" class="w-full py-4 rounded-2xl font-black text-sm active:scale-95 transition" style="border:2px dashed rgba(45,122,74,0.4);background:rgba(45,122,74,0.05);color:var(--green);">＋ 新增店家</button>
 
             <!-- 店家列表 2xN grid -->
             <template v-if="kokusaiPlaces.filter(p=>p.tab===kokusaiTab).length === 0">
@@ -1336,9 +1338,9 @@
                   <p style="font-size:12px;font-weight:900;line-height:1.3;">{{ place.name }}</p>
                   <p v-if="place.desc" style="font-size:9px;opacity:0.4;margin-top:3px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">{{ place.desc }}</p>
                   <!-- 管理員按鈕 -->
-                  <div v-if="isAdmin" style="display:flex;gap:4px;margin-top:6px;" @click.stop>
-                    <button @click="openEditKokusai(kokusaiPlaces.indexOf(place))" style="font-size:11px;background:none;border:none;cursor:pointer;opacity:0.35;">✏️</button>
-                    <button @click="confirmDelete(place.name, ()=>removeKokusai(kokusaiPlaces.indexOf(place)))" style="font-size:11px;background:none;border:none;cursor:pointer;color:rgba(200,80,80,0.5);">✕</button>
+                  <div v-if="canEdit" style="display:flex;gap:6px;margin-top:8px;" @click.stop>
+                    <button @click="openEditKokusai(kokusaiPlaces.indexOf(place))" style="font-size:16px;background:none;border:none;cursor:pointer;opacity:0.4;padding:2px;">✏️</button>
+                    <button @click="confirmDelete(place.name, ()=>removeKokusai(kokusaiPlaces.indexOf(place)))" style="font-size:16px;background:none;border:none;cursor:pointer;color:rgba(200,80,80,0.6);padding:2px;">✕</button>
                   </div>
                 </div>
               </div>
@@ -1385,6 +1387,12 @@
               <textarea v-model="kokusaiForm.desc" rows="3" placeholder="簡單介紹這家店..." class="card-neo w-full px-4 py-3 text-sm font-black outline-none bg-transparent border-none resize-none" style="border-radius:16px;"></textarea>
             </div>
 
+            <!-- 推薦商品 -->
+            <div>
+              <p style="font-size:10px;opacity:0.5;margin-bottom:6px;letter-spacing:0.1em;">推薦商品</p>
+              <textarea v-model="kokusaiForm.recommend" rows="3" placeholder="例：招牌牛肉漢堡、珊瑚礁冰淇淋..." class="card-neo w-full px-4 py-3 text-sm font-black outline-none bg-transparent border-none resize-none" style="border-radius:16px;"></textarea>
+            </div>
+
             <!-- Google Map -->
             <div>
               <p style="font-size:10px;opacity:0.5;margin-bottom:6px;letter-spacing:0.1em;">Google Maps 連結</p>
@@ -1394,7 +1402,7 @@
             <!-- 營業時間 -->
             <div>
               <p style="font-size:10px;opacity:0.5;margin-bottom:6px;letter-spacing:0.1em;">營業時間</p>
-              <textarea v-model="kokusaiForm.hours" rows="3" placeholder="例：週一至週日 10:00–22:00&#10;週三公休" class="card-neo w-full px-4 py-3 text-sm font-black outline-none bg-transparent border-none resize-none" style="border-radius:16px;"></textarea>
+              <textarea v-model="kokusaiForm.hours" rows="5" placeholder="例：週一至週日 10:00–22:00&#10;週三公休" class="card-neo w-full px-4 py-3 text-sm font-black outline-none bg-transparent border-none resize-none" style="border-radius:16px;"></textarea>
             </div>
 
             <!-- 圖片上傳 -->
@@ -1439,6 +1447,10 @@
             <div v-if="kokusaiSelected.desc" class="card-neo" style="padding:14px 16px;border-radius:18px;">
               <p style="font-size:9px;opacity:0.4;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:6px;">介紹</p>
               <p style="font-size:13px;font-weight:700;line-height:1.6;opacity:0.8;">{{ kokusaiSelected.desc }}</p>
+            </div>
+            <div v-if="kokusaiSelected.recommend" class="card-neo" style="padding:14px 16px;border-radius:18px;">
+              <p style="font-size:9px;opacity:0.4;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:6px;">⭐ 推薦商品</p>
+              <p style="font-size:13px;font-weight:700;line-height:1.6;opacity:0.8;white-space:pre-line;">{{ kokusaiSelected.recommend }}</p>
             </div>
             <div v-if="kokusaiSelected.hours" class="card-neo" style="padding:14px 16px;border-radius:18px;">
               <p style="font-size:9px;opacity:0.4;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:6px;">🕐 營業時間</p>
@@ -2317,15 +2329,14 @@
 
       const _attachGlobalClose = () => {
         if (_globalCloseHandlers) return;
-        const onEvent = () => closeUserMenu();
-        // 用 setTimeout 0 避免開啟當下的事件立刻觸發關閉
-        const attachTimer = setTimeout(() => {
-          window.addEventListener('click', onEvent, { passive: true });
+        // 延遲 200ms 關閉，讓選單按鈕的 click 有時間先執行
+        const onEvent = () => setTimeout(() => closeUserMenu(), 200);
+        setTimeout(() => {
           window.addEventListener('touchstart', onEvent, { passive: true });
           window.addEventListener('scroll', onEvent, { passive: true });
           window.addEventListener('touchmove', onEvent, { passive: true });
           _globalCloseHandlers = onEvent;
-        }, 0);
+        }, 50);
       };
 
       const _detachGlobalClose = () => {
@@ -2841,12 +2852,12 @@
 
       const openAddKokusai = () => {
         kokusaiEditIdx.value = -1;
-        kokusaiForm.value = { tab: kokusaiTab.value, name:'', desc:'', mapUrl:'', photo:'' };
+        kokusaiForm.value = { tab: kokusaiTab.value, name:'', desc:'', recommend:'', mapUrl:'', hours:'', photo:'' };
         showKokusaiEdit.value = true;
       };
       const openEditKokusai = (idx) => {
         kokusaiEditIdx.value = idx;
-        kokusaiForm.value = { ...kokusaiPlaces.value[idx] };
+        kokusaiForm.value = { recommend:'', hours:'', ...kokusaiPlaces.value[idx] };
         showKokusaiEdit.value = true;
       };
       const saveKokusai = () => {
@@ -2864,6 +2875,37 @@
       };
       const fetchHoursWithGemini = null;
       const fetchingHours = Vue.ref(false);
+
+      const _geminiRemoved = async () => {
+        if (!kokusaiForm.value.name || generatingDesc.value) return;
+        generatingDesc.value = true;
+        try {
+          const tab = kokusaiForm.value.tab;
+          const isFood = tab === 'food';
+          const prompt = isFood
+            ? `請用繁體中文為沖繩國際通的「${kokusaiForm.value.name}」餐廳寫一段約30-50字的介紹，並推薦1-2道招牌餐點。只需回傳介紹文字，不要任何標題或額外說明。`
+            : `請用繁體中文為沖繩國際通的「${kokusaiForm.value.name}」${tab === 'shop' ? '購物店' : '伴手禮店'}寫一段約30-50字的介紹。只需回傳介紹文字，不要任何標題或額外說明。`;
+
+          const res = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                contents: [{ parts: [{ text: prompt }] }],
+                generationConfig: { temperature: 0.7, maxOutputTokens: 200 }
+              })
+            }
+          );
+          const data = await res.json();
+          const text = data?.candidates?.[0]?.content?.parts?.map(p => p.text).filter(Boolean).join('').trim();
+          if (text) kokusaiForm.value.desc = text;
+        } catch(e) {
+          console.error('Gemini error:', e);
+        } finally {
+          generatingDesc.value = false;
+        }
+      };
 
       const _unused = async () => {
         if (!kokusaiForm.value.mapUrl || fetchingHours.value) return;
@@ -2913,6 +2955,8 @@
       const showEsimModal = ref(false);
       const aquariumPhotos = ref([null, null, null]);
       const isAdmin = computed(() => groupMembers.value.length > 0 && currentUser.value === groupMembers.value[0]?.name);
+      const editMode = ref(false);
+      const canEdit = computed(() => isAdmin.value && editMode.value);
       const openHotelModal = () => { showHotelModal.value = true; };
       const openCarModal = () => { showCarModal.value = true; };
       const handleAquariumPhoto = (e, idx) => {
@@ -3054,10 +3098,10 @@
       FIRESTORE_DOC.onSnapshot(snap => {
         if (!snap.exists || localUpdate) return;
         const d = snap.data();
-        if (d.expenses)     expenses.value     = d.expenses;
-        if (d.allTodos)     allTodos.value     = d.allTodos;
-          if (d.kokusaiPlaces) kokusaiPlaces.value = d.kokusaiPlaces;
-        if (d.groupMembers) groupMembers.value = d.groupMembers;
+        if (d.expenses)      expenses.value      = d.expenses;
+        if (d.allTodos)      allTodos.value      = d.allTodos;
+        if (d.kokusaiPlaces) kokusaiPlaces.value = d.kokusaiPlaces;
+        if (d.groupMembers)  groupMembers.value  = d.groupMembers;
         if (d.itinerary) {
           // 清除舊的 Storage URL 和 ph_ key 殘留
           const cleaned = JSON.parse(JSON.stringify(d.itinerary));
@@ -3201,7 +3245,7 @@
       return {
         appLoading, loadProgress, loadingMsg, currentUser, loginAs, loginDropOpen, loginSelected, loggingIn, loggingOut, pendingUser, doLogin, allTodos, onPickerScroll, scrollPickerTo, currentTab, navCollapsed, tabs, btabs, weather, weatherBg, timeObj, calcInput, calcMode, calcExpr, calcDisplayVal, calcPendingOp, switchCalcMode, pressCalc, pressCalcNum, pressCalcDot, pressCalcOp, pressCalcEqual, pressCalcClear, pressCalcBackspace, calcOutput, jpyRate, jpyBuyRate, jpySellRate, rateUpdatedAt, groupMembers, showMemberModal, newMember, showUserMenu, toggleUserMenu, closeUserMenu, showProfileModal, profileEdit, openProfile, handleProfileAvatarUpload, saveProfile, logout, handleAvatarUpload, addMember, getMemberAvatar, editingMember, openEditMember, handleEditAvatarUpload, saveEditMember, showAddMember, BLANK_AVATAR, expenseSubTab, expenses, memberStats, maxPaid, settlementAdvice, showExpenseModal, openExpenseModal, addExpense, newExpense, openEditExpense, editingExpenseIdx, expenseFilterMember, filteredExpenses, itinerary, activeDay, departureTrip, returnFlights, selectedReturnFlight, hotelData, carRental, showFlightDetail, activeFlight, triggerPasscode, showPasscodeModal, passcode, pressKey, passcodeMode, scheduleSubTab, planningSubTab, filteredTodos: computed(() => { const key = planningSubTab.value === 'essential' ? '_shared' : currentUser.value; return (allTodos.value[key]||[]).filter(t=>t.type===planningSubTab.value); }), newTodoText, addTodo, removeTodo, categories, showEditModal, isNewEvent, tempEvent, openEditModal, openAddModal, deleteEvent, saveEvent, showConfirmModal, confirmItemName, confirmDelete, executeDelete, bookingSubTab, globalCurrency, toggleAllCurrency,
         previewCanvas,hotelPhotos,showHotelLightbox,openEditExpense,editingExpenseIdx,showCropper,cropSrc,cropCanvas,cropBox,openCropper,startCropDrag,confirmCrop,currentHotelPhoto,openHotelPhoto,lbTouchStart,lbTouchEnd,
-        showHotelModal, showCarModal, showAquariumModal, showChurasunModal, showCalcModal, showCouponModal, couponZoom, showVjwModal, showKokusaiModal, showKokusaiEdit, showKokusaiDetail, kokusaiSelected, kokusaiSelectedIdx, kokusaiTab, kokusaiPlaces, kokusaiEditIdx, kokusaiForm, openAddKokusai, openEditKokusai, saveKokusai, removeKokusai, handleKokusaiPhoto, showEsimModal, showSmokingModal, smokingLat, smokingLng, smokingLocating, smokingMapSrc, openSmokingFinder, getSmokingLocation, aquariumPhotos, handleAquariumPhoto, openHotelModal, openCarModal, isAdmin,
+        editMode, canEdit, showHotelModal, showCarModal, showAquariumModal, showChurasunModal, showCalcModal, showCouponModal, couponZoom, showVjwModal, showKokusaiModal, showKokusaiEdit, showKokusaiDetail, kokusaiSelected, kokusaiSelectedIdx, kokusaiTab, kokusaiPlaces, kokusaiEditIdx, kokusaiForm, openAddKokusai, openEditKokusai, saveKokusai, removeKokusai, handleKokusaiPhoto, showEsimModal, showSmokingModal, smokingLat, smokingLng, smokingLocating, smokingMapSrc, openSmokingFinder, getSmokingLocation, aquariumPhotos, handleAquariumPhoto, openHotelModal, openCarModal, isAdmin,
         getCategoryColor: (t) => ({ transport: 'bg-[#D94F4F]', spot: 'bg-[#98BDE3]', food: 'bg-[#E3A97C]', other: 'bg-[#C4A8D4]' }[t] || 'bg-[#DCC3A0]'),
         categoryDot: (id) => ({ spot:'#98BDE3', food:'#E3A97C', transport:'#D94F4F', other:'#C4A8D4' }[id] || '#DCC3A0'),
         categoryStyle: (id, active) => {
