@@ -319,14 +319,12 @@
                 <svg v-if="loginSelected===m.name" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
               </div>
             </div>
-          </transition>
         </div>
         <button @click="loginSelected && doLogin(loginSelected)" class="w-full py-4 rounded-full font-black text-base tracking-widest uppercase transition active:scale-95" :style="loginSelected ? 'background:white;color:#4a7860;' : 'background:rgba(255,255,255,0.2);color:rgba(255,255,255,0.4);cursor:not-allowed;'">
           出發 ✈️
         </button>
       </div>
     </div>
-  </transition>
 
   <!-- 登入動畫過場 -->
   <transition name="login-enter">
@@ -336,7 +334,6 @@
       </div>
       <p class="text-white text-sm tracking-[0.3em] uppercase mt-6 opacity-80">{{ pendingUser }}</p>
     </div>
-  </transition>
 
   <!-- 登出動畫過場 -->
   <transition name="logout-fade">
@@ -346,7 +343,6 @@
       </div>
       <p class="text-white text-sm tracking-[0.3em] uppercase mt-6" style="animation:logoutText 0.8s ease forwards;">再見 👋</p>
     </div>
-  </transition>
 
   <div class="max-w-md mx-auto min-h-[100dvh] relative overflow-x-hidden">
     <!-- Header -->
@@ -370,7 +366,6 @@
               <span>🚪</span><span>登出</span>
             </button>
           </div>
-        </transition>
       </div>
     </header>
 
@@ -441,6 +436,24 @@
             </div>
           </div>
         </div>
+
+        <!-- 吸菸區卡片 -->
+        <div class="card-neo overflow-hidden active:scale-[0.98] transition cursor-pointer" style="border-radius:32px;padding:0;" @click="openSmokingFinder()">
+          <div style="padding:20px 22px;display:flex;align-items:center;gap:16px;">
+            <div style="width:52px;height:52px;border-radius:20px;background:linear-gradient(145deg,#4a4a4a,#2a2a2a);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:-2px -2px 6px rgba(255,255,255,0.15),3px 3px 8px rgba(0,0,0,0.3);">
+              <span style="font-size:24px;">🚬</span>
+            </div>
+            <div style="flex:1;">
+              <p style="font-size:15px;font-weight:900;line-height:1.2;">附近吸菸區</p>
+              <p style="font-size:10px;opacity:0.45;margin-top:3px;letter-spacing:0.05em;">點擊定位・尋找最近吸菸所</p>
+            </div>
+            <div style="font-size:11px;opacity:0.3;font-weight:900;">→</div>
+          </div>
+        </div>
+
+        <!-- Modal: 吸菸區 -->
+
+
 
         <!-- 計算機 -->
         <div class="card-neo-xl font-black overflow-hidden" style="border-radius:40px;padding:0;transition:all 0.4s;">
@@ -662,38 +675,33 @@
         <div v-if="bookingSubTab === 'tickets'" class="space-y-5 font-black">
 
           <!-- Churasun6 卡片 -->
-          <div class="card-neo overflow-hidden" style="border-radius:32px;padding:0;">
-            <!-- 預覽圖 -->
-            <div style="position:relative;width:100%;height:220px;overflow:hidden;">
-              <img src="./images/car-preview.jpg" style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block;">
-              <!-- 前往時間 badge -->
-              <div style="position:absolute;top:12px;right:12px;background:rgba(0,0,0,0.45);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.25);border-radius:999px;padding:4px 12px;display:flex;align-items:center;gap:5px;">
+          <div class="card-neo overflow-hidden active:scale-[0.98] transition cursor-pointer" style="border-radius:32px;padding:0;" @click="showChurasunModal=true">
+            <div style="position:relative;width:100%;height:220px;overflow:hidden;background:linear-gradient(145deg,#2d1b4e,#7b2fbe,#c44569);">
+              <img src="./images/churasun6-cover.jpg" style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block;">
+
+              <div style="position:absolute;top:12px;right:12px;background:rgba(0,0,0,0.35);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.3);border-radius:999px;padding:4px 12px;display:flex;align-items:center;gap:5px;">
                 <span style="font-size:10px;">🗓</span>
                 <span style="font-size:10px;font-weight:900;color:white;letter-spacing:0.05em;">6/3 &nbsp;22:00</span>
               </div>
             </div>
-            <!-- 資訊列 -->
             <div style="padding:18px 20px 16px;">
               <div class="flex justify-between items-start mb-3">
                 <div>
-                  <p style="font-size:16px;font-weight:900;line-height:1.2;">Churasun6</p>
-                  <p style="font-size:9px;opacity:0.45;margin-top:3px;letter-spacing:0.08em;text-transform:uppercase;">Entertainment · Naha</p>
+                  <p style="font-size:16px;font-weight:900;line-height:1.2;">Churasun 6 💃</p>
+                  <p style="font-size:9px;opacity:0.45;margin-top:3px;letter-spacing:0.08em;text-transform:uppercase;">Nightshow · Naha</p>
                 </div>
                 <div style="text-align:right;">
-                  <p style="font-size:9px;opacity:0.4;letter-spacing:0.08em;text-transform:uppercase;">前往時間</p>
-                  <p style="font-size:13px;font-weight:900;color:var(--green);">6/3 &nbsp;22:00</p>
+                  <p style="font-size:9px;opacity:0.4;letter-spacing:0.08em;text-transform:uppercase;">預計入場</p>
+                  <p style="font-size:13px;font-weight:900;color:var(--green);">6/3 &nbsp;21:45</p>
                 </div>
               </div>
-              <!-- 地址 -->
-              <a href="https://maps.google.com/?q=Churasun6,3-6-2+Makishi,Naha,Okinawa" target="_blank"
-                style="display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:16px;background:rgba(102,126,234,0.08);border:1px solid rgba(102,126,234,0.15);text-decoration:none;margin-top:4px;">
+              <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:16px;background:rgba(102,126,234,0.08);border:1px solid rgba(102,126,234,0.15);margin-top:4px;">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="#667eea"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
                 <div style="flex:1;">
-                  <p style="font-size:10px;font-weight:900;color:#667eea;line-height:1.3;">3-6-2 Makishi, Naha</p>
-                  <p style="font-size:9px;opacity:0.4;">牧志公設市場 2F・那霸市牧志 900-0013</p>
+                  <p style="font-size:10px;font-weight:900;color:#667eea;line-height:1.3;">那霸市松山 1-5-1 ナムラプラザビル 2階</p>
+                  <p style="font-size:9px;opacity:0.4;">Matsuyama, Naha, Okinawa 900-0032</p>
                 </div>
-                <span style="font-size:9px;opacity:0.4;font-weight:900;">地圖 →</span>
-              </a>
+              </div>
             </div>
           </div>
 
@@ -837,8 +845,48 @@
       </button>
     </nav>
 
-    <!-- Modal: 密碼鎖 -->
+    <!-- Modal: 吸菸區 -->
     <transition name="slide-up">
+      <div v-if="showSmokingModal" class="fixed inset-0 z-[1500] flex flex-col justify-end font-black" style="padding-bottom:0;height:100dvh;">
+        <div class="absolute inset-0" style="background:rgba(20,20,20,0.8);backdrop-filter:blur(6px);" @click="showSmokingModal=false"></div>
+        <div class="relative card-neo-xl overflow-hidden" style="border-radius:40px 40px 0 0;max-height:88dvh;display:flex;flex-direction:column;padding-bottom:env(safe-area-inset-bottom,0px);">
+          <!-- Header -->
+          <div style="background:linear-gradient(145deg,#2a2a2a,#444);padding:28px 28px 22px;position:relative;flex-shrink:0;">
+            <button @click="showSmokingModal=false" style="position:absolute;top:16px;right:16px;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.15);border:none;color:white;font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;">✕</button>
+            <p style="font-size:10px;letter-spacing:0.4em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:6px;">JT Smoking Area Map</p>
+            <p style="font-size:26px;font-weight:900;color:white;line-height:1.1;">🚬 附近吸菸區</p>
+            <div style="margin-top:10px;">
+              <span v-if="smokingLocating" style="font-size:10px;color:rgba(255,255,255,0.6);">📡 定位中...</span>
+              <span v-else-if="smokingLat" style="font-size:10px;color:rgba(100,220,100,0.9);">✓ 已取得位置</span>
+              <span v-else style="font-size:10px;color:rgba(255,180,50,0.9);">⚠ 請允許位置權限</span>
+            </div>
+          </div>
+          <!-- 地圖 -->
+          <div style="flex:1;position:relative;overflow:hidden;">
+            <iframe v-if="smokingMapSrc" :src="smokingMapSrc" width="100%" height="100%" style="border:0;display:block;position:absolute;inset:0;" loading="lazy"></iframe>
+            <div v-else style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:32px;">
+              <span style="font-size:48px;">📍</span>
+              <p style="font-size:13px;font-weight:900;text-align:center;opacity:0.6;">需要位置權限<br>才能顯示附近吸菸區</p>
+              <button @click="getSmokingLocation()" class="active:scale-95 transition" style="padding:12px 28px;border-radius:999px;background:linear-gradient(145deg,#555,#333);color:white;font-size:11px;font-weight:900;border:none;cursor:pointer;letter-spacing:0.1em;">重新定位</button>
+            </div>
+          </div>
+          <!-- 按鈕 -->
+          <div style="padding:12px 24px 24px;flex-shrink:0;display:flex;flex-direction:column;gap:10px;">
+            <a :href="smokingLat ? 'https://www.clubjt.jp/map#' + smokingLat + ',' + smokingLng + ',17' : 'https://www.clubjt.jp/map'" target="_blank"
+              style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-radius:20px;background:linear-gradient(145deg,#555,#2a2a2a);color:white;text-decoration:none;font-size:11px;font-weight:900;letter-spacing:0.1em;">
+              🗺 在瀏覽器開啟地圖
+            </a>
+            <a v-if="smokingLat" :href="'https://maps.google.com/?q=吸煙所&near=' + smokingLat + ',' + smokingLng" target="_blank"
+              style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-radius:20px;background:linear-gradient(145deg,#4a8a5a,#2d6b3a);color:white;text-decoration:none;font-size:11px;font-weight:900;letter-spacing:0.1em;">
+              🧭 Google Maps 導航到吸菸區
+            </a>
+            <button @click="showSmokingModal=false" class="w-full py-4 rounded-full text-[10px] uppercase font-black active:scale-95 transition card-neo" style="color:var(--tan);">Close</button>
+          </div>
+        </div>
+      </div>
+    </transition>
+
+    <!-- Modal: 密碼鎖 -->
       <div v-if="showPasscodeModal" class="fixed inset-0 z-[2500] flex flex-col items-center justify-center font-black" style="background:var(--bg);">
         <h2 class="text-2xl font-black mb-12 tracking-[0.2em] uppercase text-[#5C7A6A]">Password</h2>
         <div class="flex gap-6 mb-16 font-black">
@@ -850,10 +898,8 @@
         </div>
         <button @click="showPasscodeModal = false" class="mt-16 text-[10px] font-black text-[#DCC3A0] uppercase tracking-widest">Cancel</button>
       </div>
-    </transition>
 
     <!-- Modal: 確認刪除 -->
-    <transition name="slide-up">
       <div v-if="showConfirmModal" class="fixed inset-0 z-[6000] flex items-center justify-center p-6 font-black">
         <div class="absolute inset-0" style="background:rgba(50,40,30,0.72);backdrop-filter:blur(4px);" @click="showConfirmModal = false"></div>
         <div class="relative p-8 w-full max-w-xs text-center card-neo-xl">
@@ -866,11 +912,11 @@
           </div>
         </div>
       </div>
-    </transition>
 
     <!-- Modal: 個人資料 -->
+
     <transition name="slide-up">
-      <div v-if="showProfileModal" class="fixed inset-0 z-[1300] flex flex-col justify-end font-black">
+      <div v-if="showProfileModal" class="fixed inset-0 z-[1300] flex flex-col justify-end font-black" style="height:100dvh;">
         <div class="absolute inset-0" style="background:rgba(50,40,30,0.65);backdrop-filter:blur(3px);" @click="showProfileModal=false"></div>
         <div class="relative rounded-t-[40px] p-8 font-black" style="background:var(--bg);box-shadow:-4px -8px 30px rgba(155,135,110,0.35),0 -1px 0 rgba(255,255,255,0.7);border-top:1px solid rgba(255,255,255,0.7);">
           <div class="w-16 h-2 rounded-full mx-auto mb-7" style="background:rgba(220,195,160,0.6);box-shadow:inset 1px 1px 3px rgba(150,130,100,0.4);"></div>
@@ -893,9 +939,11 @@
       </div>
     </transition>
 
+
     <!-- Modal: 成員 -->
+
     <transition name="slide-up">
-      <div v-if="showMemberModal" class="fixed inset-0 z-[1200] flex flex-col justify-end font-black">
+      <div v-if="showMemberModal" class="fixed inset-0 z-[1200] flex flex-col justify-end font-black" style="height:100dvh;">
         <div class="absolute inset-0" style="background:rgba(50,40,30,0.65);backdrop-filter:blur(3px);" @click="showMemberModal = false"></div>
         <div class="relative rounded-t-[40px] p-8 h-[80dvh] overflow-y-auto font-black" style="background:var(--bg);box-shadow:-4px -8px 30px rgba(155,135,110,0.35),0 -1px 0 rgba(255,255,255,0.7);border-top:1px solid rgba(255,255,255,0.7);">
           <h3 class="text-2xl mb-6 uppercase text-[#5C7A6A] font-black tracking-tight leading-none">Trip Members 👥</h3>
@@ -954,9 +1002,162 @@
       </div>
     </transition>
 
-    <!-- Modal: 行程編輯 -->
+
+    <!-- Modal: Churasun 6 -->
     <transition name="slide-up">
-      <div v-if="showEditModal" class="fixed inset-0 z-[1000] flex flex-col justify-end font-black">
+      <div v-if="showChurasunModal" class="fixed inset-0 z-[1500] flex flex-col justify-end font-black" style="padding-bottom:0;height:100dvh;">
+        <div class="absolute inset-0" style="background:rgba(20,10,30,0.82);backdrop-filter:blur(6px);" @click="showChurasunModal=false"></div>
+        <div class="relative card-neo-xl overflow-hidden" style="border-radius:40px 40px 0 0;max-height:88dvh;display:flex;flex-direction:column;padding-bottom:env(safe-area-inset-bottom,0px);">
+          <div style="background:linear-gradient(145deg,#2d1b4e,#7b2fbe,#c44569);padding:28px 28px 22px;position:relative;flex-shrink:0;">
+            <button @click="showChurasunModal=false" style="position:absolute;top:16px;right:16px;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.15);border:none;color:white;font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;">✕</button>
+            <p style="font-size:10px;letter-spacing:0.4em;text-transform:uppercase;color:rgba(255,255,255,0.6);margin-bottom:6px;">Nightshow · Naha Matsuyama</p>
+            <p style="font-size:26px;font-weight:900;color:white;line-height:1.1;">Churasun 6 💃</p>
+            <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
+              <span style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:999px;padding:3px 12px;font-size:9px;color:rgba(255,255,255,0.9);letter-spacing:0.08em;">第二場</span>
+              <span style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:999px;padding:3px 12px;font-size:9px;color:rgba(255,255,255,0.9);letter-spacing:0.08em;">22:00 開場</span>
+              <span style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:999px;padding:3px 12px;font-size:9px;color:rgba(255,255,255,0.9);letter-spacing:0.08em;">📍 那霸・松山</span>
+            </div>
+          </div>
+          <div style="overflow-y:auto;padding:24px 24px 12px;flex:1;display:flex;flex-direction:column;gap:20px;">
+
+            <!-- 演出時間 -->
+            <div style="background:var(--bg-raised);border-radius:24px;box-shadow:var(--neo-out);border:var(--br);padding:18px 20px;">
+              <p style="font-size:9px;text-transform:uppercase;letter-spacing:0.2em;color:var(--tan);margin-bottom:12px;">🕐 演出時間</p>
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                  <p style="font-size:13px;font-weight:900;color:var(--text);">第二場</p>
+                  <p style="font-size:11px;color:#9b59b6;font-weight:900;margin-top:4px;">22:00 開場　22:30 開演</p>
+                  <p style="font-size:9px;opacity:0.45;margin-top:2px;">最後入場 22:20　・　演出約 1.5 – 2.5 小時</p>
+                  <p style="font-size:9px;opacity:0.35;margin-top:1px;">第二場較 FREE，可能延長至 2.5 小時</p>
+                </div>
+                <div style="text-align:right;">
+                  <p style="font-size:9px;text-transform:uppercase;letter-spacing:0.1em;color:var(--tan);">我們預計入場</p>
+                  <p style="font-size:28px;font-weight:900;color:#9b59b6;line-height:1.1;">21:45</p>
+                  <p style="font-size:9px;opacity:0.4;">提早 15 分鐘</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- 門票費用 -->
+            <div style="background:var(--bg-raised);border-radius:24px;box-shadow:var(--neo-out);border:var(--br);padding:18px 20px;">
+              <p style="font-size:9px;text-transform:uppercase;letter-spacing:0.2em;color:var(--tan);margin-bottom:12px;">🎫 門票費用（含 1 杯飲料）</p>
+              <!-- 座位圖 -->
+              <div style="width:100%;border-radius:16px;overflow:hidden;margin-bottom:14px;">
+                <img src="./images/churasun6-seatmap.png" style="width:100%;display:block;">
+              </div>
+              <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;">
+                <!-- 普通座位：淺藍 -->
+                <div style="padding:12px 14px;border-radius:16px;background:rgba(135,206,235,0.1);border:1.5px solid rgba(135,206,235,0.5);">
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="width:14px;height:14px;border-radius:3px;background:#87ceeb;display:inline-block;flex-shrink:0;"></span>
+                      <p style="font-size:12px;font-weight:900;color:var(--text);">ノーマルプラン（普通座位）</p>
+                    </div>
+                    <div style="display:flex;flex-direction:column;justify-content:center;align-items:flex-end;gap:2px;">
+                      <p style="font-size:13px;font-weight:900;color:#4aa8d8;">¥5,500 <span style="font-size:9px;opacity:0.55;">官網</span></p>
+                      <p style="font-size:13px;font-weight:900;color:#4aa8d8;">NT$ 1,096 <span style="font-size:9px;opacity:0.55;">第三方</span></p>
+                    </div>
+                  </div>
+                </div>
+                <!-- 前排座位：深藍 -->
+                <div style="padding:12px 14px;border-radius:16px;background:rgba(70,130,180,0.1);border:1.5px solid rgba(70,130,180,0.5);">
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="width:14px;height:14px;border-radius:3px;background:#4682b4;display:inline-block;flex-shrink:0;"></span>
+                      <p style="font-size:12px;font-weight:900;color:var(--text);">前方列プラン（前排座位）</p>
+                    </div>
+                    <div style="display:flex;flex-direction:column;justify-content:center;align-items:flex-end;gap:2px;">
+                      <p style="font-size:13px;font-weight:900;color:#4682b4;">¥6,000 <span style="font-size:9px;opacity:0.55;">官網</span></p>
+                      <p style="font-size:13px;font-weight:900;color:#4682b4;">NT$ 1,196 <span style="font-size:9px;opacity:0.55;">第三方</span></p>
+                    </div>
+                  </div>
+                </div>
+                <!-- 震撼座位：紫色 -->
+                <div style="padding:12px 14px;border-radius:16px;background:rgba(128,0,128,0.08);border:1.5px solid rgba(128,0,128,0.4);">
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="width:14px;height:14px;border-radius:3px;background:#800080;display:inline-block;flex-shrink:0;"></span>
+                      <p style="font-size:12px;font-weight:900;color:var(--text);">ど迫力プラン（震撼座位）</p>
+                    </div>
+                    <div style="display:flex;flex-direction:column;justify-content:center;align-items:flex-end;gap:2px;">
+                      <p style="font-size:13px;font-weight:900;color:#800080;">¥8,000 <span style="font-size:9px;opacity:0.55;">官網</span></p>
+                      <p style="font-size:13px;font-weight:900;color:#800080;">NT$ 1,594 <span style="font-size:9px;opacity:0.55;">第三方</span></p>
+                    </div>
+                  </div>
+                  <p style="font-size:9px;color:#800080;margin-top:6px;">＋ 贈送 1 本小費券（10 張）</p>
+                </div>
+                <!-- 超級震撼座位：黃色 -->
+                <div style="padding:12px 14px;border-radius:16px;background:rgba(255,215,0,0.08);border:1.5px solid rgba(255,215,0,0.5);">
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="width:14px;height:14px;border-radius:3px;background:#ffd700;display:inline-block;flex-shrink:0;"></span>
+                      <p style="font-size:12px;font-weight:900;color:var(--text);">超ど迫力プラン（超級震撼）</p>
+                    </div>
+                    <div style="display:flex;flex-direction:column;justify-content:center;align-items:flex-end;gap:2px;">
+                      <p style="font-size:13px;font-weight:900;color:#c8a000;">¥9,500 <span style="font-size:9px;opacity:0.55;">官網</span></p>
+                      <p style="font-size:13px;font-weight:900;color:#c8a000;">NT$ 1,893 <span style="font-size:9px;opacity:0.55;">第三方</span></p>
+                    </div>
+                  </div>
+                  <p style="font-size:9px;color:#c8a000;margin-top:6px;">＋ 贈送 1 本小費券（10 張）</p>
+                </div>
+              </div>
+              <div style="padding:10px 12px;border-radius:14px;background:rgba(155,89,182,0.06);border:1px solid rgba(155,89,182,0.15);">
+                <p style="font-size:9px;color:#9b59b6;font-weight:900;">🍹 所有票券皆贈送 1 杯飲料</p>
+              </div>
+            </div>
+
+            <!-- 小費券 -->
+            <div style="background:var(--bg-raised);border-radius:24px;box-shadow:var(--neo-out);border:var(--br);padding:18px 20px;">
+              <p style="font-size:9px;text-transform:uppercase;letter-spacing:0.2em;color:var(--tan);margin-bottom:12px;">💸 小費券說明</p>
+              <div style="display:flex;flex-direction:column;gap:12px;">
+                <div style="display:flex;gap:12px;align-items:flex-start;">
+                  <span style="font-size:20px;flex-shrink:0;">💴</span>
+                  <div>
+                    <p style="font-size:12px;font-weight:900;color:var(--text);">一本 ¥1,000 ／ 10 張小費券</p>
+                    <p style="font-size:10px;opacity:0.5;margin-top:2px;">需事先購買才能給舞者小費</p>
+                  </div>
+                </div>
+                <div style="display:flex;gap:12px;align-items:flex-start;">
+                  <span style="font-size:20px;flex-shrink:0;">🙅</span>
+                  <div>
+                    <p style="font-size:12px;font-weight:900;color:var(--text);">禁止碰觸身體</p>
+                    <p style="font-size:10px;opacity:0.5;margin-top:2px;">舞者會拉起內衣肩帶讓你放入小費券</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 地址 + 地圖 -->
+            <div style="background:var(--bg-raised);border-radius:24px;box-shadow:var(--neo-out);border:var(--br);padding:18px 20px;">
+              <p style="font-size:9px;text-transform:uppercase;letter-spacing:0.2em;color:var(--tan);margin-bottom:12px;">📍 地址</p>
+              <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:16px;background:rgba(155,89,182,0.06);border:1px solid rgba(155,89,182,0.15);margin-bottom:14px;">
+                <div>
+                  <p style="font-size:11px;font-weight:900;color:#9b59b6;">那霸市松山 1-5-1 ナムラプラザビル 2階</p>
+                  <p style="font-size:9px;opacity:0.45;margin-top:1px;">〒900-0032 Naha, Okinawa</p>
+                </div>
+              </div>
+              <div style="width:100%;height:200px;border-radius:20px;overflow:hidden;box-shadow:var(--neo-out);">
+                <iframe src="https://maps.google.com/maps?q=26.2176,127.6817&t=m&z=17&output=embed&iwloc=near" width="100%" height="100%" style="border:0;" loading="lazy" allowfullscreen></iframe>
+              </div>
+              <a href="https://churasun6.com/" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:10px;padding:10px;border-radius:14px;background:rgba(155,89,182,0.08);border:1px solid rgba(155,89,182,0.2);text-decoration:none;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="#9b59b6"><path d="M19 19H5V5h7V3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
+                <span style="font-size:9px;font-weight:900;color:#9b59b6;letter-spacing:0.08em;">官網 churasun6.com</span>
+              </a>
+            </div>
+
+          </div>
+          <div style="padding:12px 24px 24px;flex-shrink:0;">
+            <button @click="showChurasunModal=false" class="w-full py-4 rounded-full text-[10px] uppercase font-black active:scale-95 transition card-neo" style="color:var(--tan);">Close</button>
+          </div>
+        </div>
+      </div>
+    </transition>
+
+
+    <!-- Modal: 行程編輯 -->
+
+    <transition name="slide-up">
+      <div v-if="showEditModal" class="fixed inset-0 z-[1000] flex flex-col justify-end font-black" style="height:100dvh;">
         <div class="absolute inset-0" style="background:rgba(50,40,30,0.5);backdrop-filter:blur(2px);" @click="showEditModal = false"></div>
         <div class="relative rounded-t-[40px] p-8 max-h-[90dvh] overflow-y-auto overflow-x-hidden font-black" style="background:var(--bg);box-shadow:-4px -8px 30px rgba(155,135,110,0.35);border-top:1px solid rgba(255,255,255,0.7);touch-action:pan-y;">
           <div class="w-16 h-2 rounded-full mx-auto mb-7" style="background:rgba(220,195,160,0.6);box-shadow:inset 1px 1px 3px rgba(150,130,100,0.4);"></div>
@@ -1015,8 +1216,8 @@
       </div>
     </transition>
 
+
     <!-- Modal: 登機證 -->
-    <transition name="slide-up">
       <div v-if="showFlightDetail" class="fixed inset-0 z-[1500] flex flex-col justify-center px-6 font-black">
         <div class="absolute inset-0" style="background:rgba(50,40,30,0.75);backdrop-filter:blur(5px);" @click="showFlightDetail = false"></div>
         <div class="relative rounded-[40px] overflow-hidden p-8 space-y-8 card-neo-xl">
@@ -1038,9 +1239,10 @@
       </div>
 
       <!-- 住宿詳情彈窗 -->
-      <div v-if="showHotelModal" class="fixed inset-0 z-[1500] flex flex-col justify-end font-black" style="padding-bottom:0;">
+    <transition name="slide-up">
+      <div v-if="showHotelModal" class="fixed inset-0 z-[1500] flex flex-col justify-end font-black" style="padding-bottom:0;height:100dvh;">
         <div class="absolute inset-0" style="background:rgba(30,25,20,0.75);backdrop-filter:blur(6px);" @click="showHotelModal=false"></div>
-        <div class="relative card-neo-xl overflow-hidden" style="border-radius:40px 40px 0 0;max-height:92vh;display:flex;flex-direction:column;">
+        <div class="relative card-neo-xl overflow-hidden" style="border-radius:40px 40px 0 0;max-height:88dvh;display:flex;flex-direction:column;padding-bottom:env(safe-area-inset-bottom,0px);">
           <!-- Header -->
           <div style="background:linear-gradient(145deg,#7bbf96,#5a9070);padding:28px 28px 22px;position:relative;flex-shrink:0;">
             <button @click="showHotelModal=false" style="position:absolute;top:16px;right:16px;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.15);border:none;color:white;font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;">✕</button>
@@ -1106,11 +1308,14 @@
           </div>
         </div>
       </div>
+    </transition>
+
 
       <!-- 租車詳情彈窗 -->
-      <div v-if="showCarModal" class="fixed inset-0 z-[1500] flex flex-col justify-end font-black" style="padding-bottom:0;">
+    <transition name="slide-up">
+      <div v-if="showCarModal" class="fixed inset-0 z-[1500] flex flex-col justify-end font-black" style="padding-bottom:0;height:100dvh;">
         <div class="absolute inset-0" style="background:rgba(30,25,20,0.75);backdrop-filter:blur(6px);" @click="showCarModal=false"></div>
-        <div class="relative card-neo-xl overflow-hidden" style="border-radius:40px 40px 0 0;max-height:92vh;display:flex;flex-direction:column;">
+        <div class="relative card-neo-xl overflow-hidden" style="border-radius:40px 40px 0 0;max-height:88dvh;display:flex;flex-direction:column;padding-bottom:env(safe-area-inset-bottom,0px);">
           <!-- Header -->
           <div style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);padding:28px 28px 22px;position:relative;flex-shrink:0;">
             <button @click="showCarModal=false" style="position:absolute;top:16px;right:16px;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.15);border:none;color:white;font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;">✕</button>
@@ -1152,6 +1357,25 @@
               <p style="font-size:13px;font-weight:900;color:var(--text);line-height:1.4;">Budget Rent a Car Naha Airport</p>
               <p style="font-size:11px;opacity:0.45;margin-top:4px;">豐見城市瀨長 3-2</p>
             </div>
+
+            <!-- 預約資訊 -->
+            <div style="background:var(--bg-raised);border-radius:24px;box-shadow:var(--neo-out);border:var(--br);padding:18px 20px;">
+              <p style="font-size:9px;text-transform:uppercase;letter-spacing:0.2em;color:var(--tan);margin-bottom:14px;">📋 預約資訊</p>
+              <div style="display:flex;flex-direction:column;gap:12px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-radius:16px;background:rgba(102,126,234,0.06);border:1px solid rgba(102,126,234,0.15);">
+                  <p style="font-size:11px;opacity:0.5;">總金額</p>
+                  <p style="font-size:18px;font-weight:900;color:#667eea;">¥16,837</p>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-radius:16px;background:rgba(102,126,234,0.06);border:1px solid rgba(102,126,234,0.15);">
+                  <p style="font-size:11px;opacity:0.5;">付款方式</p>
+                  <p style="font-size:13px;font-weight:900;color:var(--text);">現場付款</p>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-radius:16px;background:rgba(102,126,234,0.06);border:1px solid rgba(102,126,234,0.15);">
+                  <p style="font-size:11px;opacity:0.5;">預約號碼</p>
+                  <p style="font-size:13px;font-weight:900;color:#667eea;letter-spacing:0.05em;">RC62461119566976209</p>
+                </div>
+              </div>
+            </div>
             <!-- 地圖 -->
             <div style="background:var(--bg-raised);border-radius:24px;box-shadow:var(--neo-out);border:var(--br);padding:18px 20px;">
               <p style="font-size:9px;text-transform:uppercase;letter-spacing:0.2em;color:var(--tan);margin-bottom:14px;">🗺 Map</p>
@@ -1166,11 +1390,14 @@
           </div>
         </div>
       </div>
+    </transition>
+
 
       <!-- 水族館詳情彈窗 -->
-      <div v-if="showAquariumModal" class="fixed inset-0 z-[1500] flex flex-col justify-end font-black" style="padding-bottom:0;">
+    <transition name="slide-up">
+      <div v-if="showAquariumModal" class="fixed inset-0 z-[1500] flex flex-col justify-end font-black" style="padding-bottom:0;height:100dvh;">
         <div class="absolute inset-0" style="background:rgba(30,25,20,0.75);backdrop-filter:blur(6px);" @click="showAquariumModal=false"></div>
-        <div class="relative card-neo-xl overflow-hidden" style="border-radius:40px 40px 0 0;max-height:92vh;display:flex;flex-direction:column;">
+        <div class="relative card-neo-xl overflow-hidden" style="border-radius:40px 40px 0 0;max-height:88dvh;display:flex;flex-direction:column;padding-bottom:env(safe-area-inset-bottom,0px);">
           <!-- Header 漸層 -->
           <div style="background:linear-gradient(145deg,#1a6b8a,#0e4d6b);padding:28px 28px 22px;position:relative;flex-shrink:0;">
             <!-- 關閉鈕 -->
@@ -1313,9 +1540,11 @@
       </div>
     </transition>
 
+
     <!-- Modal: 記帳 -->
+
     <transition name="slide-up">
-      <div v-if="showExpenseModal" class="fixed inset-0 z-[1000] flex flex-col justify-end font-black">
+      <div v-if="showExpenseModal" class="fixed inset-0 z-[1000] flex flex-col justify-end font-black" style="height:100dvh;">
         <div class="absolute inset-0" style="background:rgba(50,40,30,0.65);backdrop-filter:blur(3px);" @click="showExpenseModal = false"></div>
         <div class="relative rounded-t-[40px] p-8 max-h-[90vh] overflow-y-auto font-black" style="background:var(--bg);box-shadow:-4px -8px 30px rgba(155,135,110,0.35);border-top:1px solid rgba(255,255,255,0.7);">
           <div class="w-16 h-2 rounded-full mx-auto mb-6" style="background:rgba(220,195,160,0.6);box-shadow:inset 1px 1px 3px rgba(150,130,100,0.4);"></div>
@@ -1376,6 +1605,7 @@
         </div>
       </div>
     </transition>
+
 
 
     <!-- Image Cropper Modal -->
@@ -1945,6 +2175,33 @@
       const showHotelModal = ref(false);
       const showCarModal = ref(false);
       const showAquariumModal = ref(false);
+
+      // 吸菸區
+      const showSmokingModal = ref(false);
+      const smokingLat = ref(null);
+      const smokingLng = ref(null);
+      const smokingLocating = ref(false);
+      const smokingMapSrc = ref('');
+
+      const getSmokingLocation = () => {
+        if (!navigator.geolocation) return;
+        smokingLocating.value = true;
+        navigator.geolocation.getCurrentPosition(pos => {
+          smokingLat.value = pos.coords.latitude.toFixed(6);
+          smokingLng.value = pos.coords.longitude.toFixed(6);
+          smokingLocating.value = false;
+          smokingMapSrc.value = `https://www.clubjt.jp/map#${smokingLat.value},${smokingLng.value},17`;
+        }, () => {
+          smokingLocating.value = false;
+          smokingMapSrc.value = 'https://www.clubjt.jp/map';
+        });
+      };
+
+      const openSmokingFinder = () => {
+        showSmokingModal.value = true;
+        if (!smokingLat.value) getSmokingLocation();
+      };
+      const showChurasunModal = ref(false);
       const aquariumPhotos = ref([null, null, null]);
       const isAdmin = computed(() => groupMembers.value.length > 0 && currentUser.value === groupMembers.value[0]?.name);
       const openHotelModal = () => { showHotelModal.value = true; };
@@ -2135,7 +2392,7 @@
 
       // 任何 modal 開啟時鎖定 body 滾動
       const anyModalOpen = computed(() =>
-        showHotelModal.value || showCarModal.value || showAquariumModal.value ||
+        showHotelModal.value || showCarModal.value || showAquariumModal.value || showChurasunModal.value || showSmokingModal.value ||
         showFlightDetail.value || showPasscodeModal.value || showMemberModal.value ||
         showExpenseModal.value || showProfileModal.value || showConfirmModal.value ||
         showEditModal.value || showCropper.value || showHotelLightbox.value
@@ -2228,7 +2485,7 @@
       return {
         appLoading, loadProgress, loadingMsg, currentUser, loginAs, loginDropOpen, loginSelected, loggingIn, loggingOut, pendingUser, doLogin, allTodos, onPickerScroll, scrollPickerTo, currentTab, navCollapsed, tabs, btabs, weather, weatherBg, timeObj, calcInput, calcMode, calcExpr, calcDisplayVal, calcPendingOp, switchCalcMode, pressCalc, pressCalcNum, pressCalcDot, pressCalcOp, pressCalcEqual, pressCalcClear, pressCalcBackspace, calcOutput, jpyRate, jpyBuyRate, jpySellRate, rateUpdatedAt, groupMembers, showMemberModal, newMember, showUserMenu, toggleUserMenu, closeUserMenu, showProfileModal, profileEdit, openProfile, handleProfileAvatarUpload, saveProfile, logout, handleAvatarUpload, addMember, getMemberAvatar, editingMember, openEditMember, handleEditAvatarUpload, saveEditMember, showAddMember, BLANK_AVATAR, expenseSubTab, expenses, memberStats, maxPaid, settlementAdvice, showExpenseModal, openExpenseModal, addExpense, newExpense, openEditExpense, editingExpenseIdx, expenseFilterMember, filteredExpenses, itinerary, activeDay, departureTrip, returnFlights, selectedReturnFlight, hotelData, carRental, showFlightDetail, activeFlight, triggerPasscode, showPasscodeModal, passcode, pressKey, passcodeMode, planningSubTab, filteredTodos: computed(() => (allTodos.value[currentUser.value]||[]).filter(t=>t.type===planningSubTab.value)), newTodoText, addTodo, removeTodo, categories, showEditModal, isNewEvent, tempEvent, openEditModal, openAddModal, deleteEvent, saveEvent, showConfirmModal, confirmItemName, confirmDelete, executeDelete, bookingSubTab, globalCurrency, toggleAllCurrency,
         previewCanvas,hotelPhotos,showHotelLightbox,openEditExpense,editingExpenseIdx,showCropper,cropSrc,cropCanvas,cropBox,openCropper,startCropDrag,confirmCrop,currentHotelPhoto,openHotelPhoto,lbTouchStart,lbTouchEnd,
-        showHotelModal, showCarModal, showAquariumModal, aquariumPhotos, handleAquariumPhoto, openHotelModal, openCarModal, isAdmin,
+        showHotelModal, showCarModal, showAquariumModal, showChurasunModal, showSmokingModal, smokingLat, smokingLng, smokingLocating, smokingMapSrc, openSmokingFinder, getSmokingLocation, aquariumPhotos, handleAquariumPhoto, openHotelModal, openCarModal, isAdmin,
         getCategoryColor: (t) => ({ transport: 'bg-[#D94F4F]', spot: 'bg-[#98BDE3]', food: 'bg-[#E3A97C]', other: 'bg-[#C4A8D4]' }[t] || 'bg-[#DCC3A0]'),
         categoryDot: (id) => ({ spot:'#98BDE3', food:'#E3A97C', transport:'#D94F4F', other:'#C4A8D4' }[id] || '#DCC3A0'),
         categoryStyle: (id, active) => {
