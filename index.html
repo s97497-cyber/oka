@@ -319,12 +319,14 @@
                 <svg v-if="loginSelected===m.name" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
               </div>
             </div>
+          </transition>
         </div>
         <button @click="loginSelected && doLogin(loginSelected)" class="w-full py-4 rounded-full font-black text-base tracking-widest uppercase transition active:scale-95" :style="loginSelected ? 'background:white;color:#4a7860;' : 'background:rgba(255,255,255,0.2);color:rgba(255,255,255,0.4);cursor:not-allowed;'">
           出發 ✈️
         </button>
       </div>
     </div>
+  </transition>
 
   <!-- 登入動畫過場 -->
   <transition name="login-enter">
@@ -334,6 +336,7 @@
       </div>
       <p class="text-white text-sm tracking-[0.3em] uppercase mt-6 opacity-80">{{ pendingUser }}</p>
     </div>
+  </transition>
 
   <!-- 登出動畫過場 -->
   <transition name="logout-fade">
@@ -343,6 +346,7 @@
       </div>
       <p class="text-white text-sm tracking-[0.3em] uppercase mt-6" style="animation:logoutText 0.8s ease forwards;">再見 👋</p>
     </div>
+  </transition>
 
   <div class="max-w-md mx-auto min-h-[100dvh] relative overflow-x-hidden">
     <!-- Header -->
@@ -371,6 +375,7 @@
               <span>🚪</span><span>登出</span>
             </button>
           </div>
+        </transition>
       </div>
     </header>
 
@@ -558,6 +563,65 @@
                   <p style="font-size:9px;opacity:0.45;margin-top:3px;letter-spacing:0.08em;text-transform:uppercase;">Kokusai-dori · 那霸購物大街</p>
                 </div>
 
+              </div>
+            </div>
+          </div>
+
+          <!-- SAN-A Parco City 卡片 -->
+          <div class="card-neo overflow-hidden active:scale-[0.98] transition cursor-pointer" style="border-radius:32px;padding:0;" @click="showParcoCityModal=true">
+            <div style="position:relative;width:100%;height:220px;overflow:hidden;">
+              <img src="./images/parcocity.jpg" style="width:100%;height:100%;object-fit:cover;object-position:center;">
+            </div>
+            <div style="padding:18px 20px 16px;">
+              <div class="flex justify-between items-start">
+                <div>
+                  <p style="font-size:16px;font-weight:900;line-height:1.2;">SAN-A Parco City</p>
+                  <p style="font-size:9px;opacity:0.45;margin-top:3px;letter-spacing:0.08em;text-transform:uppercase;">Urasoe · 浦添市沖繩最大購物中心</p>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+
+          <!-- 波上宮卡片 -->
+          <div class="card-neo overflow-hidden active:scale-[0.98] transition cursor-pointer" style="border-radius:32px;padding:0;" @click="showNaminoueModal=true">
+            <div style="position:relative;width:100%;height:220px;overflow:hidden;">
+              <img src="./images/naminoue.jpg" style="width:100%;height:100%;object-fit:cover;object-position:center top;">
+            </div>
+            <div style="padding:18px 20px 16px;">
+              <div class="flex justify-between items-start">
+                <div>
+                  <p style="font-size:16px;font-weight:900;line-height:1.2;">波上宮</p>
+                  <p style="font-size:9px;opacity:0.45;margin-top:3px;letter-spacing:0.08em;text-transform:uppercase;">Naminoue-gu · 那霸 · 沖繩總鎮守</p>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          <!-- 古宇利島卡片 -->
+          <div class="card-neo overflow-hidden active:scale-[0.98] transition cursor-pointer" style="border-radius:32px;padding:0;" @click="showKouriModal=true">
+            <div style="position:relative;width:100%;height:220px;overflow:hidden;">
+              <img src="./images/kouri.jpg" style="width:100%;height:100%;object-fit:cover;object-position:center;">
+            </div>
+            <div style="padding:18px 20px 16px;">
+              <div>
+                <p style="font-size:16px;font-weight:900;line-height:1.2;">古宇利島</p>
+                <p style="font-size:9px;opacity:0.45;margin-top:3px;letter-spacing:0.08em;text-transform:uppercase;">Kouri Island · 沖繩戀島</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- 美國村卡片 -->
+          <div class="card-neo overflow-hidden active:scale-[0.98] transition cursor-pointer" style="border-radius:32px;padding:0;" @click="showAmericanVillageModal=true">
+            <div style="position:relative;width:100%;height:220px;overflow:hidden;">
+              <img src="./images/americanvillage.jpg" style="width:100%;height:100%;object-fit:cover;object-position:center;">
+            </div>
+            <div style="padding:18px 20px 16px;">
+              <div>
+                <p style="font-size:16px;font-weight:900;line-height:1.2;">美國村</p>
+                <p style="font-size:9px;opacity:0.45;margin-top:3px;letter-spacing:0.08em;text-transform:uppercase;">American Village · 北谷町</p>
               </div>
             </div>
           </div>
@@ -1293,6 +1357,617 @@
       </div>
     </transition>
 
+    <!-- Modal: 美國村 -->
+    <transition name="slide-up">
+      <div v-if="showAmericanVillageModal" class="fixed inset-0 z-[1500] flex flex-col justify-end font-black" style="padding-bottom:0;height:100dvh;">
+        <div class="absolute inset-0" style="background:rgba(30,10,20,0.82);backdrop-filter:blur(6px);" @click="showAmericanVillageModal=false"></div>
+        <div class="relative card-neo-xl overflow-hidden" style="border-radius:40px 40px 0 0;height:92dvh;display:flex;flex-direction:column;padding-bottom:env(safe-area-inset-bottom,0px);">
+          <div style="background:linear-gradient(145deg,#8a1a4a,#c0395a);padding:24px 24px 18px;flex-shrink:0;">
+            <p style="font-size:10px;letter-spacing:0.4em;text-transform:uppercase;color:rgba(255,255,255,0.6);margin-bottom:6px;">Chatan · 北谷町</p>
+            <p style="font-size:26px;font-weight:900;color:white;line-height:1.1;">🎡 美國村</p>
+          </div>
+          <div style="padding:14px 16px 0;flex-shrink:0;">
+            <div class="tab-bar" style="display:flex;">
+              <div class="tab-slider-pill" style="width:33.333%;" :style="{ transform: 'translateX('+(americanVillageTab==='food'?'0%':americanVillageTab==='shop'?'100%':'200%')+')' }"></div>
+              <button @click="americanVillageTab='food'" :class="['tab-btn text-xs', americanVillageTab==='food'?'active':'inactive']">🍜 美食</button>
+              <button @click="americanVillageTab='shop'" :class="['tab-btn text-xs', americanVillageTab==='shop'?'active':'inactive']">🛍️ 購物</button>
+              <button @click="americanVillageTab='souvenir'" :class="['tab-btn text-xs', americanVillageTab==='souvenir'?'active':'inactive']">🎁 機位</button>
+            </div>
+          </div>
+          <div style="overflow-y:auto;padding:16px 16px 12px;flex:1;display:flex;flex-direction:column;gap:12px;">
+            <button v-if="canEdit" @click="openAddAmericanVillage()" class="w-full py-4 rounded-2xl font-black text-sm active:scale-95 transition" style="border:2px dashed rgba(138,26,74,0.4);background:rgba(138,26,74,0.05);color:#8a1a4a;">＋ 新增店家</button>
+            <template v-if="americanVillagePlaces.filter(p=>p.tab===americanVillageTab).length === 0">
+              <div class="card-neo p-6 text-center" style="opacity:0.4;">
+                <p style="font-size:28px;margin-bottom:8px;">{{ americanVillageTab==='food'?'🍜':americanVillageTab==='shop'?'🛍️':'🎁' }}</p>
+                <p style="font-size:12px;font-weight:900;">尚無店家資料</p>
+              </div>
+            </template>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+              <div v-for="(place, idx) in americanVillagePlaces.filter(p=>p.tab===americanVillageTab)" :key="place.id"
+                class="card-neo overflow-hidden cursor-pointer active:scale-95 transition"
+                style="border-radius:20px;padding:0;"
+                @click="americanVillageSelected=place; showAmericanVillageDetail=true">
+                <div style="width:100%;height:100px;overflow:hidden;background:rgba(220,195,160,0.15);">
+                  <img v-if="place.photo" :src="place.photo" style="width:100%;height:100%;object-fit:cover;">
+                  <div v-else style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:28px;">
+                    {{ americanVillageTab==='food'?'🍜':americanVillageTab==='shop'?'🛍️':'🎁' }}
+                  </div>
+                </div>
+                <div style="padding:10px 10px 8px;">
+                  <p style="font-size:12px;font-weight:900;line-height:1.3;">{{ place.name }}</p>
+                  <p v-if="place.desc" style="font-size:9px;opacity:0.4;margin-top:3px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">{{ place.desc }}</p>
+                  <div v-if="canEdit" style="display:flex;gap:4px;margin-top:6px;" @click.stop>
+                    <button @click="openEditAmericanVillage(americanVillagePlaces.indexOf(place))" style="font-size:16px;background:none;border:none;cursor:pointer;opacity:0.4;padding:2px;">✏️</button>
+                    <button @click="confirmDelete(place.name, ()=>removeAmericanVillagePlace(americanVillagePlaces.indexOf(place)))" style="font-size:16px;background:none;border:none;cursor:pointer;color:rgba(200,80,80,0.6);padding:2px;">✕</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="padding:12px 24px 24px;flex-shrink:0;">
+            <button @click="showAmericanVillageModal=false" class="w-full py-4 rounded-full text-[10px] uppercase font-black active:scale-95 transition card-neo" style="color:var(--tan);">Close</button>
+          </div>
+        </div>
+      </div>
+    </transition>
+
+    <!-- Modal: 美國村 店家詳細 -->
+    <transition name="slide-up">
+      <div v-if="showAmericanVillageDetail && americanVillageSelected" class="fixed inset-0 z-[1700] flex flex-col justify-end font-black" style="padding-bottom:0;height:100dvh;">
+        <div class="absolute inset-0" style="background:rgba(0,0,0,0.75);backdrop-filter:blur(6px);" @click="showAmericanVillageDetail=false"></div>
+        <div class="relative card-neo-xl overflow-hidden" style="border-radius:40px 40px 0 0;max-height:85dvh;display:flex;flex-direction:column;padding-bottom:env(safe-area-inset-bottom,0px);">
+          <div v-if="americanVillageSelected.photo" style="width:100%;height:220px;overflow:hidden;flex-shrink:0;">
+            <img :src="americanVillageSelected.photo" style="width:100%;height:100%;object-fit:cover;">
+          </div>
+          <div style="overflow-y:auto;padding:20px 22px 12px;flex:1;display:flex;flex-direction:column;gap:14px;">
+            <div>
+              <p style="font-size:22px;font-weight:900;line-height:1.2;">{{ americanVillageSelected.name }}</p>
+              <span style="font-size:9px;font-weight:900;padding:3px 10px;border-radius:999px;background:rgba(220,195,160,0.3);color:var(--tan);letter-spacing:0.1em;margin-top:6px;display:inline-block;">
+                {{ americanVillageSelected.tab==='food'?'🍜 美食':americanVillageSelected.tab==='shop'?'🛍️ 購物':'🎁 機位' }}
+              </span>
+            </div>
+            <div v-if="americanVillageSelected.desc" class="card-neo" style="padding:14px 16px;border-radius:18px;">
+              <p style="font-size:9px;opacity:0.4;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:6px;">介紹</p>
+              <p style="font-size:13px;font-weight:700;line-height:1.6;opacity:0.8;">{{ americanVillageSelected.desc }}</p>
+            </div>
+            <div v-if="americanVillageSelected.recommend" class="card-neo" style="padding:14px 16px;border-radius:18px;">
+              <p style="font-size:9px;opacity:0.4;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:6px;">⭐ 推薦商品</p>
+              <p style="font-size:13px;font-weight:700;line-height:1.6;opacity:0.8;white-space:pre-line;">{{ americanVillageSelected.recommend }}</p>
+            </div>
+            <div v-if="americanVillageSelected.hours" class="card-neo" style="padding:14px 16px;border-radius:18px;">
+              <p style="font-size:9px;opacity:0.4;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:6px;">🕐 營業時間</p>
+              <p style="font-size:13px;font-weight:700;line-height:1.6;opacity:0.8;white-space:pre-line;">{{ americanVillageSelected.hours }}</p>
+            </div>
+            <a v-if="americanVillageSelected.mapUrl" :href="americanVillageSelected.mapUrl" target="_blank"
+              style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-radius:18px;background:linear-gradient(135deg,#ea4335,#c62828);color:white;text-decoration:none;box-shadow:0 4px 12px rgba(234,67,53,0.4);">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+              <span style="font-size:11px;font-weight:900;letter-spacing:0.1em;">Google Maps 導航</span>
+            </a>
+          </div>
+          <div style="padding:12px 24px 24px;flex-shrink:0;">
+            <button @click="showAmericanVillageDetail=false" class="w-full py-4 rounded-full text-[10px] uppercase font-black active:scale-95 transition card-neo" style="color:var(--tan);">Close</button>
+          </div>
+        </div>
+      </div>
+    </transition>
+
+    <!-- Modal: 美國村 店家編輯 -->
+    <transition name="slide-up">
+      <div v-if="showAmericanVillageEdit" class="fixed inset-0 z-[1600] flex flex-col justify-end font-black" style="padding-bottom:0;height:100dvh;">
+        <div class="absolute inset-0" style="background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);" @click="showAmericanVillageEdit=false"></div>
+        <div class="relative card-neo-xl overflow-hidden" style="border-radius:40px 40px 0 0;max-height:88dvh;display:flex;flex-direction:column;padding-bottom:env(safe-area-inset-bottom,0px);">
+          <div style="background:linear-gradient(145deg,#c0395a,#8a1a4a);padding:22px 24px 16px;flex-shrink:0;">
+            <p style="font-size:20px;font-weight:900;color:white;">{{ americanVillageEditIdx===-1 ? '新增店家' : '編輯店家' }}</p>
+          </div>
+          <div style="overflow-y:auto;padding:20px 20px 12px;flex:1;display:flex;flex-direction:column;gap:14px;">
+            <div>
+              <p style="font-size:10px;opacity:0.5;margin-bottom:6px;letter-spacing:0.1em;">分類</p>
+              <div class="tab-bar" style="display:flex;">
+                <div class="tab-slider-pill" style="width:33.333%;" :style="{ transform: 'translateX('+(americanVillageForm.tab==='food'?'0%':americanVillageForm.tab==='shop'?'100%':'200%')+')' }"></div>
+                <button @click="americanVillageForm.tab='food'" :class="['tab-btn text-xs', americanVillageForm.tab==='food'?'active':'inactive']">🍜 美食</button>
+                <button @click="americanVillageForm.tab='shop'" :class="['tab-btn text-xs', americanVillageForm.tab==='shop'?'active':'inactive']">🛍️ 購物</button>
+                <button @click="americanVillageForm.tab='souvenir'" :class="['tab-btn text-xs', americanVillageForm.tab==='souvenir'?'active':'inactive']">🎁 機位</button>
+              </div>
+            </div>
+            <div>
+              <p style="font-size:10px;opacity:0.5;margin-bottom:6px;letter-spacing:0.1em;">店家名稱</p>
+              <input v-model="americanVillageForm.name" type="text" placeholder="例：Depot Island" class="card-neo w-full px-4 py-3 text-sm font-black outline-none bg-transparent border-none">
+            </div>
+            <div>
+              <p style="font-size:10px;opacity:0.5;margin-bottom:6px;letter-spacing:0.1em;">店家介紹</p>
+              <textarea v-model="americanVillageForm.desc" rows="3" placeholder="簡單介紹這家店..." class="card-neo w-full px-4 py-3 text-sm font-black outline-none bg-transparent border-none resize-none" style="border-radius:16px;"></textarea>
+            </div>
+            <div>
+              <p style="font-size:10px;opacity:0.5;margin-bottom:6px;letter-spacing:0.1em;">推薦商品</p>
+              <textarea v-model="americanVillageForm.recommend" rows="3" placeholder="例：限定商品、必買清單..." class="card-neo w-full px-4 py-3 text-sm font-black outline-none bg-transparent border-none resize-none" style="border-radius:16px;"></textarea>
+            </div>
+            <div>
+              <p style="font-size:10px;opacity:0.5;margin-bottom:6px;letter-spacing:0.1em;">Google Maps 連結</p>
+              <input v-model="americanVillageForm.mapUrl" type="url" placeholder="https://maps.app.goo.gl/..." class="card-neo w-full px-4 py-3 text-sm font-black outline-none bg-transparent border-none">
+            </div>
+            <div>
+              <p style="font-size:10px;opacity:0.5;margin-bottom:6px;letter-spacing:0.1em;">營業時間</p>
+              <textarea v-model="americanVillageForm.hours" rows="5" placeholder="例：週一至週日 10:00–22:00" class="card-neo w-full px-4 py-3 text-sm font-black outline-none bg-transparent border-none resize-none" style="border-radius:16px;"></textarea>
+            </div>
+            <div>
+              <p style="font-size:10px;opacity:0.5;margin-bottom:6px;letter-spacing:0.1em;">店家圖片</p>
+              <div v-if="americanVillageForm.photo" style="position:relative;width:100%;height:140px;border-radius:16px;overflow:hidden;margin-bottom:8px;">
+                <img :src="americanVillageForm.photo" style="width:100%;height:100%;object-fit:cover;">
+                <button @click="americanVillageForm.photo=''" style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.5);color:white;border:none;border-radius:50%;width:24px;height:24px;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+              </div>
+              <label class="card-neo w-full py-3 flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition" style="border-radius:16px;display:flex;">
+                <span style="font-size:12px;font-weight:900;color:#8a1a4a;">{{ americanVillageUploading ? '⏳ 上傳中...' : '📷 上傳圖片' }}</span>
+                <input type="file" accept="image/*" style="display:none;" @change="handleAmericanVillagePhoto" :disabled="americanVillageUploading">
+              </label>
+            </div>
+          </div>
+          <div style="padding:12px 20px 20px;flex-shrink:0;display:flex;gap:10px;">
+            <button @click="showAmericanVillageEdit=false" class="flex-1 py-4 rounded-full text-[10px] uppercase font-black active:scale-95 transition card-neo" style="color:var(--tan);">取消</button>
+            <button @click="saveAmericanVillagePlace()" class="flex-1 py-4 rounded-full text-[10px] uppercase font-black active:scale-95 transition text-white" style="background:linear-gradient(145deg,#c0395a,#8a1a4a);box-shadow:0 4px 12px rgba(138,26,74,0.4);">儲存</button>
+          </div>
+        </div>
+      </div>
+    </transition>
+
+    <!-- Modal: 古宇利島 -->
+    <transition name="slide-up">
+      <div v-if="showKouriModal" class="fixed inset-0 z-[1500] flex flex-col justify-end font-black" style="padding-bottom:0;height:100dvh;">
+        <div class="absolute inset-0" style="background:rgba(0,20,40,0.82);backdrop-filter:blur(6px);" @click="showKouriModal=false"></div>
+        <div class="relative card-neo-xl overflow-hidden" style="border-radius:40px 40px 0 0;height:92dvh;display:flex;flex-direction:column;padding-bottom:env(safe-area-inset-bottom,0px);">
+          <div style="background:linear-gradient(145deg,#0e6b8a,#1a9ab5);padding:24px 24px 18px;flex-shrink:0;">
+            <p style="font-size:10px;letter-spacing:0.4em;text-transform:uppercase;color:rgba(255,255,255,0.6);margin-bottom:6px;">Kouri Island · 今帰仁村</p>
+            <p style="font-size:26px;font-weight:900;color:white;line-height:1.1;">🏝️ 古宇利島</p>
+          </div>
+          <div style="padding:14px 16px 0;flex-shrink:0;">
+            <div class="tab-bar" style="display:flex;">
+              <div class="tab-slider-pill" style="width:33.333%;" :style="{ transform: 'translateX('+(kouriTab==='food'?'0%':kouriTab==='shop'?'100%':'200%')+')' }"></div>
+              <button @click="kouriTab='food'" :class="['tab-btn text-xs', kouriTab==='food'?'active':'inactive']">🍜 美食</button>
+              <button @click="kouriTab='shop'" :class="['tab-btn text-xs', kouriTab==='shop'?'active':'inactive']">🛍️ 購物</button>
+              <button @click="kouriTab='souvenir'" :class="['tab-btn text-xs', kouriTab==='souvenir'?'active':'inactive']">🎁 機位</button>
+            </div>
+          </div>
+          <div style="overflow-y:auto;padding:16px 16px 12px;flex:1;display:flex;flex-direction:column;gap:12px;">
+            <button v-if="canEdit" @click="openAddKouri()" class="w-full py-4 rounded-2xl font-black text-sm active:scale-95 transition" style="border:2px dashed rgba(14,107,138,0.4);background:rgba(14,107,138,0.05);color:#0e6b8a;">＋ 新增店家</button>
+            <template v-if="kouriPlaces.filter(p=>p.tab===kouriTab).length === 0">
+              <div class="card-neo p-6 text-center" style="opacity:0.4;">
+                <p style="font-size:28px;margin-bottom:8px;">{{ kouriTab==='food'?'🍜':kouriTab==='shop'?'🛍️':'🎁' }}</p>
+                <p style="font-size:12px;font-weight:900;">尚無店家資料</p>
+              </div>
+            </template>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+              <div v-for="(place, idx) in kouriPlaces.filter(p=>p.tab===kouriTab)" :key="place.id"
+                class="card-neo overflow-hidden cursor-pointer active:scale-95 transition"
+                style="border-radius:20px;padding:0;"
+                @click="kouriSelected=place; showKouriDetail=true">
+                <div style="width:100%;height:100px;overflow:hidden;background:rgba(220,195,160,0.15);">
+                  <img v-if="place.photo" :src="place.photo" style="width:100%;height:100%;object-fit:cover;">
+                  <div v-else style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:28px;">
+                    {{ kouriTab==='food'?'🍜':kouriTab==='shop'?'🛍️':'🎁' }}
+                  </div>
+                </div>
+                <div style="padding:10px 10px 8px;">
+                  <p style="font-size:12px;font-weight:900;line-height:1.3;">{{ place.name }}</p>
+                  <p v-if="place.desc" style="font-size:9px;opacity:0.4;margin-top:3px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">{{ place.desc }}</p>
+                  <div v-if="canEdit" style="display:flex;gap:4px;margin-top:6px;" @click.stop>
+                    <button @click="openEditKouri(kouriPlaces.indexOf(place))" style="font-size:16px;background:none;border:none;cursor:pointer;opacity:0.4;padding:2px;">✏️</button>
+                    <button @click="confirmDelete(place.name, ()=>removeKouriPlace(kouriPlaces.indexOf(place)))" style="font-size:16px;background:none;border:none;cursor:pointer;color:rgba(200,80,80,0.6);padding:2px;">✕</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="padding:12px 24px 24px;flex-shrink:0;">
+            <button @click="showKouriModal=false" class="w-full py-4 rounded-full text-[10px] uppercase font-black active:scale-95 transition card-neo" style="color:var(--tan);">Close</button>
+          </div>
+        </div>
+      </div>
+    </transition>
+
+    <!-- Modal: 古宇利島 店家詳細 -->
+    <transition name="slide-up">
+      <div v-if="showKouriDetail && kouriSelected" class="fixed inset-0 z-[1700] flex flex-col justify-end font-black" style="padding-bottom:0;height:100dvh;">
+        <div class="absolute inset-0" style="background:rgba(0,0,0,0.75);backdrop-filter:blur(6px);" @click="showKouriDetail=false"></div>
+        <div class="relative card-neo-xl overflow-hidden" style="border-radius:40px 40px 0 0;max-height:85dvh;display:flex;flex-direction:column;padding-bottom:env(safe-area-inset-bottom,0px);">
+          <div v-if="kouriSelected.photo" style="width:100%;height:220px;overflow:hidden;flex-shrink:0;">
+            <img :src="kouriSelected.photo" style="width:100%;height:100%;object-fit:cover;">
+          </div>
+          <div style="overflow-y:auto;padding:20px 22px 12px;flex:1;display:flex;flex-direction:column;gap:14px;">
+            <div>
+              <p style="font-size:22px;font-weight:900;line-height:1.2;">{{ kouriSelected.name }}</p>
+              <span style="font-size:9px;font-weight:900;padding:3px 10px;border-radius:999px;background:rgba(220,195,160,0.3);color:var(--tan);letter-spacing:0.1em;margin-top:6px;display:inline-block;">
+                {{ kouriSelected.tab==='food'?'🍜 美食':kouriSelected.tab==='shop'?'🛍️ 購物':'🎁 機位' }}
+              </span>
+            </div>
+            <div v-if="kouriSelected.desc" class="card-neo" style="padding:14px 16px;border-radius:18px;">
+              <p style="font-size:9px;opacity:0.4;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:6px;">介紹</p>
+              <p style="font-size:13px;font-weight:700;line-height:1.6;opacity:0.8;">{{ kouriSelected.desc }}</p>
+            </div>
+            <div v-if="kouriSelected.recommend" class="card-neo" style="padding:14px 16px;border-radius:18px;">
+              <p style="font-size:9px;opacity:0.4;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:6px;">⭐ 推薦商品</p>
+              <p style="font-size:13px;font-weight:700;line-height:1.6;opacity:0.8;white-space:pre-line;">{{ kouriSelected.recommend }}</p>
+            </div>
+            <div v-if="kouriSelected.hours" class="card-neo" style="padding:14px 16px;border-radius:18px;">
+              <p style="font-size:9px;opacity:0.4;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:6px;">🕐 營業時間</p>
+              <p style="font-size:13px;font-weight:700;line-height:1.6;opacity:0.8;white-space:pre-line;">{{ kouriSelected.hours }}</p>
+            </div>
+            <a v-if="kouriSelected.mapUrl" :href="kouriSelected.mapUrl" target="_blank"
+              style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-radius:18px;background:linear-gradient(135deg,#ea4335,#c62828);color:white;text-decoration:none;box-shadow:0 4px 12px rgba(234,67,53,0.4);">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+              <span style="font-size:11px;font-weight:900;letter-spacing:0.1em;">Google Maps 導航</span>
+            </a>
+          </div>
+          <div style="padding:12px 24px 24px;flex-shrink:0;">
+            <button @click="showKouriDetail=false" class="w-full py-4 rounded-full text-[10px] uppercase font-black active:scale-95 transition card-neo" style="color:var(--tan);">Close</button>
+          </div>
+        </div>
+      </div>
+    </transition>
+
+    <!-- Modal: 古宇利島 店家編輯 -->
+    <transition name="slide-up">
+      <div v-if="showKouriEdit" class="fixed inset-0 z-[1600] flex flex-col justify-end font-black" style="padding-bottom:0;height:100dvh;">
+        <div class="absolute inset-0" style="background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);" @click="showKouriEdit=false"></div>
+        <div class="relative card-neo-xl overflow-hidden" style="border-radius:40px 40px 0 0;max-height:88dvh;display:flex;flex-direction:column;padding-bottom:env(safe-area-inset-bottom,0px);">
+          <div style="background:linear-gradient(145deg,#1a9ab5,#0e6b8a);padding:22px 24px 16px;flex-shrink:0;">
+            <p style="font-size:20px;font-weight:900;color:white;">{{ kouriEditIdx===-1 ? '新增店家' : '編輯店家' }}</p>
+          </div>
+          <div style="overflow-y:auto;padding:20px 20px 12px;flex:1;display:flex;flex-direction:column;gap:14px;">
+            <div>
+              <p style="font-size:10px;opacity:0.5;margin-bottom:6px;letter-spacing:0.1em;">分類</p>
+              <div class="tab-bar" style="display:flex;">
+                <div class="tab-slider-pill" style="width:33.333%;" :style="{ transform: 'translateX('+(kouriForm.tab==='food'?'0%':kouriForm.tab==='shop'?'100%':'200%')+')' }"></div>
+                <button @click="kouriForm.tab='food'" :class="['tab-btn text-xs', kouriForm.tab==='food'?'active':'inactive']">🍜 美食</button>
+                <button @click="kouriForm.tab='shop'" :class="['tab-btn text-xs', kouriForm.tab==='shop'?'active':'inactive']">🛍️ 購物</button>
+                <button @click="kouriForm.tab='souvenir'" :class="['tab-btn text-xs', kouriForm.tab==='souvenir'?'active':'inactive']">🎁 機位</button>
+              </div>
+            </div>
+            <div>
+              <p style="font-size:10px;opacity:0.5;margin-bottom:6px;letter-spacing:0.1em;">店家名稱</p>
+              <input v-model="kouriForm.name" type="text" placeholder="例：古宇利海灘小屋" class="card-neo w-full px-4 py-3 text-sm font-black outline-none bg-transparent border-none">
+            </div>
+            <div>
+              <p style="font-size:10px;opacity:0.5;margin-bottom:6px;letter-spacing:0.1em;">店家介紹</p>
+              <textarea v-model="kouriForm.desc" rows="3" placeholder="簡單介紹這家店..." class="card-neo w-full px-4 py-3 text-sm font-black outline-none bg-transparent border-none resize-none" style="border-radius:16px;"></textarea>
+            </div>
+            <div>
+              <p style="font-size:10px;opacity:0.5;margin-bottom:6px;letter-spacing:0.1em;">推薦商品</p>
+              <textarea v-model="kouriForm.recommend" rows="3" placeholder="例：必吃龍蝦、新鮮海鮮..." class="card-neo w-full px-4 py-3 text-sm font-black outline-none bg-transparent border-none resize-none" style="border-radius:16px;"></textarea>
+            </div>
+            <div>
+              <p style="font-size:10px;opacity:0.5;margin-bottom:6px;letter-spacing:0.1em;">Google Maps 連結</p>
+              <input v-model="kouriForm.mapUrl" type="url" placeholder="https://maps.app.goo.gl/..." class="card-neo w-full px-4 py-3 text-sm font-black outline-none bg-transparent border-none">
+            </div>
+            <div>
+              <p style="font-size:10px;opacity:0.5;margin-bottom:6px;letter-spacing:0.1em;">營業時間</p>
+              <textarea v-model="kouriForm.hours" rows="5" placeholder="例：週一至週日 10:00–18:00" class="card-neo w-full px-4 py-3 text-sm font-black outline-none bg-transparent border-none resize-none" style="border-radius:16px;"></textarea>
+            </div>
+            <div>
+              <p style="font-size:10px;opacity:0.5;margin-bottom:6px;letter-spacing:0.1em;">店家圖片</p>
+              <div v-if="kouriForm.photo" style="position:relative;width:100%;height:140px;border-radius:16px;overflow:hidden;margin-bottom:8px;">
+                <img :src="kouriForm.photo" style="width:100%;height:100%;object-fit:cover;">
+                <button @click="kouriForm.photo=''" style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.5);color:white;border:none;border-radius:50%;width:24px;height:24px;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+              </div>
+              <label class="card-neo w-full py-3 flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition" style="border-radius:16px;display:flex;">
+                <span style="font-size:12px;font-weight:900;color:#0e6b8a;">{{ kouriUploading ? '⏳ 上傳中...' : '📷 上傳圖片' }}</span>
+                <input type="file" accept="image/*" style="display:none;" @change="handleKouriPhoto" :disabled="kouriUploading">
+              </label>
+            </div>
+          </div>
+          <div style="padding:12px 20px 20px;flex-shrink:0;display:flex;gap:10px;">
+            <button @click="showKouriEdit=false" class="flex-1 py-4 rounded-full text-[10px] uppercase font-black active:scale-95 transition card-neo" style="color:var(--tan);">取消</button>
+            <button @click="saveKouriPlace()" class="flex-1 py-4 rounded-full text-[10px] uppercase font-black active:scale-95 transition text-white" style="background:linear-gradient(145deg,#1a9ab5,#0e6b8a);box-shadow:0 4px 12px rgba(14,107,138,0.4);">儲存</button>
+          </div>
+        </div>
+      </div>
+    </transition>
+
+    <!-- Modal: 波上宮 -->
+    <transition name="slide-up">
+      <div v-if="showNaminoueModal" class="fixed inset-0 z-[1500] flex flex-col justify-end font-black" style="padding-bottom:0;height:100dvh;">
+        <div class="absolute inset-0" style="background:rgba(30,10,10,0.82);backdrop-filter:blur(6px);" @click="showNaminoueModal=false"></div>
+        <div class="relative card-neo-xl overflow-hidden" style="border-radius:40px 40px 0 0;height:92dvh;display:flex;flex-direction:column;padding-bottom:env(safe-area-inset-bottom,0px);">
+          <div style="background:linear-gradient(145deg,#6b1a1a,#a83232);padding:24px 24px 18px;flex-shrink:0;">
+            <p style="font-size:10px;letter-spacing:0.4em;text-transform:uppercase;color:rgba(255,255,255,0.6);margin-bottom:6px;">Naminoue · 那霸</p>
+            <p style="font-size:26px;font-weight:900;color:white;line-height:1.1;">⛩️ 波上宮</p>
+          </div>
+          <div style="padding:14px 16px 0;flex-shrink:0;">
+            <div class="tab-bar" style="display:flex;">
+              <div class="tab-slider-pill" style="width:33.333%;" :style="{ transform: 'translateX('+(naminoueTab==='food'?'0%':naminoueTab==='shop'?'100%':'200%')+')' }"></div>
+              <button @click="naminoueTab='food'" :class="['tab-btn text-xs', naminoueTab==='food'?'active':'inactive']">🍜 美食</button>
+              <button @click="naminoueTab='shop'" :class="['tab-btn text-xs', naminoueTab==='shop'?'active':'inactive']">🛍️ 購物</button>
+              <button @click="naminoueTab='souvenir'" :class="['tab-btn text-xs', naminoueTab==='souvenir'?'active':'inactive']">🎁 機位</button>
+            </div>
+          </div>
+          <div style="overflow-y:auto;padding:16px 16px 12px;flex:1;display:flex;flex-direction:column;gap:12px;">
+            <button v-if="canEdit" @click="openAddNaminoue()" class="w-full py-4 rounded-2xl font-black text-sm active:scale-95 transition" style="border:2px dashed rgba(168,50,50,0.4);background:rgba(168,50,50,0.05);color:#a83232;">＋ 新增店家</button>
+            <template v-if="naminouePlaces.filter(p=>p.tab===naminoueTab).length === 0">
+              <div class="card-neo p-6 text-center" style="opacity:0.4;">
+                <p style="font-size:28px;margin-bottom:8px;">{{ naminoueTab==='food'?'🍜':naminoueTab==='shop'?'🛍️':'🎁' }}</p>
+                <p style="font-size:12px;font-weight:900;">尚無店家資料</p>
+              </div>
+            </template>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+              <div v-for="(place, idx) in naminouePlaces.filter(p=>p.tab===naminoueTab)" :key="place.id"
+                class="card-neo overflow-hidden cursor-pointer active:scale-95 transition"
+                style="border-radius:20px;padding:0;"
+                @click="naminoueSelected=place; showNaminoueDetail=true">
+                <div style="width:100%;height:100px;overflow:hidden;background:rgba(220,195,160,0.15);">
+                  <img v-if="place.photo" :src="place.photo" style="width:100%;height:100%;object-fit:cover;">
+                  <div v-else style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:28px;">
+                    {{ naminoueTab==='food'?'🍜':naminoueTab==='shop'?'🛍️':'🎁' }}
+                  </div>
+                </div>
+                <div style="padding:10px 10px 8px;">
+                  <p style="font-size:12px;font-weight:900;line-height:1.3;">{{ place.name }}</p>
+                  <p v-if="place.desc" style="font-size:9px;opacity:0.4;margin-top:3px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">{{ place.desc }}</p>
+                  <div v-if="canEdit" style="display:flex;gap:4px;margin-top:6px;" @click.stop>
+                    <button @click="openEditNaminoue(naminouePlaces.indexOf(place))" style="font-size:16px;background:none;border:none;cursor:pointer;opacity:0.4;padding:2px;">✏️</button>
+                    <button @click="confirmDelete(place.name, ()=>removeNaminouePlace(naminouePlaces.indexOf(place)))" style="font-size:16px;background:none;border:none;cursor:pointer;color:rgba(200,80,80,0.6);padding:2px;">✕</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="padding:12px 24px 24px;flex-shrink:0;">
+            <button @click="showNaminoueModal=false" class="w-full py-4 rounded-full text-[10px] uppercase font-black active:scale-95 transition card-neo" style="color:var(--tan);">Close</button>
+          </div>
+        </div>
+      </div>
+    </transition>
+
+    <!-- Modal: 波上宮 店家詳細 -->
+    <transition name="slide-up">
+      <div v-if="showNaminoueDetail && naminoueSelected" class="fixed inset-0 z-[1700] flex flex-col justify-end font-black" style="padding-bottom:0;height:100dvh;">
+        <div class="absolute inset-0" style="background:rgba(0,0,0,0.75);backdrop-filter:blur(6px);" @click="showNaminoueDetail=false"></div>
+        <div class="relative card-neo-xl overflow-hidden" style="border-radius:40px 40px 0 0;max-height:85dvh;display:flex;flex-direction:column;padding-bottom:env(safe-area-inset-bottom,0px);">
+          <div v-if="naminoueSelected.photo" style="width:100%;height:220px;overflow:hidden;flex-shrink:0;">
+            <img :src="naminoueSelected.photo" style="width:100%;height:100%;object-fit:cover;">
+          </div>
+          <div style="overflow-y:auto;padding:20px 22px 12px;flex:1;display:flex;flex-direction:column;gap:14px;">
+            <div>
+              <p style="font-size:22px;font-weight:900;line-height:1.2;">{{ naminoueSelected.name }}</p>
+              <span style="font-size:9px;font-weight:900;padding:3px 10px;border-radius:999px;background:rgba(220,195,160,0.3);color:var(--tan);letter-spacing:0.1em;margin-top:6px;display:inline-block;">
+                {{ naminoueSelected.tab==='food'?'🍜 美食':naminoueSelected.tab==='shop'?'🛍️ 購物':'🎁 機位' }}
+              </span>
+            </div>
+            <div v-if="naminoueSelected.desc" class="card-neo" style="padding:14px 16px;border-radius:18px;">
+              <p style="font-size:9px;opacity:0.4;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:6px;">介紹</p>
+              <p style="font-size:13px;font-weight:700;line-height:1.6;opacity:0.8;">{{ naminoueSelected.desc }}</p>
+            </div>
+            <div v-if="naminoueSelected.recommend" class="card-neo" style="padding:14px 16px;border-radius:18px;">
+              <p style="font-size:9px;opacity:0.4;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:6px;">⭐ 推薦商品</p>
+              <p style="font-size:13px;font-weight:700;line-height:1.6;opacity:0.8;white-space:pre-line;">{{ naminoueSelected.recommend }}</p>
+            </div>
+            <div v-if="naminoueSelected.hours" class="card-neo" style="padding:14px 16px;border-radius:18px;">
+              <p style="font-size:9px;opacity:0.4;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:6px;">🕐 營業時間</p>
+              <p style="font-size:13px;font-weight:700;line-height:1.6;opacity:0.8;white-space:pre-line;">{{ naminoueSelected.hours }}</p>
+            </div>
+            <a v-if="naminoueSelected.mapUrl" :href="naminoueSelected.mapUrl" target="_blank"
+              style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-radius:18px;background:linear-gradient(135deg,#ea4335,#c62828);color:white;text-decoration:none;box-shadow:0 4px 12px rgba(234,67,53,0.4);">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+              <span style="font-size:11px;font-weight:900;letter-spacing:0.1em;">Google Maps 導航</span>
+            </a>
+          </div>
+          <div style="padding:12px 24px 24px;flex-shrink:0;">
+            <button @click="showNaminoueDetail=false" class="w-full py-4 rounded-full text-[10px] uppercase font-black active:scale-95 transition card-neo" style="color:var(--tan);">Close</button>
+          </div>
+        </div>
+      </div>
+    </transition>
+
+    <!-- Modal: 波上宮 店家編輯 -->
+    <transition name="slide-up">
+      <div v-if="showNaminoueEdit" class="fixed inset-0 z-[1600] flex flex-col justify-end font-black" style="padding-bottom:0;height:100dvh;">
+        <div class="absolute inset-0" style="background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);" @click="showNaminoueEdit=false"></div>
+        <div class="relative card-neo-xl overflow-hidden" style="border-radius:40px 40px 0 0;max-height:88dvh;display:flex;flex-direction:column;padding-bottom:env(safe-area-inset-bottom,0px);">
+          <div style="background:linear-gradient(145deg,#a83232,#6b1a1a);padding:22px 24px 16px;flex-shrink:0;">
+            <p style="font-size:20px;font-weight:900;color:white;">{{ naminoueEditIdx===-1 ? '新增店家' : '編輯店家' }}</p>
+          </div>
+          <div style="overflow-y:auto;padding:20px 20px 12px;flex:1;display:flex;flex-direction:column;gap:14px;">
+            <div>
+              <p style="font-size:10px;opacity:0.5;margin-bottom:6px;letter-spacing:0.1em;">分類</p>
+              <div class="tab-bar" style="display:flex;">
+                <div class="tab-slider-pill" style="width:33.333%;" :style="{ transform: 'translateX('+(naminoueForm.tab==='food'?'0%':naminoueForm.tab==='shop'?'100%':'200%')+')' }"></div>
+                <button @click="naminoueForm.tab='food'" :class="['tab-btn text-xs', naminoueForm.tab==='food'?'active':'inactive']">🍜 美食</button>
+                <button @click="naminoueForm.tab='shop'" :class="['tab-btn text-xs', naminoueForm.tab==='shop'?'active':'inactive']">🛍️ 購物</button>
+                <button @click="naminoueForm.tab='souvenir'" :class="['tab-btn text-xs', naminoueForm.tab==='souvenir'?'active':'inactive']">🎁 機位</button>
+              </div>
+            </div>
+            <div>
+              <p style="font-size:10px;opacity:0.5;margin-bottom:6px;letter-spacing:0.1em;">店家名稱</p>
+              <input v-model="naminoueForm.name" type="text" placeholder="例：波上海灘食堂" class="card-neo w-full px-4 py-3 text-sm font-black outline-none bg-transparent border-none">
+            </div>
+            <div>
+              <p style="font-size:10px;opacity:0.5;margin-bottom:6px;letter-spacing:0.1em;">店家介紹</p>
+              <textarea v-model="naminoueForm.desc" rows="3" placeholder="簡單介紹這家店..." class="card-neo w-full px-4 py-3 text-sm font-black outline-none bg-transparent border-none resize-none" style="border-radius:16px;"></textarea>
+            </div>
+            <div>
+              <p style="font-size:10px;opacity:0.5;margin-bottom:6px;letter-spacing:0.1em;">推薦商品</p>
+              <textarea v-model="naminoueForm.recommend" rows="3" placeholder="例：必買御守、限定商品..." class="card-neo w-full px-4 py-3 text-sm font-black outline-none bg-transparent border-none resize-none" style="border-radius:16px;"></textarea>
+            </div>
+            <div>
+              <p style="font-size:10px;opacity:0.5;margin-bottom:6px;letter-spacing:0.1em;">Google Maps 連結</p>
+              <input v-model="naminoueForm.mapUrl" type="url" placeholder="https://maps.app.goo.gl/..." class="card-neo w-full px-4 py-3 text-sm font-black outline-none bg-transparent border-none">
+            </div>
+            <div>
+              <p style="font-size:10px;opacity:0.5;margin-bottom:6px;letter-spacing:0.1em;">營業時間</p>
+              <textarea v-model="naminoueForm.hours" rows="5" placeholder="例：週一至週日 09:00–18:00" class="card-neo w-full px-4 py-3 text-sm font-black outline-none bg-transparent border-none resize-none" style="border-radius:16px;"></textarea>
+            </div>
+            <div>
+              <p style="font-size:10px;opacity:0.5;margin-bottom:6px;letter-spacing:0.1em;">店家圖片</p>
+              <div v-if="naminoueForm.photo" style="position:relative;width:100%;height:140px;border-radius:16px;overflow:hidden;margin-bottom:8px;">
+                <img :src="naminoueForm.photo" style="width:100%;height:100%;object-fit:cover;">
+                <button @click="naminoueForm.photo=''" style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.5);color:white;border:none;border-radius:50%;width:24px;height:24px;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+              </div>
+              <label class="card-neo w-full py-3 flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition" style="border-radius:16px;display:flex;">
+                <span style="font-size:12px;font-weight:900;color:#a83232;">{{ naminoueUploading ? '⏳ 上傳中...' : '📷 上傳圖片' }}</span>
+                <input type="file" accept="image/*" style="display:none;" @change="handleNaminouePhoto" :disabled="naminoueUploading">
+              </label>
+            </div>
+          </div>
+          <div style="padding:12px 20px 20px;flex-shrink:0;display:flex;gap:10px;">
+            <button @click="showNaminoueEdit=false" class="flex-1 py-4 rounded-full text-[10px] uppercase font-black active:scale-95 transition card-neo" style="color:var(--tan);">取消</button>
+            <button @click="saveNaminouePlace()" class="flex-1 py-4 rounded-full text-[10px] uppercase font-black active:scale-95 transition text-white" style="background:linear-gradient(145deg,#a83232,#6b1a1a);box-shadow:0 4px 12px rgba(168,50,50,0.4);">儲存</button>
+          </div>
+        </div>
+      </div>
+    </transition>
+
+    <!-- Modal: SAN-A Parco City -->
+    <transition name="slide-up">
+      <div v-if="showParcoCityModal" class="fixed inset-0 z-[1500] flex flex-col justify-end font-black" style="padding-bottom:0;height:100dvh;">
+        <div class="absolute inset-0" style="background:rgba(0,10,30,0.82);backdrop-filter:blur(6px);" @click="showParcoCityModal=false"></div>
+        <div class="relative card-neo-xl overflow-hidden" style="border-radius:40px 40px 0 0;height:92dvh;display:flex;flex-direction:column;padding-bottom:env(safe-area-inset-bottom,0px);">
+          <!-- Header -->
+          <div style="background:linear-gradient(145deg,#1a2a4a,#2a4a8a);padding:24px 24px 18px;flex-shrink:0;">
+            <p style="font-size:10px;letter-spacing:0.4em;text-transform:uppercase;color:rgba(255,255,255,0.6);margin-bottom:6px;">Urasoe · 浦添</p>
+            <p style="font-size:26px;font-weight:900;color:white;line-height:1.1;">🏬 SAN-A Parco City</p>
+          </div>
+          <!-- 子 tab -->
+          <div style="padding:14px 16px 0;flex-shrink:0;">
+            <div class="tab-bar" style="display:flex;">
+              <div class="tab-slider-pill" style="width:33.333%;" :style="{ transform: 'translateX('+(parcoCityTab==='food'?'0%':parcoCityTab==='shop'?'100%':'200%')+')' }"></div>
+              <button @click="parcoCityTab='food'" :class="['tab-btn text-xs', parcoCityTab==='food'?'active':'inactive']">🍜 美食</button>
+              <button @click="parcoCityTab='shop'" :class="['tab-btn text-xs', parcoCityTab==='shop'?'active':'inactive']">🛍️ 購物</button>
+              <button @click="parcoCityTab='souvenir'" :class="['tab-btn text-xs', parcoCityTab==='souvenir'?'active':'inactive']">🎁 機位</button>
+            </div>
+          </div>
+          <!-- 內容 -->
+          <div style="overflow-y:auto;padding:16px 16px 12px;flex:1;display:flex;flex-direction:column;gap:12px;">
+            <button v-if="canEdit" @click="openAddParcoCity()" class="w-full py-4 rounded-2xl font-black text-sm active:scale-95 transition" style="border:2px dashed rgba(42,74,138,0.4);background:rgba(42,74,138,0.05);color:#2a4a8a;">＋ 新增店家</button>
+            <template v-if="parcoCityPlaces.filter(p=>p.tab===parcoCityTab).length === 0">
+              <div class="card-neo p-6 text-center" style="opacity:0.4;">
+                <p style="font-size:28px;margin-bottom:8px;">{{ parcoCityTab==='food'?'🍜':parcoCityTab==='shop'?'🛍️':'🎁' }}</p>
+                <p style="font-size:12px;font-weight:900;">尚無店家資料</p>
+              </div>
+            </template>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+              <div v-for="(place, idx) in parcoCityPlaces.filter(p=>p.tab===parcoCityTab)" :key="place.id"
+                class="card-neo overflow-hidden cursor-pointer active:scale-95 transition"
+                style="border-radius:20px;padding:0;"
+                @click="parcoCitySelected=place; showParcoCityDetail=true">
+                <div style="width:100%;height:100px;overflow:hidden;background:rgba(220,195,160,0.15);">
+                  <img v-if="place.photo" :src="place.photo" style="width:100%;height:100%;object-fit:cover;">
+                  <div v-else style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:28px;">
+                    {{ parcoCityTab==='food'?'🍜':parcoCityTab==='shop'?'🛍️':'🎁' }}
+                  </div>
+                </div>
+                <div style="padding:10px 10px 8px;">
+                  <p style="font-size:12px;font-weight:900;line-height:1.3;">{{ place.name }}</p>
+                  <p v-if="place.desc" style="font-size:9px;opacity:0.4;margin-top:3px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">{{ place.desc }}</p>
+                  <div v-if="canEdit" style="display:flex;gap:4px;margin-top:6px;" @click.stop>
+                    <button @click="openEditParcoCity(parcoCityPlaces.indexOf(place))" style="font-size:16px;background:none;border:none;cursor:pointer;opacity:0.4;padding:2px;">✏️</button>
+                    <button @click="confirmDelete(place.name, ()=>removeParcoCityPlace(parcoCityPlaces.indexOf(place)))" style="font-size:16px;background:none;border:none;cursor:pointer;color:rgba(200,80,80,0.6);padding:2px;">✕</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="padding:12px 24px 24px;flex-shrink:0;">
+            <button @click="showParcoCityModal=false" class="w-full py-4 rounded-full text-[10px] uppercase font-black active:scale-95 transition card-neo" style="color:var(--tan);">Close</button>
+          </div>
+        </div>
+      </div>
+    </transition>
+
+    <!-- Modal: Parco City 店家詳細 -->
+    <transition name="slide-up">
+      <div v-if="showParcoCityDetail && parcoCitySelected" class="fixed inset-0 z-[1700] flex flex-col justify-end font-black" style="padding-bottom:0;height:100dvh;">
+        <div class="absolute inset-0" style="background:rgba(0,0,0,0.75);backdrop-filter:blur(6px);" @click="showParcoCityDetail=false"></div>
+        <div class="relative card-neo-xl overflow-hidden" style="border-radius:40px 40px 0 0;max-height:85dvh;display:flex;flex-direction:column;padding-bottom:env(safe-area-inset-bottom,0px);">
+          <div v-if="parcoCitySelected.photo" style="width:100%;height:220px;overflow:hidden;flex-shrink:0;">
+            <img :src="parcoCitySelected.photo" style="width:100%;height:100%;object-fit:cover;">
+          </div>
+          <div style="overflow-y:auto;padding:20px 22px 12px;flex:1;display:flex;flex-direction:column;gap:14px;">
+            <div>
+              <p style="font-size:22px;font-weight:900;line-height:1.2;">{{ parcoCitySelected.name }}</p>
+              <span style="font-size:9px;font-weight:900;padding:3px 10px;border-radius:999px;background:rgba(220,195,160,0.3);color:var(--tan);letter-spacing:0.1em;margin-top:6px;display:inline-block;">
+                {{ parcoCitySelected.tab==='food'?'🍜 美食':parcoCitySelected.tab==='shop'?'🛍️ 購物':'🎁 機位' }}
+              </span>
+            </div>
+            <div v-if="parcoCitySelected.desc" class="card-neo" style="padding:14px 16px;border-radius:18px;">
+              <p style="font-size:9px;opacity:0.4;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:6px;">介紹</p>
+              <p style="font-size:13px;font-weight:700;line-height:1.6;opacity:0.8;">{{ parcoCitySelected.desc }}</p>
+            </div>
+            <div v-if="parcoCitySelected.recommend" class="card-neo" style="padding:14px 16px;border-radius:18px;">
+              <p style="font-size:9px;opacity:0.4;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:6px;">⭐ 推薦商品</p>
+              <p style="font-size:13px;font-weight:700;line-height:1.6;opacity:0.8;white-space:pre-line;">{{ parcoCitySelected.recommend }}</p>
+            </div>
+            <div v-if="parcoCitySelected.hours" class="card-neo" style="padding:14px 16px;border-radius:18px;">
+              <p style="font-size:9px;opacity:0.4;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:6px;">🕐 營業時間</p>
+              <p style="font-size:13px;font-weight:700;line-height:1.6;opacity:0.8;white-space:pre-line;">{{ parcoCitySelected.hours }}</p>
+            </div>
+            <a v-if="parcoCitySelected.mapUrl" :href="parcoCitySelected.mapUrl" target="_blank"
+              style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-radius:18px;background:linear-gradient(135deg,#ea4335,#c62828);color:white;text-decoration:none;box-shadow:0 4px 12px rgba(234,67,53,0.4);">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+              <span style="font-size:11px;font-weight:900;letter-spacing:0.1em;">Google Maps 導航</span>
+            </a>
+          </div>
+          <div style="padding:12px 24px 24px;flex-shrink:0;">
+            <button @click="showParcoCityDetail=false" class="w-full py-4 rounded-full text-[10px] uppercase font-black active:scale-95 transition card-neo" style="color:var(--tan);">Close</button>
+          </div>
+        </div>
+      </div>
+    </transition>
+
+    <!-- Modal: Parco City 店家編輯 -->
+    <transition name="slide-up">
+      <div v-if="showParcoCityEdit" class="fixed inset-0 z-[1600] flex flex-col justify-end font-black" style="padding-bottom:0;height:100dvh;">
+        <div class="absolute inset-0" style="background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);" @click="showParcoCityEdit=false"></div>
+        <div class="relative card-neo-xl overflow-hidden" style="border-radius:40px 40px 0 0;max-height:88dvh;display:flex;flex-direction:column;padding-bottom:env(safe-area-inset-bottom,0px);">
+          <div style="background:linear-gradient(145deg,#2a4a8a,#1a2a4a);padding:22px 24px 16px;flex-shrink:0;">
+            <p style="font-size:20px;font-weight:900;color:white;">{{ parcoCityEditIdx===-1 ? '新增店家' : '編輯店家' }}</p>
+          </div>
+          <div style="overflow-y:auto;padding:20px 20px 12px;flex:1;display:flex;flex-direction:column;gap:14px;">
+            <div>
+              <p style="font-size:10px;opacity:0.5;margin-bottom:6px;letter-spacing:0.1em;">分類</p>
+              <div class="tab-bar" style="display:flex;">
+                <div class="tab-slider-pill" style="width:33.333%;" :style="{ transform: 'translateX('+(parcoCityForm.tab==='food'?'0%':parcoCityForm.tab==='shop'?'100%':'200%')+')' }"></div>
+                <button @click="parcoCityForm.tab='food'" :class="['tab-btn text-xs', parcoCityForm.tab==='food'?'active':'inactive']">🍜 美食</button>
+                <button @click="parcoCityForm.tab='shop'" :class="['tab-btn text-xs', parcoCityForm.tab==='shop'?'active':'inactive']">🛍️ 購物</button>
+                <button @click="parcoCityForm.tab='souvenir'" :class="['tab-btn text-xs', parcoCityForm.tab==='souvenir'?'active':'inactive']">🎁 機位</button>
+              </div>
+            </div>
+            <div>
+              <p style="font-size:10px;opacity:0.5;margin-bottom:6px;letter-spacing:0.1em;">店家名稱</p>
+              <input v-model="parcoCityForm.name" type="text" placeholder="例：UNIQLO" class="card-neo w-full px-4 py-3 text-sm font-black outline-none bg-transparent border-none">
+            </div>
+            <div>
+              <p style="font-size:10px;opacity:0.5;margin-bottom:6px;letter-spacing:0.1em;">店家介紹</p>
+              <textarea v-model="parcoCityForm.desc" rows="3" placeholder="簡單介紹這家店..." class="card-neo w-full px-4 py-3 text-sm font-black outline-none bg-transparent border-none resize-none" style="border-radius:16px;"></textarea>
+            </div>
+            <div>
+              <p style="font-size:10px;opacity:0.5;margin-bottom:6px;letter-spacing:0.1em;">推薦商品</p>
+              <textarea v-model="parcoCityForm.recommend" rows="3" placeholder="例：限定商品、必買清單..." class="card-neo w-full px-4 py-3 text-sm font-black outline-none bg-transparent border-none resize-none" style="border-radius:16px;"></textarea>
+            </div>
+            <div>
+              <p style="font-size:10px;opacity:0.5;margin-bottom:6px;letter-spacing:0.1em;">Google Maps 連結</p>
+              <input v-model="parcoCityForm.mapUrl" type="url" placeholder="https://maps.app.goo.gl/..." class="card-neo w-full px-4 py-3 text-sm font-black outline-none bg-transparent border-none">
+            </div>
+            <div>
+              <p style="font-size:10px;opacity:0.5;margin-bottom:6px;letter-spacing:0.1em;">營業時間</p>
+              <textarea v-model="parcoCityForm.hours" rows="5" placeholder="例：週一至週日 10:00–22:00" class="card-neo w-full px-4 py-3 text-sm font-black outline-none bg-transparent border-none resize-none" style="border-radius:16px;"></textarea>
+            </div>
+            <div>
+              <p style="font-size:10px;opacity:0.5;margin-bottom:6px;letter-spacing:0.1em;">店家圖片</p>
+              <div v-if="parcoCityForm.photo" style="position:relative;width:100%;height:140px;border-radius:16px;overflow:hidden;margin-bottom:8px;">
+                <img :src="parcoCityForm.photo" style="width:100%;height:100%;object-fit:cover;">
+                <button @click="parcoCityForm.photo=''" style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.5);color:white;border:none;border-radius:50%;width:24px;height:24px;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+              </div>
+              <label class="card-neo w-full py-3 flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition" style="border-radius:16px;display:flex;">
+                <span style="font-size:12px;font-weight:900;color:#2a4a8a;">{{ parcoCityUploading ? '⏳ 上傳中...' : '📷 上傳圖片' }}</span>
+                <input type="file" accept="image/*" style="display:none;" @change="handleParcoCityPhoto" :disabled="parcoCityUploading">
+              </label>
+            </div>
+          </div>
+          <div style="padding:12px 20px 20px;flex-shrink:0;display:flex;gap:10px;">
+            <button @click="showParcoCityEdit=false" class="flex-1 py-4 rounded-full text-[10px] uppercase font-black active:scale-95 transition card-neo" style="color:var(--tan);">取消</button>
+            <button @click="saveParcoCityPlace()" class="flex-1 py-4 rounded-full text-[10px] uppercase font-black active:scale-95 transition text-white" style="background:linear-gradient(145deg,#2a4a8a,#1a2a4a);box-shadow:0 4px 12px rgba(42,74,138,0.4);">儲存</button>
+          </div>
+        </div>
+      </div>
+    </transition>
+
     <!-- Modal: 國際通 -->
     <transition name="slide-up">
       <div v-if="showKokusaiModal" class="fixed inset-0 z-[1500] flex flex-col justify-end font-black" style="padding-bottom:0;height:100dvh;">
@@ -1465,6 +2140,7 @@
               <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
               <span style="font-size:11px;font-weight:900;letter-spacing:0.1em;">Google Maps 導航</span>
             </a>
+
           </div>
           <div style="padding:12px 24px 24px;flex-shrink:0;">
             <button @click="showKokusaiDetail=false" class="w-full py-4 rounded-full text-[10px] uppercase font-black active:scale-95 transition card-neo" style="color:var(--tan);">Close</button>
@@ -2851,6 +3527,217 @@
       const couponZoom = ref(null);
       const showVjwModal = ref(false);
       const showKokusaiModal = ref(false);
+      const showAmericanVillageModal = ref(false);
+      const showAmericanVillageDetail = ref(false);
+      const showAmericanVillageEdit = ref(false);
+      const americanVillageTab = ref('food');
+      const americanVillagePlaces = ref([]);
+      const americanVillageSelected = ref(null);
+      const americanVillageEditIdx = ref(-1);
+      const americanVillageForm = ref({ tab:'food', name:'', desc:'', recommend:'', mapUrl:'', hours:'', photo:'' });
+      const americanVillageUploading = ref(false);
+
+      const openAddAmericanVillage = () => {
+        americanVillageEditIdx.value = -1;
+        americanVillageForm.value = { tab: americanVillageTab.value, name:'', desc:'', recommend:'', mapUrl:'', hours:'', photo:'' };
+        showAmericanVillageEdit.value = true;
+      };
+      const openEditAmericanVillage = (idx) => {
+        americanVillageEditIdx.value = idx;
+        americanVillageForm.value = { recommend:'', hours:'', ...americanVillagePlaces.value[idx] };
+        showAmericanVillageEdit.value = true;
+      };
+      const saveAmericanVillagePlace = () => {
+        if (!americanVillageForm.value.name) return;
+        if (americanVillageEditIdx.value === -1) {
+          americanVillagePlaces.value = [...americanVillagePlaces.value, { ...americanVillageForm.value, id: Date.now() }];
+        } else {
+          const updated = [...americanVillagePlaces.value];
+          updated[americanVillageEditIdx.value] = { ...americanVillageForm.value, id: americanVillagePlaces.value[americanVillageEditIdx.value]?.id || Date.now() };
+          americanVillagePlaces.value = updated;
+        }
+        showAmericanVillageEdit.value = false;
+      };
+      const removeAmericanVillagePlace = (idx) => {
+        americanVillagePlaces.value = americanVillagePlaces.value.filter((_, i) => i !== idx);
+      };
+      const handleAmericanVillagePhoto = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = async (ev) => {
+          americanVillageUploading.value = true;
+          try {
+            const compressed = await compressImage(ev.target.result);
+            const url = await uploadToCloudinary(compressed);
+            americanVillageForm.value.photo = url;
+          } catch(err) {
+            americanVillageForm.value.photo = await compressImage(ev.target.result, 600, 0.7);
+          } finally {
+            americanVillageUploading.value = false;
+          }
+        };
+        reader.readAsDataURL(file);
+      };
+
+      const showKouriModal = ref(false);
+      const showKouriDetail = ref(false);
+      const showKouriEdit = ref(false);
+      const kouriTab = ref('food');
+      const kouriPlaces = ref([]);
+      const kouriSelected = ref(null);
+      const kouriEditIdx = ref(-1);
+      const kouriForm = ref({ tab:'food', name:'', desc:'', recommend:'', mapUrl:'', hours:'', photo:'' });
+      const kouriUploading = ref(false);
+
+      const openAddKouri = () => {
+        kouriEditIdx.value = -1;
+        kouriForm.value = { tab: kouriTab.value, name:'', desc:'', recommend:'', mapUrl:'', hours:'', photo:'' };
+        showKouriEdit.value = true;
+      };
+      const openEditKouri = (idx) => {
+        kouriEditIdx.value = idx;
+        kouriForm.value = { recommend:'', hours:'', ...kouriPlaces.value[idx] };
+        showKouriEdit.value = true;
+      };
+      const saveKouriPlace = () => {
+        if (!kouriForm.value.name) return;
+        if (kouriEditIdx.value === -1) {
+          kouriPlaces.value = [...kouriPlaces.value, { ...kouriForm.value, id: Date.now() }];
+        } else {
+          const updated = [...kouriPlaces.value];
+          updated[kouriEditIdx.value] = { ...kouriForm.value, id: kouriPlaces.value[kouriEditIdx.value]?.id || Date.now() };
+          kouriPlaces.value = updated;
+        }
+        showKouriEdit.value = false;
+      };
+      const removeKouriPlace = (idx) => {
+        kouriPlaces.value = kouriPlaces.value.filter((_, i) => i !== idx);
+      };
+      const handleKouriPhoto = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = async (ev) => {
+          kouriUploading.value = true;
+          try {
+            const compressed = await compressImage(ev.target.result);
+            const url = await uploadToCloudinary(compressed);
+            kouriForm.value.photo = url;
+          } catch(err) {
+            kouriForm.value.photo = await compressImage(ev.target.result, 600, 0.7);
+          } finally {
+            kouriUploading.value = false;
+          }
+        };
+        reader.readAsDataURL(file);
+      };
+
+      const showNaminoueModal = ref(false);
+      const showNaminoueDetail = ref(false);
+      const showNaminoueEdit = ref(false);
+      const naminoueTab = ref('food');
+      const naminouePlaces = ref([]);
+      const naminoueSelected = ref(null);
+      const naminoueEditIdx = ref(-1);
+      const naminoueForm = ref({ tab:'food', name:'', desc:'', recommend:'', mapUrl:'', hours:'', photo:'' });
+      const naminoueUploading = ref(false);
+
+      const openAddNaminoue = () => {
+        naminoueEditIdx.value = -1;
+        naminoueForm.value = { tab: naminoueTab.value, name:'', desc:'', recommend:'', mapUrl:'', hours:'', photo:'' };
+        showNaminoueEdit.value = true;
+      };
+      const openEditNaminoue = (idx) => {
+        naminoueEditIdx.value = idx;
+        naminoueForm.value = { recommend:'', hours:'', ...naminouePlaces.value[idx] };
+        showNaminoueEdit.value = true;
+      };
+      const saveNaminouePlace = () => {
+        if (!naminoueForm.value.name) return;
+        if (naminoueEditIdx.value === -1) {
+          naminouePlaces.value = [...naminouePlaces.value, { ...naminoueForm.value, id: Date.now() }];
+        } else {
+          const updated = [...naminouePlaces.value];
+          updated[naminoueEditIdx.value] = { ...naminoueForm.value, id: naminouePlaces.value[naminoueEditIdx.value]?.id || Date.now() };
+          naminouePlaces.value = updated;
+        }
+        showNaminoueEdit.value = false;
+      };
+      const removeNaminouePlace = (idx) => {
+        naminouePlaces.value = naminouePlaces.value.filter((_, i) => i !== idx);
+      };
+      const handleNaminouePhoto = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = async (ev) => {
+          naminoueUploading.value = true;
+          try {
+            const compressed = await compressImage(ev.target.result);
+            const url = await uploadToCloudinary(compressed);
+            naminoueForm.value.photo = url;
+          } catch(err) {
+            naminoueForm.value.photo = await compressImage(ev.target.result, 600, 0.7);
+          } finally {
+            naminoueUploading.value = false;
+          }
+        };
+        reader.readAsDataURL(file);
+      };
+
+      const showParcoCityModal = ref(false);
+      const showParcoCityDetail = ref(false);
+      const showParcoCityEdit = ref(false);
+      const parcoCityTab = ref('food');
+      const parcoCityPlaces = ref([]);
+      const parcoCitySelected = ref(null);
+      const parcoCityEditIdx = ref(-1);
+      const parcoCityForm = ref({ tab:'food', name:'', desc:'', recommend:'', mapUrl:'', hours:'', photo:'' });
+      const parcoCityUploading = ref(false);
+
+      const openAddParcoCity = () => {
+        parcoCityEditIdx.value = -1;
+        parcoCityForm.value = { tab: parcoCityTab.value, name:'', desc:'', recommend:'', mapUrl:'', hours:'', photo:'' };
+        showParcoCityEdit.value = true;
+      };
+      const openEditParcoCity = (idx) => {
+        parcoCityEditIdx.value = idx;
+        parcoCityForm.value = { recommend:'', hours:'', ...parcoCityPlaces.value[idx] };
+        showParcoCityEdit.value = true;
+      };
+      const saveParcoCityPlace = () => {
+        if (!parcoCityForm.value.name) return;
+        if (parcoCityEditIdx.value === -1) {
+          parcoCityPlaces.value = [...parcoCityPlaces.value, { ...parcoCityForm.value, id: Date.now() }];
+        } else {
+          const updated = [...parcoCityPlaces.value];
+          updated[parcoCityEditIdx.value] = { ...parcoCityForm.value, id: parcoCityPlaces.value[parcoCityEditIdx.value]?.id || Date.now() };
+          parcoCityPlaces.value = updated;
+        }
+        showParcoCityEdit.value = false;
+      };
+      const removeParcoCityPlace = (idx) => {
+        parcoCityPlaces.value = parcoCityPlaces.value.filter((_, i) => i !== idx);
+      };
+      const handleParcoCityPhoto = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = async (ev) => {
+          parcoCityUploading.value = true;
+          try {
+            const compressed = await compressImage(ev.target.result);
+            const url = await uploadToCloudinary(compressed);
+            parcoCityForm.value.photo = url;
+          } catch(err) {
+            parcoCityForm.value.photo = await compressImage(ev.target.result, 600, 0.7);
+          } finally {
+            parcoCityUploading.value = false;
+          }
+        };
+        reader.readAsDataURL(file);
+      };
       const showKokusaiEdit = ref(false);
       const showKokusaiDetail = ref(false);
       const kokusaiSelected = ref(null);
@@ -2890,78 +3777,6 @@
       const removeKokusai = (idx) => {
         kokusaiPlaces.value = kokusaiPlaces.value.filter((_, i) => i !== idx);
       };
-      const fetchHoursWithGemini = null;
-      const fetchingHours = Vue.ref(false);
-
-      const _geminiRemoved = async () => {
-        if (!kokusaiForm.value.name || generatingDesc.value) return;
-        generatingDesc.value = true;
-        try {
-          const tab = kokusaiForm.value.tab;
-          const isFood = tab === 'food';
-          const prompt = isFood
-            ? `請用繁體中文為沖繩國際通的「${kokusaiForm.value.name}」餐廳寫一段約30-50字的介紹，並推薦1-2道招牌餐點。只需回傳介紹文字，不要任何標題或額外說明。`
-            : `請用繁體中文為沖繩國際通的「${kokusaiForm.value.name}」${tab === 'shop' ? '購物店' : '伴手禮店'}寫一段約30-50字的介紹。只需回傳介紹文字，不要任何標題或額外說明。`;
-
-          const res = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`,
-            {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                contents: [{ parts: [{ text: prompt }] }],
-                generationConfig: { temperature: 0.7, maxOutputTokens: 200 }
-              })
-            }
-          );
-          const data = await res.json();
-          const text = data?.candidates?.[0]?.content?.parts?.map(p => p.text).filter(Boolean).join('').trim();
-          if (text) kokusaiForm.value.desc = text;
-        } catch(e) {
-          console.error('Gemini error:', e);
-        } finally {
-          generatingDesc.value = false;
-        }
-      };
-
-      const _unused = async () => {
-        if (!kokusaiForm.value.mapUrl || fetchingHours.value) return;
-        fetchingHours.value = true;
-        try {
-          // 用店名優先，若沒有就用 mapUrl，讓 Gemini 用 Google Search 搜尋
-          const storeName = kokusaiForm.value.name || '';
-          const mapUrl = kokusaiForm.value.mapUrl || '';
-          const prompt = storeName
-            ? `請用 Google 搜尋「${storeName} 沖縄 営業時間」，找出這家店的營業時間。只需回傳營業時間，格式簡潔（例：週一至週日 10:00–22:00 / 週三公休），不要其他說明。查不到請回傳「查無資料」。`
-            : `請分析這個 Google Maps 連結：${mapUrl}
-先找出店家名稱，再用 Google 搜尋該店家在沖縄的營業時間。只需回傳營業時間，格式簡潔（例：週一至週日 10:00–22:00 / 週三公休），不要其他說明。查不到請回傳「查無資料」。`;
-
-          const res = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`,
-            {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                contents: [{ parts: [{ text: prompt }] }],
-                tools: [{ google_search: {} }],
-                generationConfig: { temperature: 0 }
-              })
-            }
-          );
-          const data = await res.json();
-          const text = data?.candidates?.[0]?.content?.parts?.map(p => p.text).filter(Boolean).join('').trim();
-          if (text && !text.includes('查無資料')) {
-            kokusaiForm.value.hours = text;
-          } else {
-            kokusaiForm.value.hours = '查無資料，請手動填入';
-          }
-        } catch(e) {
-          kokusaiForm.value.hours = '查詢失敗，請手動填入';
-        } finally {
-          fetchingHours.value = false;
-        }
-      };
-
       // Cloudinary 設定
       const CLOUDINARY_CLOUD = 'dmic75elp';
       const CLOUDINARY_PRESET = 'u1oajdye';
@@ -3164,7 +3979,11 @@
         const d = snap.data();
         if (d.expenses)      expenses.value      = d.expenses;
         if (d.allTodos)      allTodos.value      = d.allTodos;
-        if (d.kokusaiPlaces) kokusaiPlaces.value = d.kokusaiPlaces;
+        if (d.kokusaiPlaces)   kokusaiPlaces.value   = d.kokusaiPlaces;
+        if (d.parcoCityPlaces)  parcoCityPlaces.value  = d.parcoCityPlaces;
+        if (d.naminouePlaces)   naminouePlaces.value   = d.naminouePlaces;
+        if (d.kouriPlaces)           kouriPlaces.value           = d.kouriPlaces;
+        if (d.americanVillagePlaces) americanVillagePlaces.value = d.americanVillagePlaces;
         if (d.groupMembers)  groupMembers.value  = d.groupMembers;
         if (d.itinerary) {
           // 清除舊的 Storage URL 和 ph_ key 殘留
@@ -3212,11 +4031,15 @@
       watch(allTodos,     v => { localUpdate=true; saveToFirestore('allTodos',v).then(()=>setTimeout(()=>localUpdate=false,500)); }, { deep:true });
       watch(itinerary,    v => { localUpdate=true; saveToFirestore('itinerary',v).then(()=>setTimeout(()=>localUpdate=false,3000)); }, { deep:true });
       watch(groupMembers,   v => { localUpdate=true; saveToFirestore('groupMembers',v).then(()=>setTimeout(()=>localUpdate=false,500)); }, { deep:true });
-      watch(kokusaiPlaces,  v => { localUpdate=true; saveToFirestore('kokusaiPlaces',v).then(()=>setTimeout(()=>localUpdate=false,500)); }, { deep:true });
+      watch(kokusaiPlaces,   v => { localUpdate=true; saveToFirestore('kokusaiPlaces',v).then(()=>setTimeout(()=>localUpdate=false,500)); }, { deep:true });
+      watch(parcoCityPlaces, v => { localUpdate=true; saveToFirestore('parcoCityPlaces',v).then(()=>setTimeout(()=>localUpdate=false,500)); }, { deep:true });
+      watch(naminouePlaces,  v => { localUpdate=true; saveToFirestore('naminouePlaces',v).then(()=>setTimeout(()=>localUpdate=false,500)); }, { deep:true });
+      watch(kouriPlaces,           v => { localUpdate=true; saveToFirestore('kouriPlaces',v).then(()=>setTimeout(()=>localUpdate=false,500)); }, { deep:true });
+      watch(americanVillagePlaces, v => { localUpdate=true; saveToFirestore('americanVillagePlaces',v).then(()=>setTimeout(()=>localUpdate=false,500)); }, { deep:true });
 
       // 任何 modal 開啟時鎖定 body 滾動
       const anyModalOpen = computed(() =>
-        showHotelModal.value || showCarModal.value || showAquariumModal.value || showChurasunModal.value || showSmokingModal.value || showCalcModal.value || showCouponModal.value || showVjwModal.value || showKokusaiModal.value || showKokusaiEdit.value || showKokusaiDetail.value || showEsimModal.value ||
+        showHotelModal.value || showCarModal.value || showAquariumModal.value || showChurasunModal.value || showSmokingModal.value || showCalcModal.value || showCouponModal.value || showVjwModal.value || showKokusaiModal.value || showKokusaiEdit.value || showKokusaiDetail.value || showAmericanVillageModal.value || showAmericanVillageEdit.value || showAmericanVillageDetail.value || showKouriModal.value || showKouriEdit.value || showKouriDetail.value || showNaminoueModal.value || showNaminoueEdit.value || showNaminoueDetail.value || showParcoCityModal.value || showParcoCityEdit.value || showParcoCityDetail.value || showNaminoueModal.value || showEsimModal.value ||
         showFlightDetail.value || showPasscodeModal.value || showMemberModal.value ||
         showExpenseModal.value || showProfileModal.value || showConfirmModal.value ||
         showEditModal.value || showCropper.value || showHotelLightbox.value
@@ -3309,7 +4132,7 @@
       return {
         appLoading, loadProgress, loadingMsg, currentUser, loginAs, loginDropOpen, loginSelected, loggingIn, loggingOut, pendingUser, doLogin, allTodos, onPickerScroll, scrollPickerTo, currentTab, navCollapsed, tabs, btabs, weather, weatherBg, timeObj, calcInput, calcMode, calcExpr, calcDisplayVal, calcPendingOp, switchCalcMode, pressCalc, pressCalcNum, pressCalcDot, pressCalcOp, pressCalcEqual, pressCalcClear, pressCalcBackspace, calcOutput, jpyRate, jpyBuyRate, jpySellRate, rateUpdatedAt, groupMembers, showMemberModal, newMember, showUserMenu, toggleUserMenu, closeUserMenu, showProfileModal, profileEdit, openProfile, handleProfileAvatarUpload, saveProfile, logout, handleAvatarUpload, addMember, getMemberAvatar, editingMember, openEditMember, handleEditAvatarUpload, saveEditMember, showAddMember, BLANK_AVATAR, expenseSubTab, expenses, memberStats, maxPaid, settlementAdvice, showExpenseModal, openExpenseModal, addExpense, newExpense, openEditExpense, editingExpenseIdx, expenseFilterMember, filteredExpenses, itinerary, activeDay, departureTrip, returnFlights, selectedReturnFlight, hotelData, carRental, showFlightDetail, activeFlight, triggerPasscode, showPasscodeModal, passcode, pressKey, passcodeMode, scheduleSubTab, planningSubTab, filteredTodos: computed(() => { const key = planningSubTab.value === 'essential' ? '_shared' : currentUser.value; return (allTodos.value[key]||[]).filter(t=>t.type===planningSubTab.value); }), newTodoText, addTodo, removeTodo, categories, showEditModal, isNewEvent, tempEvent, openEditModal, openAddModal, deleteEvent, saveEvent, showConfirmModal, confirmItemName, confirmDelete, executeDelete, bookingSubTab, globalCurrency, toggleAllCurrency,
         previewCanvas,hotelPhotos,showHotelLightbox,openEditExpense,editingExpenseIdx,showCropper,cropSrc,cropCanvas,cropBox,openCropper,startCropDrag,confirmCrop,currentHotelPhoto,openHotelPhoto,lbTouchStart,lbTouchEnd,
-        editMode, canEdit, showHotelModal, showCarModal, showAquariumModal, showChurasunModal, showCalcModal, showCouponModal, couponZoom, showVjwModal, showKokusaiModal, showKokusaiEdit, showKokusaiDetail, kokusaiSelected, kokusaiSelectedIdx, kokusaiTab, kokusaiPlaces, kokusaiEditIdx, kokusaiForm, openAddKokusai, openEditKokusai, saveKokusai, removeKokusai, handleKokusaiPhoto, kokusaiUploading, showEsimModal, showSmokingModal, smokingLat, smokingLng, smokingLocating, smokingMapSrc, openSmokingFinder, getSmokingLocation, aquariumPhotos, handleAquariumPhoto, openHotelModal, openCarModal, isAdmin,
+        editMode, canEdit, showHotelModal, showCarModal, showAquariumModal, showChurasunModal, showCalcModal, showCouponModal, couponZoom, showVjwModal, showKokusaiModal, showKokusaiEdit, showKokusaiDetail, showAmericanVillageModal, showAmericanVillageDetail, showAmericanVillageEdit, americanVillageTab, americanVillagePlaces, americanVillageSelected, americanVillageEditIdx, americanVillageForm, americanVillageUploading, openAddAmericanVillage, openEditAmericanVillage, saveAmericanVillagePlace, removeAmericanVillagePlace, handleAmericanVillagePhoto, showKouriModal, showKouriDetail, showKouriEdit, kouriTab, kouriPlaces, kouriSelected, kouriEditIdx, kouriForm, kouriUploading, openAddKouri, openEditKouri, saveKouriPlace, removeKouriPlace, handleKouriPhoto, showNaminoueModal, showNaminoueDetail, showNaminoueEdit, naminoueTab, naminouePlaces, naminoueSelected, naminoueEditIdx, naminoueForm, naminoueUploading, openAddNaminoue, openEditNaminoue, saveNaminouePlace, removeNaminouePlace, handleNaminouePhoto, showParcoCityModal, showParcoCityDetail, showParcoCityEdit, showNaminoueModal, parcoCityTab, parcoCityPlaces, parcoCitySelected, parcoCityEditIdx, parcoCityForm, parcoCityUploading, openAddParcoCity, openEditParcoCity, saveParcoCityPlace, removeParcoCityPlace, handleParcoCityPhoto, kokusaiSelected, kokusaiSelectedIdx, kokusaiTab, kokusaiPlaces, kokusaiEditIdx, kokusaiForm, openAddKokusai, openEditKokusai, saveKokusai, removeKokusai, handleKokusaiPhoto, kokusaiUploading, showEsimModal, showSmokingModal, smokingLat, smokingLng, smokingLocating, smokingMapSrc, openSmokingFinder, getSmokingLocation, aquariumPhotos, handleAquariumPhoto, openHotelModal, openCarModal, isAdmin,
         getCategoryColor: (t) => ({ transport: 'bg-[#D94F4F]', spot: 'bg-[#98BDE3]', food: 'bg-[#E3A97C]', other: 'bg-[#C4A8D4]' }[t] || 'bg-[#DCC3A0]'),
         categoryDot: (id) => ({ spot:'#98BDE3', food:'#E3A97C', transport:'#D94F4F', other:'#C4A8D4' }[id] || '#DCC3A0'),
         categoryStyle: (id, active) => {
