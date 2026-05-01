@@ -3397,7 +3397,7 @@
           </div>
           <div class="mt-9 flex space-x-5">
             <button @click="showEditModal = false" class="flex-1 py-4 rounded-full font-black uppercase text-xs card-neo" style="color:var(--tan);">Cancel</button>
-            <button @click="saveEvent" class="flex-1 py-4 rounded-full font-black uppercase text-xs text-white" style="background:linear-gradient(145deg,#8ec4a1,#5a9070);box-shadow:-3px -3px 8px rgba(255,255,255,0.25),5px 5px 12px rgba(45,85,60,0.42);">Save</button>
+            <button @click="saveEvent" :disabled="eventPhotoUploading" class="flex-1 py-4 rounded-full font-black uppercase text-xs text-white" style="background:linear-gradient(145deg,#8ec4a1,#5a9070);box-shadow:-3px -3px 8px rgba(255,255,255,0.25),5px 5px 12px rgba(45,85,60,0.42);" :style="eventPhotoUploading?'opacity:0.5':''">{{ eventPhotoUploading ? '上傳中...' : 'Save' }}</button>
           </div>
         </div>
       </div>
@@ -5102,7 +5102,13 @@
       const openEditModal = (i, d, e) => { isNewEvent.value = false; curEvIdx = e; tempEvent.value = { ...i }; showEditModal.value = true; };
       const openAddModal = (d) => { isNewEvent.value = true; tempEvent.value = { time: '12:00', title: '', type: 'spot', typeLabel: '景點', photo: '', url: '', detail: '' }; showEditModal.value = true; };
       const deleteEvent = () => { itinerary.value[activeDay.value].events.splice(curEvIdx, 1); showEditModal.value = false; };
-      const saveEvent = () => {
+      const saveEvent = async () => {
+        // 等照片上傳完再儲存
+        if (eventPhotoUploading.value) {
+          await new Promise(resolve => {
+            const stop = watch(eventPhotoUploading, v => { if (!v) { stop(); resolve(); } });
+          });
+        }
         tempEvent.value.typeLabel = categories.find(c=>c.id===tempEvent.value.type)?.name || '行程';
         if(isNewEvent.value) itinerary.value[activeDay.value].events.push({...tempEvent.value});
         else itinerary.value[activeDay.value].events[curEvIdx] = {...tempEvent.value};
@@ -5280,7 +5286,6 @@
       watch(ashibinaaPlaces,       v => { localUpdate=true; saveToFirestore('ashibinaaPlaces',v).then(()=>setTimeout(()=>localUpdate=false,500)); }, { deep:true });
       watch(churuamiGuidePlaces,  v => { localUpdate=true; saveToFirestore('churuamiGuidePlaces',v).then(()=>setTimeout(()=>localUpdate=false,500)); }, { deep:true });
       watch(tomariPortPlaces,   v => { localUpdate=true; saveToFirestore('tomariPortPlaces',v).then(()=>setTimeout(()=>localUpdate=false,500)); }, { deep:true });
-      watch(tomariPortPlaces,    v => { localUpdate=true; saveToFirestore('tomariPortPlaces',v).then(()=>setTimeout(()=>localUpdate=false,500)); }, { deep:true });
 
       // 任何 modal 開啟時鎖定 body 滾動
       const anyModalOpen = computed(() =>
