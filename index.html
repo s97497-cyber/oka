@@ -4336,17 +4336,21 @@
         canvas.width = sw; canvas.height = sh;
         const ctx = canvas.getContext('2d');
         const img = new Image();
-        img.onload = () => {
+        img.onload = async () => {
           ctx.drawImage(img, sx, sy, sw, sh, 0, 0, sw, sh);
-          // 壓縮後上傳 Cloudinary
           const base64 = canvas.toDataURL('image/jpeg', 0.82);
-          uploadToCloudinary(base64).then(url => {
-            tempEvent.value.photo = url;
-          }).catch(() => {
-            tempEvent.value.photo = base64; // fallback base64
-          });
           showCropper.value = false;
           cropSrc.value = '';
+          // 上傳到 Cloudinary（與攻略卡片相同流程）
+          eventPhotoUploading.value = true;
+          try {
+            const url = await uploadToCloudinary(base64);
+            tempEvent.value.photo = url;
+          } catch (err) {
+            tempEvent.value.photo = base64;
+          } finally {
+            eventPhotoUploading.value = false;
+          }
         };
         img.src = cropSrc.value;
       };
@@ -5214,32 +5218,30 @@
         } catch(e) { console.warn('Firestore save failed:', e); }
       };
 
-      let localUpdate = false;
+      // per-field lock：只鎖住正在寫的欄位，其他欄位仍可接收同步
+      const _localLock = {};
+      const _lock = (key, ms) => {
+        _localLock[key] = (_localLock[key] || 0) + 1;
+        setTimeout(() => { _localLock[key] = Math.max(0, (_localLock[key]||1) - 1); }, ms);
+      };
+      const _locked = (key) => (_localLock[key] || 0) > 0;
+
       FIRESTORE_DOC.onSnapshot(snap => {
-        if (!snap.exists || localUpdate) return;
+        if (!snap.exists) return;
         const d = snap.data();
-        if (d.expenses)      expenses.value      = d.expenses;
-        if (d.allTodos)      allTodos.value      = d.allTodos;
-        if (d.kokusaiPlaces)   kokusaiPlaces.value   = d.kokusaiPlaces;
-        if (d.parcoCityPlaces)  parcoCityPlaces.value  = d.parcoCityPlaces;
-        if (d.naminouePlaces)   naminouePlaces.value   = d.naminouePlaces;
-        if (d.kouriPlaces)           kouriPlaces.value           = d.kouriPlaces;
-        if (d.americanVillagePlaces) americanVillagePlaces.value = d.americanVillagePlaces;
-        if (d.aeonMallPlaces)       aeonMallPlaces.value       = d.aeonMallPlaces;
-        if (d.ashibinaaPlaces)        ashibinaaPlaces.value        = d.ashibinaaPlaces;
-        if (d.churuamiGuidePlaces)  churuamiGuidePlaces.value  = d.churuamiGuidePlaces;
-        if (d.tomariPortPlaces)    tomariPortPlaces.value    = d.tomariPortPlaces;
-        if (d.tomariPortPlaces)    tomariPortPlaces.value    = d.tomariPortPlaces;
-        if (d.groupMembers)  groupMembers.value  = d.groupMembers;
-        if (d.itinerary) {
-          // 清除舊的 Storage URL 和 ph_ key 殘留
-          const cleaned = JSON.parse(JSON.stringify(d.itinerary));
-          for (const day of cleaned)
-            for (const ev of (day.events || []))
-              if (ev.photo && !ev.photo.startsWith('data:'))
-                ev.photo = '';
-          itinerary.value = cleaned;
-        }
+        if (d.expenses      && !_locked('expenses'))             expenses.value             = d.expenses;
+        if (d.allTodos      && !_locked('allTodos'))             allTodos.value             = d.allTodos;
+        if (d.groupMembers  && !_locked('groupMembers'))         groupMembers.value         = d.groupMembers;
+        if (d.itinerary     && !_locked('itinerary'))            itinerary.value            = d.itinerary;
+        if (d.kokusaiPlaces           && !_locked('kokusaiPlaces'))           kokusaiPlaces.value           = d.kokusaiPlaces;
+        if (d.parcoCityPlaces         && !_locked('parcoCityPlaces'))         parcoCityPlaces.value         = d.parcoCityPlaces;
+        if (d.naminouePlaces          && !_locked('naminouePlaces'))          naminouePlaces.value          = d.naminouePlaces;
+        if (d.kouriPlaces             && !_locked('kouriPlaces'))             kouriPlaces.value             = d.kouriPlaces;
+        if (d.americanVillagePlaces   && !_locked('americanVillagePlaces'))   americanVillagePlaces.value   = d.americanVillagePlaces;
+        if (d.aeonMallPlaces          && !_locked('aeonMallPlaces'))          aeonMallPlaces.value          = d.aeonMallPlaces;
+        if (d.ashibinaaPlaces         && !_locked('ashibinaaPlaces'))         ashibinaaPlaces.value         = d.ashibinaaPlaces;
+        if (d.churuamiGuidePlaces     && !_locked('churuamiGuidePlaces'))     churuamiGuidePlaces.value     = d.churuamiGuidePlaces;
+        if (d.tomariPortPlaces        && !_locked('tomariPortPlaces'))        tomariPortPlaces.value        = d.tomariPortPlaces;
       });
 
       const { watch } = Vue;
@@ -5273,19 +5275,19 @@
       watch(cropBox, _drawPreview, { deep: true });
       watch(cropSrc, () => { Vue.nextTick(_drawPreview); });
 
-      watch(expenses,     v => { localUpdate=true; saveToFirestore('expenses',v).then(()=>setTimeout(()=>localUpdate=false,500)); }, { deep:true });
-      watch(allTodos,     v => { localUpdate=true; saveToFirestore('allTodos',v).then(()=>setTimeout(()=>localUpdate=false,500)); }, { deep:true });
-      watch(itinerary,    v => { localUpdate=true; saveToFirestore('itinerary',v).then(()=>setTimeout(()=>localUpdate=false,3000)); }, { deep:true });
-      watch(groupMembers,   v => { localUpdate=true; saveToFirestore('groupMembers',v).then(()=>setTimeout(()=>localUpdate=false,500)); }, { deep:true });
-      watch(kokusaiPlaces,   v => { localUpdate=true; saveToFirestore('kokusaiPlaces',v).then(()=>setTimeout(()=>localUpdate=false,500)); }, { deep:true });
-      watch(parcoCityPlaces, v => { localUpdate=true; saveToFirestore('parcoCityPlaces',v).then(()=>setTimeout(()=>localUpdate=false,500)); }, { deep:true });
-      watch(naminouePlaces,  v => { localUpdate=true; saveToFirestore('naminouePlaces',v).then(()=>setTimeout(()=>localUpdate=false,500)); }, { deep:true });
-      watch(kouriPlaces,           v => { localUpdate=true; saveToFirestore('kouriPlaces',v).then(()=>setTimeout(()=>localUpdate=false,500)); }, { deep:true });
-      watch(americanVillagePlaces, v => { localUpdate=true; saveToFirestore('americanVillagePlaces',v).then(()=>setTimeout(()=>localUpdate=false,500)); }, { deep:true });
-      watch(aeonMallPlaces,      v => { localUpdate=true; saveToFirestore('aeonMallPlaces',v).then(()=>setTimeout(()=>localUpdate=false,500)); }, { deep:true });
-      watch(ashibinaaPlaces,       v => { localUpdate=true; saveToFirestore('ashibinaaPlaces',v).then(()=>setTimeout(()=>localUpdate=false,500)); }, { deep:true });
-      watch(churuamiGuidePlaces,  v => { localUpdate=true; saveToFirestore('churuamiGuidePlaces',v).then(()=>setTimeout(()=>localUpdate=false,500)); }, { deep:true });
-      watch(tomariPortPlaces,   v => { localUpdate=true; saveToFirestore('tomariPortPlaces',v).then(()=>setTimeout(()=>localUpdate=false,500)); }, { deep:true });
+      watch(expenses,     v => { _lock('expenses',2000);     saveToFirestore('expenses',v); }, { deep:true });
+      watch(allTodos,     v => { _lock('allTodos',2000);     saveToFirestore('allTodos',v); }, { deep:true });
+      watch(itinerary,    v => { _lock('itinerary',5000);    saveToFirestore('itinerary',v); }, { deep:true });
+      watch(groupMembers,   v => { _lock('groupMembers',2000);  saveToFirestore('groupMembers',v); }, { deep:true });
+      watch(kokusaiPlaces,   v => { _lock('kokusaiPlaces',2000);   saveToFirestore('kokusaiPlaces',v); }, { deep:true });
+      watch(parcoCityPlaces, v => { _lock('parcoCityPlaces',2000); saveToFirestore('parcoCityPlaces',v); }, { deep:true });
+      watch(naminouePlaces,  v => { _lock('naminouePlaces',2000);  saveToFirestore('naminouePlaces',v); }, { deep:true });
+      watch(kouriPlaces,           v => { _lock('kouriPlaces',2000);           saveToFirestore('kouriPlaces',v); }, { deep:true });
+      watch(americanVillagePlaces, v => { _lock('americanVillagePlaces',2000); saveToFirestore('americanVillagePlaces',v); }, { deep:true });
+      watch(aeonMallPlaces,      v => { _lock('aeonMallPlaces',2000);      saveToFirestore('aeonMallPlaces',v); }, { deep:true });
+      watch(ashibinaaPlaces,       v => { _lock('ashibinaaPlaces',2000);       saveToFirestore('ashibinaaPlaces',v); }, { deep:true });
+      watch(churuamiGuidePlaces,  v => { _lock('churuamiGuidePlaces',2000);  saveToFirestore('churuamiGuidePlaces',v); }, { deep:true });
+      watch(tomariPortPlaces,   v => { _lock('tomariPortPlaces',2000);   saveToFirestore('tomariPortPlaces',v); }, { deep:true });
 
       // 任何 modal 開啟時鎖定 body 滾動
       const anyModalOpen = computed(() =>
