@@ -4287,10 +4287,20 @@
           // 更新 currentUser
           currentUser.value = profileEdit.value.name;
           localStorage.setItem('okinawa_user', profileEdit.value.name);
-          // 如果改了名字，遷移 allTodos
-          if(oldName !== profileEdit.value.name && allTodos.value[oldName]) {
-            allTodos.value[profileEdit.value.name] = allTodos.value[oldName];
-            delete allTodos.value[oldName];
+          // 如果改了名字，遷移 allTodos + 更新 expenses
+          if(oldName !== profileEdit.value.name) {
+            const newName = profileEdit.value.name;
+            // allTodos
+            if(allTodos.value[oldName]) {
+              allTodos.value[newName] = allTodos.value[oldName];
+              delete allTodos.value[oldName];
+            }
+            // expenses：payer 和 splitWith 都要換
+            expenses.value = expenses.value.map(e => ({
+              ...e,
+              payer: e.payer === oldName ? newName : e.payer,
+              splitWith: e.splitWith.map(n => n === oldName ? newName : n)
+            }));
           }
         }
         showProfileModal.value = false;
