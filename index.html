@@ -181,8 +181,7 @@
     .day-btn-off { background:var(--bg-raised); box-shadow:var(--neo-out); border:var(--br); color:var(--tan); }
     .blue-pill .tab-slider-pill { background:linear-gradient(145deg,#60a5fa,#2563eb); box-shadow:-2px -2px 6px rgba(255,255,255,0.25),4px 4px 10px rgba(30,64,175,0.4); }
     .blue-pill .tab-btn.active { color:white; }
-    .orange-pill .tab-slider-pill { background:linear-gradient(145deg,#f59e0b,#d97706); box-shadow:-2px -2px 6px rgba(255,255,255,0.25),4px 4px 10px rgba(180,83,9,0.4); }
-    .orange-pill .tab-btn.active { color:white; }
+
     .transit-connector { display:flex; align-items:center; gap:10px; padding:8px 14px; margin:4px 0 4px 0; }
     .transit-line { flex:1; height:1px; background:linear-gradient(to right, transparent, rgba(220,195,160,0.3), transparent); }
     .dot { width:14px; height:14px; border-radius:50%; border:2px solid var(--tan); box-shadow:var(--neo-out); }
@@ -628,30 +627,22 @@
                   :class="['tab-btn text-xs', activeDay === index ? 'active' : 'inactive']">Day {{ index + 1 }}</button>
         </div>
         <div class="relative pl-6 border-l-4 border-[#EAE1D0] ml-3 space-y-8 pb-10">
-          <!-- 晴天/雨天切換（管理員） -->
-          <div v-if="canEdit" style="display:flex;gap:8px;margin-bottom:14px;align-items:center;">
-            <p style="font-size:9px;opacity:0.4;letter-spacing:0.1em;text-transform:uppercase;flex-shrink:0;">今日天氣</p>
-            <div class="tab-bar orange-pill flex-1" style="display:flex;">
-              <div class="tab-slider-pill" style="width:50%;" :style="{ transform: 'translateX('+(itinerary[activeDay].weatherMode==='rainy'?'100%':'0%')+')' }"></div>
-              <button @click="itinerary[activeDay].weatherMode='sunny'" :class="['tab-btn text-xs', itinerary[activeDay].weatherMode==='sunny'?'active':'inactive']">☀️ 晴天</button>
-              <button @click="itinerary[activeDay].weatherMode='rainy'" :class="['tab-btn text-xs', itinerary[activeDay].weatherMode==='rainy'?'active':'inactive']">🌧️ 雨天</button>
-            </div>
-          </div>
 
-          <template v-for="(item, idx) in itinerary[activeDay].events.filter(e => (e.weather||'sunny')===(itinerary[activeDay].weatherMode||'sunny'))" :key="idx">
+
+          <template v-for="(item, idx) in itinerary[activeDay].events" :key="idx">
             <!-- 交通連接器 -->
-            <div v-if="idx > 0 && (!itinerary[activeDay].events.filter(e=>(e.weather||'sunny')===(itinerary[activeDay].weatherMode||'sunny'))[idx].transitHidden || canEdit)" class="transit-connector">
+            <div v-if="idx > 0 && (!itinerary[activeDay].events.filter(e=>true)[idx].transitHidden || canEdit)" class="transit-connector">
               <div class="transit-line"></div>
               <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;">
                 <!-- 顯示區：點擊展開編輯 -->
                 <div style="display:flex;align-items:center;gap:6px;padding:5px 14px;border-radius:999px;background:var(--bg-raised);box-shadow:var(--neo-out);cursor:default;"
                      @click.stop="canEdit && (transitEditIdx===idx ? transitEditIdx=-1 : transitEditIdx=idx)">
-                  <template v-if="itinerary[activeDay].events.filter(e=>(e.weather||'sunny')===(itinerary[activeDay].weatherMode||'sunny'))[idx].transitHidden">
+                  <template v-if="itinerary[activeDay].events.filter(e=>true)[idx].transitHidden">
                     <span style="font-size:9px;font-weight:900;opacity:0.2;">—</span>
                   </template>
                   <template v-else-if="getTransitMode(activeDay, idx)==='transit'">
                     <span style="font-size:13px;">🚌</span>
-                    <span v-if="itinerary[activeDay].events.filter(e=>(e.weather||'sunny')===(itinerary[activeDay].weatherMode||'sunny'))[idx].transitManual" style="font-size:10px;font-weight:900;color:var(--tan);">{{ itinerary[activeDay].events.filter(e=>(e.weather||'sunny')===(itinerary[activeDay].weatherMode||'sunny'))[idx].transitManual }}</span>
+                    <span v-if="itinerary[activeDay].events.filter(e=>true)[idx].transitManual" style="font-size:10px;font-weight:900;color:var(--tan);">{{ itinerary[activeDay].events.filter(e=>true)[idx].transitManual }}</span>
                     <span v-else style="font-size:9px;font-weight:900;opacity:0.35;">{{ canEdit ? "＋ 輸入時間" : "—" }}</span>
                   </template>
                   <template v-else-if="getTransitInfo(activeDay, idx)">
@@ -671,11 +662,11 @@
                     <!-- 顯示開關 -->
                     <div style="display:flex;justify-content:space-between;align-items:center;">
                       <span style="font-size:10px;font-weight:900;opacity:0.6;">顯示交通時間</span>
-                      <div @click.stop="itinerary[activeDay].events.filter(e=>(e.weather||'sunny')===(itinerary[activeDay].weatherMode||'sunny'))[idx].transitHidden = !itinerary[activeDay].events.filter(e=>(e.weather||'sunny')===(itinerary[activeDay].weatherMode||'sunny'))[idx].transitHidden"
+                      <div @click.stop="itinerary[activeDay].events.filter(e=>true)[idx].transitHidden = !itinerary[activeDay].events.filter(e=>true)[idx].transitHidden"
                            style="width:44px;height:24px;border-radius:999px;cursor:pointer;transition:background 0.2s;display:flex;align-items:center;padding:2px;"
-                           :style="itinerary[activeDay].events.filter(e=>(e.weather||'sunny')===(itinerary[activeDay].weatherMode||'sunny'))[idx].transitHidden ? 'background:rgba(200,200,200,0.3);' : 'background:var(--green);'">
+                           :style="itinerary[activeDay].events.filter(e=>true)[idx].transitHidden ? 'background:rgba(200,200,200,0.3);' : 'background:var(--green);'">
                         <div style="width:20px;height:20px;border-radius:50%;background:white;transition:transform 0.2s;box-shadow:0 1px 4px rgba(0,0,0,0.2);"
-                             :style="itinerary[activeDay].events.filter(e=>(e.weather||'sunny')===(itinerary[activeDay].weatherMode||'sunny'))[idx].transitHidden ? 'transform:translateX(0)' : 'transform:translateX(20px)'"></div>
+                             :style="itinerary[activeDay].events.filter(e=>true)[idx].transitHidden ? 'transform:translateX(0)' : 'transform:translateX(20px)'"></div>
                       </div>
                     </div>
 
@@ -697,8 +688,8 @@
                       <p style="font-size:9px;opacity:0.4;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:4px;">搭乘時間</p>
                       <div style="display:flex;align-items:center;gap:8px;">
                         <input
-                          :value="itinerary[activeDay].events.filter(e=>(e.weather||'sunny')===(itinerary[activeDay].weatherMode||'sunny'))[idx].transitManual||''"
-                          @change="itinerary[activeDay].events.filter(e=>(e.weather||'sunny')===(itinerary[activeDay].weatherMode||'sunny'))[idx].transitManual=$event.target.value"
+                          :value="itinerary[activeDay].events.filter(e=>true)[idx].transitManual||''"
+                          @change="itinerary[activeDay].events.filter(e=>true)[idx].transitManual=$event.target.value"
                           type="text" placeholder="例：35 分、1h20m"
                           class="card-neo flex-1 px-3 py-2 text-sm font-black outline-none bg-transparent border-none" style="border-radius:12px;">
                         <button @click.stop="transitEditIdx=-1"
@@ -710,14 +701,14 @@
                     <template v-if="getTransitMode(activeDay, idx)!=='transit'">
                       <div>
                         <p style="font-size:9px;opacity:0.4;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:4px;">上個景點連結</p>
-                        <input :value="itinerary[activeDay].events.filter(e=>(e.weather||'sunny')===(itinerary[activeDay].weatherMode||'sunny'))[idx-1].url"
-                               @input="itinerary[activeDay].events.filter(e=>(e.weather||'sunny')===(itinerary[activeDay].weatherMode||'sunny'))[idx-1].url=$event.target.value"
+                        <input :value="itinerary[activeDay].events.filter(e=>true)[idx-1].url"
+                               @input="itinerary[activeDay].events.filter(e=>true)[idx-1].url=$event.target.value"
                                type="url" placeholder="https://maps.google.com/..." class="card-neo w-full px-3 py-2 text-xs font-black outline-none bg-transparent border-none" style="border-radius:12px;">
                       </div>
                       <div>
                         <p style="font-size:9px;opacity:0.4;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:4px;">下個景點連結</p>
-                        <input :value="itinerary[activeDay].events.filter(e=>(e.weather||'sunny')===(itinerary[activeDay].weatherMode||'sunny'))[idx].url"
-                               @input="itinerary[activeDay].events.filter(e=>(e.weather||'sunny')===(itinerary[activeDay].weatherMode||'sunny'))[idx].url=$event.target.value"
+                        <input :value="itinerary[activeDay].events.filter(e=>true)[idx].url"
+                               @input="itinerary[activeDay].events.filter(e=>true)[idx].url=$event.target.value"
                                type="url" placeholder="https://maps.google.com/..." class="card-neo w-full px-3 py-2 text-xs font-black outline-none bg-transparent border-none" style="border-radius:12px;">
                       </div>
                       <p style="font-size:8px;opacity:0.3;text-align:center;">Google Maps → 分享 → 複製連結</p>
@@ -4666,9 +4657,7 @@
       };
 
       const getTransitInfo = (dayIdx, eventIdx) => {
-        const filteredEvents = itinerary.value[dayIdx].events.filter(
-          e => (e.weather || 'sunny') === (itinerary.value[dayIdx].weatherMode || 'sunny')
-        );
+        const filteredEvents = itinerary.value[dayIdx].events;
         const prev = filteredEvents[eventIdx - 1];
         const curr = filteredEvents[eventIdx];
         // 檢查是否隱藏
@@ -4706,10 +4695,7 @@
         } catch(e) {}
       };
 
-      const getFilteredEvs = (dayIdx) =>
-        itinerary.value[dayIdx].events.filter(
-          e => (e.weather || 'sunny') === (itinerary.value[dayIdx].weatherMode || 'sunny')
-        );
+      const getFilteredEvs = (dayIdx) => itinerary.value[dayIdx].events;
 
       const getTransitMode = (dayIdx, filtIdx) => {
         return getFilteredEvs(dayIdx)[filtIdx]?.transitMode || 'driving';
@@ -5772,7 +5758,7 @@
       const eventPhotoUploading = ref(false);
       let curEvIdx = -1;
       const openEditModal = (i, d, e) => { isNewEvent.value = false; curEvIdx = e; tempEvent.value = { weather:'sunny', ...i }; showEditModal.value = true; };
-      const openAddModal = (d) => { isNewEvent.value = true; tempEvent.value = { time: '12:00', title: '', type: 'spot', typeLabel: '景點', photo: '', url: '', detail: '', weather: 'sunny', lat: '', lng: '' }; showEditModal.value = true; };
+      const openAddModal = (d) => { isNewEvent.value = true; tempEvent.value = { time: '12:00', title: '', type: 'spot', typeLabel: '景點', photo: '', url: '', detail: '', lat: '', lng: '' }; showEditModal.value = true; };
       const deleteEvent = () => { itinerary.value[activeDay.value].events.splice(curEvIdx, 1); showEditModal.value = false; };
       const saveEvent = async () => {
         // 等照片上傳完再儲存
