@@ -1206,6 +1206,34 @@
     </nav>
 
 
+    <!-- QR Code 裁切器 -->
+    <div v-if="showQRCropper" style="position:fixed;inset:0;z-index:9500;background:rgba(0,0,0,0.95);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;gap:0;" @touchmove.prevent>
+      <p style="color:white;font-size:11px;font-weight:900;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:16px;opacity:0.6;">裁切 QR Code（正方形）</p>
+      <div style="position:relative;overflow:hidden;border-radius:8px;flex-shrink:0;"
+           :style="{width: qrCropCanvas.dispW+'px', height: qrCropCanvas.dispH+'px'}">
+        <img :src="qrCropSrc" :style="{width: qrCropCanvas.dispW+'px', height: qrCropCanvas.dispH+'px', display:'block'}" draggable="false">
+        <!-- 暗色遮罩 -->
+        <div style="position:absolute;inset:0;background:rgba(0,0,0,0.5);pointer-events:none;"></div>
+        <!-- 裁切框 -->
+        <div :style="{position:'absolute', left:qrCropBox.x+'px', top:qrCropBox.y+'px', width:qrCropBox.w+'px', height:qrCropBox.h+'px', border:'2px solid white', boxShadow:'0 0 0 9999px rgba(0,0,0,0.5)', cursor:'move', boxSizing:'border-box'}"
+             @mousedown="startQRCropDrag($event,'move')" @touchstart="startQRCropDrag($event,'move')">
+          <!-- 角落拖拉點 -->
+          <div style="position:absolute;right:-6px;bottom:-6px;width:16px;height:16px;background:white;border-radius:50%;cursor:se-resize;"
+               @mousedown.stop="startQRCropDrag($event,'resize')" @touchstart.stop="startQRCropDrag($event,'resize')"></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;margin-top:20px;width:100%;max-width:360px;">
+        <button @click="showQRCropper=false;qrCropSrc=''" style="flex:1;padding:14px;border-radius:999px;background:rgba(255,255,255,0.12);color:white;font-size:11px;font-weight:900;border:none;cursor:pointer;letter-spacing:0.1em;" class="active:scale-95 transition">取消</button>
+        <button @click="confirmQRCrop" style="flex:1;padding:14px;border-radius:999px;background:linear-gradient(145deg,#8ec4a1,#5a9070);color:white;font-size:11px;font-weight:900;border:none;cursor:pointer;letter-spacing:0.1em;" class="active:scale-95 transition">確認裁切</button>
+      </div>
+    </div>
+
+    <!-- QR 放大 lightbox -->
+    <div v-if="qrZoom" @click="qrZoom=null"
+         style="position:fixed;inset:0;z-index:9200;background:rgba(0,0,0,0.92);display:flex;align-items:center;justify-content:center;padding:24px;cursor:zoom-out;">
+      <img :src="qrZoom" style="max-width:90vw;max-height:90vh;border-radius:12px;object-fit:contain;">
+    </div>
+
     <!-- 機位照片放大 lightbox -->
     <div v-if="kokusaiPhotoZoom || parcoCityPhotoZoom || naminouePhotoZoom || kouriPhotoZoom || americanVillagePhotoZoom || aeonMallPhotoZoom || ashibinaaPhotoZoom || churuamiGuidePhotoZoom || nakagusukuPhotoZoom || ryuboPhotoZoom || tomariPortPhotoZoom || ryuboPhotoZoom || ryuboPhotoZoom"
          @click="kokusaiPhotoZoom=null; parcoCityPhotoZoom=null; naminouePhotoZoom=null; kouriPhotoZoom=null; americanVillagePhotoZoom=null; aeonMallPhotoZoom=null; ashibinaaPhotoZoom=null; churuamiGuidePhotoZoom=null; nakagusukuPhotoZoom=null; tomariPortPhotoZoom=null"
@@ -4320,7 +4348,7 @@
               <!-- 一般用戶：顯示自己的 QR -->
               <div v-if="!canEdit">
                 <div v-if="memberQRCodes['funpass_'+currentUser]" style="display:flex;justify-content:center;padding:8px 0;">
-                  <img :src="memberQRCodes['funpass_'+currentUser]" style="width:200px;height:200px;object-fit:contain;border-radius:12px;">
+                  <img :src="memberQRCodes['funpass_'+currentUser]" style="width:200px;height:200px;object-fit:contain;border-radius:12px;cursor:zoom-in;" @click="qrZoom=memberQRCodes['funpass_'+currentUser]">
                 </div>
                 <p v-else style="font-size:13px;opacity:0.35;text-align:center;padding:12px 0;">尚未上傳 QRcode</p>
               </div>
@@ -4329,12 +4357,12 @@
                 <div v-for="member in groupMembers" :key="member.name" style="border-radius:14px;background:rgba(192,64,64,0.05);border:1px solid rgba(192,64,64,0.15);padding:12px;">
                   <p style="font-size:10px;font-weight:900;opacity:0.6;margin-bottom:8px;">{{ member.name }}</p>
                   <div v-if="memberQRCodes['funpass_'+member.name]" style="display:flex;justify-content:center;position:relative;margin-bottom:8px;">
-                    <img :src="memberQRCodes['funpass_'+member.name]" style="width:120px;height:120px;object-fit:contain;border-radius:10px;">
+                    <img :src="memberQRCodes['funpass_'+member.name]" style="width:120px;height:120px;object-fit:contain;border-radius:10px;cursor:zoom-in;" @click.stop="qrZoom=memberQRCodes['funpass_'+member.name]">
                     <button @click="deleteQR('funpass_'+member.name)" style="position:absolute;top:2px;right:calc(50% - 60px - 6px);background:rgba(0,0,0,0.5);color:white;border:none;border-radius:50%;width:20px;height:20px;font-size:10px;cursor:pointer;">✕</button>
                   </div>
                   <label class="card-neo w-full py-2 flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition" style="border-radius:12px;display:flex;">
                     <span style="font-size:11px;font-weight:900;color:#c04040;">{{ qrUploading==='funpass_'+member.name ? '⏳ 上傳中...' : (memberQRCodes['funpass_'+member.name] ? '更換' : '📷 上傳') }}</span>
-                    <input type="file" accept="image/*" style="display:none;" @change="handleMemberQR($event,'funpass_',member.name)" :disabled="!!qrUploading">
+                    <input type="file" accept="image/*" style="display:none;" @change="openQRCropper($event,'funpass_',member.name)" :disabled="!!qrUploading">
                   </label>
                 </div>
               </div>
@@ -4449,7 +4477,7 @@
               <!-- 一般用戶：顯示自己的 QR -->
               <div v-if="!canEdit">
                 <div v-if="memberQRCodes['aquarium_'+currentUser]" style="display:flex;justify-content:center;padding:8px 0;">
-                  <img :src="memberQRCodes['aquarium_'+currentUser]" style="width:200px;height:200px;object-fit:contain;border-radius:12px;">
+                  <img :src="memberQRCodes['aquarium_'+currentUser]" style="width:200px;height:200px;object-fit:contain;border-radius:12px;cursor:zoom-in;" @click="qrZoom=memberQRCodes['aquarium_'+currentUser]">
                 </div>
                 <p v-else style="font-size:13px;opacity:0.35;text-align:center;padding:12px 0;">尚未上傳 QRcode</p>
               </div>
@@ -4458,12 +4486,12 @@
                 <div v-for="member in groupMembers" :key="member.name" style="border-radius:14px;background:rgba(26,107,138,0.05);border:1px solid rgba(26,107,138,0.15);padding:12px;">
                   <p style="font-size:10px;font-weight:900;opacity:0.6;margin-bottom:8px;">{{ member.name }}</p>
                   <div v-if="memberQRCodes['aquarium_'+member.name]" style="display:flex;justify-content:center;position:relative;margin-bottom:8px;">
-                    <img :src="memberQRCodes['aquarium_'+member.name]" style="width:120px;height:120px;object-fit:contain;border-radius:10px;">
+                    <img :src="memberQRCodes['aquarium_'+member.name]" style="width:120px;height:120px;object-fit:contain;border-radius:10px;cursor:zoom-in;" @click.stop="qrZoom=memberQRCodes['aquarium_'+member.name]">
                     <button @click="deleteQR('aquarium_'+member.name)" style="position:absolute;top:2px;right:calc(50% - 60px - 6px);background:rgba(0,0,0,0.5);color:white;border:none;border-radius:50%;width:20px;height:20px;font-size:10px;cursor:pointer;">✕</button>
                   </div>
                   <label class="card-neo w-full py-2 flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition" style="border-radius:12px;display:flex;">
                     <span style="font-size:11px;font-weight:900;color:#1a6b8a;">{{ qrUploading==='aquarium_'+member.name ? '⏳ 上傳中...' : (memberQRCodes['aquarium_'+member.name] ? '更換' : '📷 上傳') }}</span>
-                    <input type="file" accept="image/*" style="display:none;" @change="handleMemberQR($event,'aquarium_',member.name)" :disabled="!!qrUploading">
+                    <input type="file" accept="image/*" style="display:none;" @change="openQRCropper($event,'aquarium_',member.name)" :disabled="!!qrUploading">
                   </label>
                 </div>
               </div>
@@ -5353,6 +5381,87 @@
       });
 
       // ── Cropper ──
+      // QR Code 裁切器（1:1 正方形）
+      const qrZoom = ref(null);
+      const showQRCropper = ref(false);
+      const qrCropSrc = ref('');
+      const qrCropCanvas = ref({dispW:0, dispH:0, natW:0, natH:0});
+      const qrCropBox = ref({x:0,y:0,w:200,h:200});
+      let _qrPendingPrefix = '', _qrPendingMember = '';
+      let _qrCropDragMode = '', _qrCropDragStart = {x:0,y:0}, _qrCropBoxStart = {x:0,y:0,w:0,h:0};
+
+      const openQRCropper = (e, prefix, memberName) => {
+        const f = e.target.files[0]; if(!f) return;
+        _qrPendingPrefix = prefix; _qrPendingMember = memberName;
+        const r = new FileReader();
+        r.onload = ev => {
+          qrCropSrc.value = ev.target.result;
+          const img = new Image();
+          img.onload = () => {
+            const maxS = Math.min(window.innerWidth - 40, 360);
+            const scale = Math.min(maxS / img.naturalWidth, maxS / img.naturalHeight, 1);
+            const dw = Math.round(img.naturalWidth * scale);
+            const dh = Math.round(img.naturalHeight * scale);
+            qrCropCanvas.value = { dispW: dw, dispH: dh, natW: img.naturalWidth, natH: img.naturalHeight };
+            const s = Math.min(dw, dh);
+            const x = Math.round((dw - s) / 2);
+            const y = Math.round((dh - s) / 2);
+            qrCropBox.value = { x, y, w: s, h: s };
+            showQRCropper.value = true;
+          };
+          img.src = ev.target.result;
+        };
+        r.readAsDataURL(f);
+        e.target.value = '';
+      };
+
+      const startQRCropDrag = (e, mode) => {
+        e.preventDefault();
+        _qrCropDragMode = mode;
+        _qrCropDragStart = { x: (e.touches?.[0]||e).clientX, y: (e.touches?.[0]||e).clientY };
+        _qrCropBoxStart = { ...qrCropBox.value };
+        const onMove = (ev) => {
+          const cx = (ev.touches?.[0]||ev).clientX, cy = (ev.touches?.[0]||ev).clientY;
+          const dx = cx - _qrCropDragStart.x, dy = cy - _qrCropDragStart.y;
+          const c = qrCropCanvas.value;
+          let {x,y,w,h} = _qrCropBoxStart;
+          const s = Math.min(w,h);
+          if (_qrCropDragMode === 'move') {
+            x = Math.max(0, Math.min(c.dispW - s, x + dx));
+            y = Math.max(0, Math.min(c.dispH - s, y + dy));
+            qrCropBox.value = {x,y,w:s,h:s};
+          } else {
+            let ns = Math.max(40, s + dx + dy);
+            ns = Math.min(ns, c.dispW - x, c.dispH - y);
+            qrCropBox.value = {x,y,w:ns,h:ns};
+          }
+        };
+        const onUp = () => { window.removeEventListener('mousemove',onMove); window.removeEventListener('mouseup',onUp); window.removeEventListener('touchmove',onMove); window.removeEventListener('touchend',onUp); };
+        window.addEventListener('mousemove',onMove); window.addEventListener('mouseup',onUp);
+        window.addEventListener('touchmove',onMove,{passive:false}); window.addEventListener('touchend',onUp);
+      };
+
+      const confirmQRCrop = async () => {
+        const c = qrCropCanvas.value, b = qrCropBox.value;
+        const scaleX = c.natW / c.dispW, scaleY = c.natH / c.dispH;
+        const canvas = document.createElement('canvas');
+        canvas.width = canvas.height = 400;
+        const ctx = canvas.getContext('2d');
+        const img = new Image(); img.src = qrCropSrc.value;
+        await new Promise(res => { img.onload = res; if(img.complete) res(); });
+        ctx.drawImage(img, b.x*scaleX, b.y*scaleY, b.w*scaleX, b.h*scaleY, 0, 0, 400, 400);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+        showQRCropper.value = false;
+        const key = _qrPendingPrefix + _qrPendingMember;
+        qrUploading.value = key;
+        try {
+          const url = await uploadToCloudinary(dataUrl);
+          memberQRCodes.value = { ...memberQRCodes.value, [key]: url };
+        } catch(err) {
+          memberQRCodes.value = { ...memberQRCodes.value, [key]: dataUrl };
+        } finally { qrUploading.value = ''; }
+      };
+
       const showCropper = ref(false);
       const cropSrc = ref('');
       const cropCanvas = ref({dispW:0, dispH:0, natW:0, natH:0});
@@ -6562,7 +6671,7 @@
         showHotelModal.value || showCarModal.value || showFunpassModal.value || showAquariumModal.value || showChurasunModal.value || showSmokingModal.value || showCalcModal.value || showCouponModal.value || showVjwModal.value || showKokusaiModal.value || showKokusaiEdit.value || showKokusaiDetail.value || showTomariPortModal.value || showTomariPortEdit.value || showTomariPortDetail.value || showTomariPortModal.value || showTomariPortEdit.value || showTomariPortDetail.value || showChuruamiGuideModal.value || showChuruamiGuideEdit.value || showChuruamiGuideDetail.value || showRyuboModal.value || showRyuboEdit.value || showRyuboDetail.value || showRyuboModal.value || showRyuboEdit.value || showRyuboDetail.value || showRyuboModal.value || showRyuboEdit.value || showRyuboDetail.value || showAshibinaaModal.value || showAshibinaaEdit.value || showAshibinaaDetail.value || showNakagusukuModal.value || showNakagusukuEdit.value || showNakagusukuDetail.value || showAeonMallModal.value || showAeonMallEdit.value || showAeonMallDetail.value || showAmericanVillageModal.value || showAmericanVillageEdit.value || showAmericanVillageDetail.value || showKouriModal.value || showKouriEdit.value || showKouriDetail.value || showNaminoueModal.value || showNaminoueEdit.value || showNaminoueDetail.value || showParcoCityModal.value || showParcoCityEdit.value || showParcoCityDetail.value || showNaminoueModal.value || showEsimModal.value ||
         showFlightDetail.value || showPasscodeModal.value || showMemberModal.value ||
         showExpenseModal.value || showProfileModal.value || showConfirmModal.value ||
-        showEditModal.value || showCropper.value || showHotelLightbox.value
+        showEditModal.value || showCropper.value || showQRCropper.value || showHotelLightbox.value
       );
       watch(anyModalOpen, v => {
         document.body.style.overflow = v ? 'hidden' : '';
@@ -6656,7 +6765,7 @@
       return {
         appLoading, loadProgress, loadingMsg, currentUser, loginAs, loginDropOpen, loginSelected, showLoginPinSheet, loggingIn, loggingOut, pendingUser, doLogin, loginPin, loginPinVerified, loginPinError, loginPinPress, profilePinPress, allTodos, onPickerScroll, scrollPickerTo, currentTab, navCollapsed, tabs, btabs, weather, weatherBg, transitCache, transitEditIdx, getTransitInfo, refreshAllTransit, calcTransit, getTransitMode, setTransitMode,  timeObj, calcInput, calcMode, calcExpr, calcDisplayVal, calcPendingOp, switchCalcMode, pressCalc, pressCalcNum, pressCalcDot, pressCalcOp, pressCalcEqual, pressCalcClear, pressCalcBackspace, calcOutput, jpyRate, jpyBuyRate, jpySellRate, rateUpdatedAt, groupMembers, showMemberModal, newMember, showUserMenu, toggleUserMenu, closeUserMenu, showProfileModal, profileEdit, profileEditing, showProfilePinEdit, openProfile, currentPinDisplay, handleProfileAvatarUpload, avatarUploading, saveProfile, logout, handleAvatarUpload, addMember, getMemberAvatar, editingMember, openEditMember, handleEditAvatarUpload, saveEditMember, showAddMember, BLANK_AVATAR, expenseSubTab, expenses, memberStats, maxPaid, settlementAdvice, showExpenseModal, openExpenseModal, addExpense, newExpense, openEditExpense, editingExpenseIdx, expenseFilterMember, filteredExpenses, itinerary, activeDay, departureTrip, returnFlights, selectedReturnFlight, hotelData, carRental, showFlightDetail, activeFlight, triggerPasscode, showPasscodeModal, passcode, pressKey, passcodeMode, scheduleSubTab, guideRegion, planningSubTab, filteredTodos: computed(() => { const key = planningSubTab.value === 'essential' ? '_shared' : currentUser.value; return (allTodos.value[key]||[]).filter(t=>t.type===planningSubTab.value); }), newTodoText, addTodo, removeTodo, categories, showEditModal, eventPhotoUploading, isNewEvent, tempEvent, openEditModal, openAddModal, deleteEvent, saveEvent, showConfirmModal, confirmItemName, confirmDelete, executeDelete, bookingSubTab, globalCurrency, toggleAllCurrency,
         previewCanvas,hotelPhotos,showHotelLightbox,openEditExpense,editingExpenseIdx,showCropper,cropSrc,cropCanvas,cropBox,openCropper,startCropDrag,confirmCrop,currentHotelPhoto,openHotelPhoto,lbTouchStart,lbTouchEnd,
-        editMode, canEdit, showHotelModal, showCarModal, showFunpassModal, showAquariumModal, memberQRCodes, qrUploading, handleMemberQR, deleteQR, showChurasunModal, churasunOrderNo, churasunOrderNo, churasunEditOrder, saveChurasunOrder, showCalcModal, showCouponModal, couponZoom, showVjwModal, showKokusaiModal, showKokusaiEdit, showKokusaiDetail, showTomariPortModal, showTomariPortDetail, showTomariPortEdit, tomariPortTab, tomariPortPlaces, tomariPortSelected, tomariPortEditIdx, tomariPortForm, tomariPortUploading, tomariPortUploadProgress, tomariPortPhotoZoom, openAddTomariPort, openEditTomariPort, saveTomariPortPlace, removeTomariPortPlace, handleTomariPortPhoto, handleTomariPortPhotoMulti, showChuruamiGuideModal, showChuruamiGuideDetail, showChuruamiGuideEdit, churuamiGuideTab, churuamiGuidePlaces, churuamiGuideSelected, churuamiGuideEditIdx, churuamiGuideForm, churuamiGuideUploading, churuamiGuideUploadProgress, churuamiGuidePhotoZoom, openAddChuruamiGuide, openEditChuruamiGuide, saveChuruamiGuidePlace, removeChuruamiGuidePlace, handleChuruamiGuidePhoto, handleChuruamiGuidePhotoMulti, showRyuboModal, showRyuboDetail, showRyuboEdit, ryuboTab, ryuboPlaces, ryuboSelected, ryuboEditIdx, ryuboForm, ryuboUploading, ryuboUploadProgress, ryuboPhotoZoom, openAddRyubo, openEditRyubo, saveRyuboPlace, removeRyuboPlace, handleRyuboPhoto, handleRyuboPhotoMulti, showAshibinaaModal, showAshibinaaDetail, showAshibinaaEdit, ashibinaaTab, ashibinaaPlaces, ashibinaaSelected, ashibinaaEditIdx, ashibinaaForm, ashibinaaUploading, ashibinaaUploadProgress, ashibinaaPhotoZoom, openAddAshibinaa, openEditAshibinaa, saveAshibinaaPlace, removeAshibinaaPlace, handleAshibinaaPhoto, handleAshibinaaPhotoMulti, showNakagusukuModal, showNakagusukuDetail, showNakagusukuEdit, nakagusukuTab, nakagusukuPlaces, nakagusukuSelected, nakagusukuEditIdx, nakagusukuForm, nakagusukuUploading, nakagusukuUploadProgress, nakagusukuPhotoZoom, openAddNakagusuku, openEditNakagusuku, saveNakagusukuPlace, removeNakagusukuPlace, handleNakagusukuPhoto, handleNakagusukuPhotoMulti, showAeonMallModal, showAeonMallDetail, showAeonMallEdit, aeonMallTab, aeonMallPlaces, aeonMallSelected, aeonMallEditIdx, aeonMallForm, aeonMallUploading, aeonMallUploadProgress, aeonMallPhotoZoom, openAddAeonMall, openEditAeonMall, saveAeonMallPlace, removeAeonMallPlace, handleAeonMallPhoto, handleAeonMallPhotoMulti, showAmericanVillageModal, showAmericanVillageDetail, showAmericanVillageEdit, americanVillageTab, americanVillagePlaces, americanVillageSelected, americanVillageEditIdx, americanVillageForm, americanVillageUploading, openAddAmericanVillage, openEditAmericanVillage, saveAmericanVillagePlace, removeAmericanVillagePlace, handleAmericanVillagePhoto, handleAmericanVillagePhotoMulti, americanVillageUploadProgress, showKouriModal, showKouriDetail, showKouriEdit, kouriTab, kouriPlaces, kouriSelected, kouriEditIdx, kouriForm, kouriUploading, openAddKouri, openEditKouri, saveKouriPlace, removeKouriPlace, handleKouriPhoto, handleKouriPhotoMulti, kouriUploadProgress, showNaminoueModal, showNaminoueDetail, showNaminoueEdit, naminoueTab, naminouePlaces, naminoueSelected, naminoueEditIdx, naminoueForm, naminoueUploading, openAddNaminoue, openEditNaminoue, saveNaminouePlace, removeNaminouePlace, handleNaminouePhoto, handleNaminouePhotoMulti, naminoueUploadProgress, showParcoCityModal, showParcoCityDetail, showParcoCityEdit, showNaminoueModal, parcoCityTab, parcoCityPlaces, parcoCitySelected, parcoCityEditIdx, parcoCityForm, parcoCityUploading, openAddParcoCity, openEditParcoCity, saveParcoCityPlace, removeParcoCityPlace, handleParcoCityPhoto, handleParcoCityPhotoMulti, parcoCityUploadProgress, kokusaiSelected, kokusaiSelectedIdx, kokusaiTab, kokusaiPlaces, kokusaiEditIdx, kokusaiForm, openAddKokusai, openEditKokusai, saveKokusai, removeKokusai, handleKokusaiPhoto, handleKokusaiPhotoMulti, kokusaiUploadProgress, kokusaiUploading, kokusaiPhotoZoom, parcoCityPhotoZoom, naminouePhotoZoom, kouriPhotoZoom, americanVillagePhotoZoom, showEsimModal, showSmokingModal, smokingLat, smokingLng, smokingLocating, smokingMapSrc, openSmokingFinder, getSmokingLocation, aquariumPhotos, handleAquariumPhoto, openHotelModal, openCarModal, isAdmin,
+        editMode, canEdit, showHotelModal, showCarModal, showFunpassModal, showAquariumModal, memberQRCodes, qrUploading, handleMemberQR, deleteQR, qrZoom, showQRCropper, qrCropSrc, qrCropCanvas, qrCropBox, openQRCropper, startQRCropDrag, confirmQRCrop, showChurasunModal, churasunOrderNo, churasunOrderNo, churasunEditOrder, saveChurasunOrder, showCalcModal, showCouponModal, couponZoom, showVjwModal, showKokusaiModal, showKokusaiEdit, showKokusaiDetail, showTomariPortModal, showTomariPortDetail, showTomariPortEdit, tomariPortTab, tomariPortPlaces, tomariPortSelected, tomariPortEditIdx, tomariPortForm, tomariPortUploading, tomariPortUploadProgress, tomariPortPhotoZoom, openAddTomariPort, openEditTomariPort, saveTomariPortPlace, removeTomariPortPlace, handleTomariPortPhoto, handleTomariPortPhotoMulti, showChuruamiGuideModal, showChuruamiGuideDetail, showChuruamiGuideEdit, churuamiGuideTab, churuamiGuidePlaces, churuamiGuideSelected, churuamiGuideEditIdx, churuamiGuideForm, churuamiGuideUploading, churuamiGuideUploadProgress, churuamiGuidePhotoZoom, openAddChuruamiGuide, openEditChuruamiGuide, saveChuruamiGuidePlace, removeChuruamiGuidePlace, handleChuruamiGuidePhoto, handleChuruamiGuidePhotoMulti, showRyuboModal, showRyuboDetail, showRyuboEdit, ryuboTab, ryuboPlaces, ryuboSelected, ryuboEditIdx, ryuboForm, ryuboUploading, ryuboUploadProgress, ryuboPhotoZoom, openAddRyubo, openEditRyubo, saveRyuboPlace, removeRyuboPlace, handleRyuboPhoto, handleRyuboPhotoMulti, showAshibinaaModal, showAshibinaaDetail, showAshibinaaEdit, ashibinaaTab, ashibinaaPlaces, ashibinaaSelected, ashibinaaEditIdx, ashibinaaForm, ashibinaaUploading, ashibinaaUploadProgress, ashibinaaPhotoZoom, openAddAshibinaa, openEditAshibinaa, saveAshibinaaPlace, removeAshibinaaPlace, handleAshibinaaPhoto, handleAshibinaaPhotoMulti, showNakagusukuModal, showNakagusukuDetail, showNakagusukuEdit, nakagusukuTab, nakagusukuPlaces, nakagusukuSelected, nakagusukuEditIdx, nakagusukuForm, nakagusukuUploading, nakagusukuUploadProgress, nakagusukuPhotoZoom, openAddNakagusuku, openEditNakagusuku, saveNakagusukuPlace, removeNakagusukuPlace, handleNakagusukuPhoto, handleNakagusukuPhotoMulti, showAeonMallModal, showAeonMallDetail, showAeonMallEdit, aeonMallTab, aeonMallPlaces, aeonMallSelected, aeonMallEditIdx, aeonMallForm, aeonMallUploading, aeonMallUploadProgress, aeonMallPhotoZoom, openAddAeonMall, openEditAeonMall, saveAeonMallPlace, removeAeonMallPlace, handleAeonMallPhoto, handleAeonMallPhotoMulti, showAmericanVillageModal, showAmericanVillageDetail, showAmericanVillageEdit, americanVillageTab, americanVillagePlaces, americanVillageSelected, americanVillageEditIdx, americanVillageForm, americanVillageUploading, openAddAmericanVillage, openEditAmericanVillage, saveAmericanVillagePlace, removeAmericanVillagePlace, handleAmericanVillagePhoto, handleAmericanVillagePhotoMulti, americanVillageUploadProgress, showKouriModal, showKouriDetail, showKouriEdit, kouriTab, kouriPlaces, kouriSelected, kouriEditIdx, kouriForm, kouriUploading, openAddKouri, openEditKouri, saveKouriPlace, removeKouriPlace, handleKouriPhoto, handleKouriPhotoMulti, kouriUploadProgress, showNaminoueModal, showNaminoueDetail, showNaminoueEdit, naminoueTab, naminouePlaces, naminoueSelected, naminoueEditIdx, naminoueForm, naminoueUploading, openAddNaminoue, openEditNaminoue, saveNaminouePlace, removeNaminouePlace, handleNaminouePhoto, handleNaminouePhotoMulti, naminoueUploadProgress, showParcoCityModal, showParcoCityDetail, showParcoCityEdit, showNaminoueModal, parcoCityTab, parcoCityPlaces, parcoCitySelected, parcoCityEditIdx, parcoCityForm, parcoCityUploading, openAddParcoCity, openEditParcoCity, saveParcoCityPlace, removeParcoCityPlace, handleParcoCityPhoto, handleParcoCityPhotoMulti, parcoCityUploadProgress, kokusaiSelected, kokusaiSelectedIdx, kokusaiTab, kokusaiPlaces, kokusaiEditIdx, kokusaiForm, openAddKokusai, openEditKokusai, saveKokusai, removeKokusai, handleKokusaiPhoto, handleKokusaiPhotoMulti, kokusaiUploadProgress, kokusaiUploading, kokusaiPhotoZoom, parcoCityPhotoZoom, naminouePhotoZoom, kouriPhotoZoom, americanVillagePhotoZoom, showEsimModal, showSmokingModal, smokingLat, smokingLng, smokingLocating, smokingMapSrc, openSmokingFinder, getSmokingLocation, aquariumPhotos, handleAquariumPhoto, openHotelModal, openCarModal, isAdmin,
         getCategoryColor: (t) => ({ transport: 'bg-[#D94F4F]', spot: 'bg-[#98BDE3]', food: 'bg-[#E3A97C]', other: 'bg-[#C4A8D4]' }[t] || 'bg-[#DCC3A0]'),
         categoryDot: (id) => ({ spot:'#98BDE3', food:'#E3A97C', transport:'#D94F4F', other:'#C4A8D4' }[id] || '#DCC3A0'),
         categoryStyle: (id, active) => {
