@@ -988,6 +988,21 @@
         <!-- 門票分頁 -->
         <div v-if="bookingSubTab === 'tickets'" class="space-y-5 font-black">
 
+          <!-- FUNPASS 卡片 -->
+          <div class="unified-card" @click="showFunpassModal=true">
+            <div class="unified-card-cover">
+              <img src="./images/funpass.jpg" style="object-position:center center;">
+              <div class="unified-card-badge" style="background:rgba(200,60,60,0.85);">數位票券</div>
+            </div>
+            <div class="unified-card-body">
+              <div class="unified-card-icon" style="background:linear-gradient(145deg,#c04040,#8a1a1a);">🎡</div>
+              <div>
+                <p style="font-size:14px;font-weight:900;">FUNPASS</p>
+                <p style="font-size:10px;opacity:0.45;margin-top:2px;">沖繩景點票券</p>
+              </div>
+            </div>
+          </div>
+
           <!-- Churasun6 卡片 -->
           <div class="unified-card" @click="showChurasunModal=true">
             <div class="unified-card-cover">
@@ -4284,6 +4299,131 @@
 
 
       <!-- 水族館詳情彈窗 -->
+    <!-- Modal: FUNPASS -->
+    <transition name="slide-up">
+      <div v-if="showFunpassModal" class="umodal-backdrop">
+        <div class="umodal-scrim" style="background:rgba(40,10,10,0.85);" @click="showFunpassModal=false"></div>
+        <div class="umodal-shell">
+          <div class="umodal-header" style="background:linear-gradient(145deg,#c04040,#8a1a1a);">
+            <p class="umodal-eyebrow">Okinawa Attraction Pass</p>
+            <p class="umodal-title">🎡 FUNPASS</p>
+            <div class="umodal-chips">
+              <span class="umodal-chip">數位票券</span>
+              <span class="umodal-chip">沖繩景點</span>
+            </div>
+          </div>
+          <div class="umodal-body">
+
+            <!-- 每人 QR（最上面） -->
+            <div class="info-block-lg" style="border:1.5px solid rgba(192,64,64,0.3);">
+              <p class="info-label">🎟 我的 FUNPASS QRcode</p>
+              <!-- 一般用戶：顯示自己的 QR -->
+              <div v-if="!canEdit">
+                <div v-if="memberQRCodes['funpass_'+currentUser]" style="display:flex;justify-content:center;padding:8px 0;">
+                  <img :src="memberQRCodes['funpass_'+currentUser]" style="width:200px;height:200px;object-fit:contain;border-radius:12px;">
+                </div>
+                <p v-else style="font-size:13px;opacity:0.35;text-align:center;padding:12px 0;">尚未上傳 QRcode</p>
+              </div>
+              <!-- 管理員：為每個人上傳 -->
+              <div v-if="canEdit" style="display:flex;flex-direction:column;gap:12px;">
+                <div v-for="member in groupMembers" :key="member.name" style="border-radius:14px;background:rgba(192,64,64,0.05);border:1px solid rgba(192,64,64,0.15);padding:12px;">
+                  <p style="font-size:10px;font-weight:900;opacity:0.6;margin-bottom:8px;">{{ member.name }}</p>
+                  <div v-if="memberQRCodes['funpass_'+member.name]" style="display:flex;justify-content:center;position:relative;margin-bottom:8px;">
+                    <img :src="memberQRCodes['funpass_'+member.name]" style="width:120px;height:120px;object-fit:contain;border-radius:10px;">
+                    <button @click="deleteQR('funpass_'+member.name)" style="position:absolute;top:2px;right:calc(50% - 60px - 6px);background:rgba(0,0,0,0.5);color:white;border:none;border-radius:50%;width:20px;height:20px;font-size:10px;cursor:pointer;">✕</button>
+                  </div>
+                  <label class="card-neo w-full py-2 flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition" style="border-radius:12px;display:flex;">
+                    <span style="font-size:11px;font-weight:900;color:#c04040;">{{ qrUploading==='funpass_'+member.name ? '⏳ 上傳中...' : (memberQRCodes['funpass_'+member.name] ? '更換' : '📷 上傳') }}</span>
+                    <input type="file" accept="image/*" style="display:none;" @change="e=>handleMemberQR(e,'funpass_',member.name)" :disabled="qrUploading">
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- 可使用景點＋單價 -->
+            <div class="info-block-lg">
+              <p class="info-label">🎡 可使用景點（成人原價）</p>
+              <div style="display:flex;flex-direction:column;gap:0;">
+                <div class="info-kv"><span class="info-kv-k">🐋 美麗海水族館</span><span class="info-kv-v" style="color:var(--green);font-weight:900;">NT$436</span></div>
+                <div class="info-kv"><span class="info-kv-k">🐠 DMM Kariyushi 水族館</span><span class="info-kv-v" style="color:var(--green);font-weight:900;">NT$560</span></div>
+                <div class="info-kv"><span class="info-kv-k">🗻 沖繩世界 玉泉洞</span><span class="info-kv-v" style="color:var(--green);font-weight:900;">NT$400</span></div>
+                <div class="info-kv"><span class="info-kv-k">🗼 古宇利海洋塔</span><span class="info-kv-v" style="color:var(--green);font-weight:900;">NT$330</span></div>
+                <div class="info-kv"><span class="info-kv-k">🌿 東南植物樂園</span><span class="info-kv-v" style="color:var(--green);font-weight:900;">NT$308</span></div>
+                <div class="info-kv"><span class="info-kv-k">🦁 名護動植物園</span><span class="info-kv-v" style="color:var(--green);font-weight:900;">NT$260</span></div>
+                <div class="info-kv"><span class="info-kv-k">🍍 名護鳳梨園</span><span class="info-kv-v" style="color:var(--green);font-weight:900;">NT$300</span></div>
+                <div class="info-kv"><span class="info-kv-k">🏯 琉球村</span><span class="info-kv-v" style="color:var(--green);font-weight:900;">NT$300</span></div>
+                <div class="info-kv"><span class="info-kv-k">🦕 DINO 恐龍園</span><span class="info-kv-v" style="color:var(--green);font-weight:900;">NT$360</span></div>
+                <div class="info-kv"><span class="info-kv-k">🌊 萬座毛</span><span class="info-kv-v" style="color:var(--green);font-weight:900;">NT$20</span></div>
+                <div class="info-kv"><span class="info-kv-k">🏰 勝連城跡（含常設展）</span><span class="info-kv-v" style="color:var(--green);font-weight:900;">NT$120</span></div>
+                <div class="info-kv"><span class="info-kv-k">🌟 little Universe OKINAWA</span><span class="info-kv-v" style="color:var(--green);font-weight:900;">NT$440</span></div>
+                <div class="info-kv"><span class="info-kv-k">🍒 沖繩水果樂園</span><span class="info-kv-v" style="color:var(--green);font-weight:900;">NT$300</span></div>
+                <div class="info-kv"><span class="info-kv-k">🦁 沖繩兒童王國</span><span class="info-kv-v" style="color:var(--green);font-weight:900;">NT$100</span></div>
+              </div>
+            </div>
+
+            <!-- 美食兌換 -->
+            <div class="info-block-lg">
+              <p class="info-label">🍜 美食兌換（每項佔 1 個額度）</p>
+              <div style="display:flex;flex-direction:column;gap:4px;">
+                <div class="info-kv"><span class="info-kv-k">🍦 Yanbaru Gelato</span><span class="info-kv-v">義式冰淇淋 1 球（基礎口味）NT$81</span></div>
+                <div class="info-kv"><span class="info-kv-k">🍦 Blue Seal</span><span class="info-kv-v">冰淇淋 1 球（口味任選）NT$81</span></div>
+                <div class="info-kv"><span class="info-kv-k">🍦 東南植物樂園 知花Gelato</span><span class="info-kv-v">義式冰淇淋 1 球 NT$110</span></div>
+                <div class="info-kv"><span class="info-kv-k">🍔 Zootons 那霸店</span><span class="info-kv-v">三種起司漢堡 1 份 NT$233</span></div>
+                <div class="info-kv"><span class="info-kv-k">🍔 Zootons 首里店</span><span class="info-kv-v">起司漢堡 1 份 NT$208</span></div>
+                <div class="info-kv"><span class="info-kv-k">🍺 Zootons 那霸店</span><span class="info-kv-v">Orion 瓶裝啤酒 1 瓶 NT$134</span></div>
+                <div class="info-kv"><span class="info-kv-k">🍖 燒肉 DOURAKU</span><span class="info-kv-v">套餐 3 選 1（牛小排/牛肋/牛腰）NT$315</span></div>
+                <div class="info-kv"><span class="info-kv-k">🍣 北海素材迴轉壽司</span><span class="info-kv-v">套餐 3 選 1（壽司組/海鮮丼×2）NT$315</span></div>
+                <div class="info-kv"><span class="info-kv-k">🍽️ WaGyu Cafe 1 號店</span><span class="info-kv-v">套餐 3 選 1（牛蓋飯/夏威夷炸雞/蒜香蝦）NT$315</span></div>
+                <div class="info-kv"><span class="info-kv-k">🌺 Hawaiian Cafe 2 號店</span><span class="info-kv-v">套餐 3 選 1（海陸/豬肉蒜蝦/漢堡肉）NT$315</span></div>
+                <div class="info-kv"><span class="info-kv-k">🍜 牛骨琉球 MARUMARO</span><span class="info-kv-v">拉麵 3 選 1（醬油/味噌/鹽味）NT$315</span></div>
+                <div class="info-kv"><span class="info-kv-k">🐟 古宇利島うみんちゅ Seafood</span><span class="info-kv-v">套餐 3 選 1（鮪魚丼/爆香蝦/炸魚）NT$315</span></div>
+                <div class="info-kv"><span class="info-kv-k">☕ Cafe R</span><span class="info-kv-v">馬卡龍下午茶套餐 NT$324</span></div>
+                <div class="info-kv"><span class="info-kv-k">🍰 DMM Kirara Cafe</span><span class="info-kv-v">甜點套餐（甜點+飲品）NT$320</span></div>
+                <div class="info-kv"><span class="info-kv-k">🍛 DMM Kirara Cafe</span><span class="info-kv-v">咖哩套餐（咖哩+飲品）NT$425</span></div>
+                <div class="info-kv"><span class="info-kv-k">🍜 DMM Kirara Cafe</span><span class="info-kv-v">拉麵套餐（拉麵+飲品）NT$260</span></div>
+                <div class="info-kv"><span class="info-kv-k">🍶 琉球村 咲元泡盛</span><span class="info-kv-v">25 度泡盛 1 瓶（限外帶）NT$313</span></div>
+                <div class="info-kv"><span class="info-kv-k">🍺 珊瑚啤酒 KÖLSCH</span><span class="info-kv-v">科隆啤酒 1 瓶（沖繩世界）NT$123</span></div>
+                <div class="info-kv"><span class="info-kv-k">🍺 珊瑚啤酒 IPA</span><span class="info-kv-v">印度淡色艾爾 1 瓶（沖繩世界）NT$123</span></div>
+                <div class="info-kv"><span class="info-kv-k">🍺 珊瑚啤酒 Saiso</span><span class="info-kv-v">季節啤酒 1 瓶（沖繩世界）NT$123</span></div>
+                <div class="info-kv"><span class="info-kv-k">🍺 VAMOS</span><span class="info-kv-v">精釀啤酒中杯（國際通）NT$183</span></div>
+              </div>
+            </div>
+
+            <!-- 購物優惠 -->
+            <div class="info-block-lg">
+              <p class="info-label">🛍️ 購物優惠</p>
+              <div style="display:flex;flex-direction:column;gap:0;">
+                <div class="info-kv"><span class="info-kv-k">💊 札幌藥妝</span><span class="info-kv-v">滿 ¥5,000 免稅+折 5%＋小禮物</span></div>
+                <div class="info-kv"><span class="info-kv-k">💊 DEGU 藥妝</span><span class="info-kv-v">滿 ¥5,000 免稅+折 5%＋小禮物</span></div>
+                <div class="info-kv"><span class="info-kv-k">💊 drug eleven</span><span class="info-kv-v">滿 ¥5,000 免稅+折 5%（¥30,000 享 17%）</span></div>
+                <div class="info-kv"><span class="info-kv-k">🛒 唐吉訶德</span><span class="info-kv-v">滿 ¥10,000 免稅+折 5%</span></div>
+                <div class="info-kv"><span class="info-kv-k">📺 BIC Camera / KOJIMA</span><span class="info-kv-v">免稅+現場折扣</span></div>
+                <div class="info-kv"><span class="info-kv-k">🛍️ iias 豐崎購物中心</span><span class="info-kv-v">折扣券領取</span></div>
+                <div class="info-kv"><span class="info-kv-k">🍡 御菓子御殿</span><span class="info-kv-v">滿 ¥3,000 贈小禮物</span></div>
+                <div class="info-kv"><span class="info-kv-k">💆 Ryu Spa</span><span class="info-kv-v">兌換小禮物（¥1,000-1,500）+ 9 折</span></div>
+                <div class="info-kv"><span class="info-kv-k">🌐 WAmazing</span><span class="info-kv-v">免稅+折 3%（至 2026/6/30）</span></div>
+              </div>
+            </div>
+
+            <!-- 注意事項 -->
+            <div class="info-block-lg">
+              <p class="info-label">📋 使用注意</p>
+              <div style="display:flex;flex-direction:column;gap:8px;">
+                <div style="display:flex;gap:8px;align-items:flex-start;"><span style="font-size:14px;flex-shrink:0;">⏱️</span><p style="font-size:11px;font-weight:700;opacity:0.7;line-height:1.5;">首次使用後 <strong>5 天內</strong>需用完（含使用當日）</p></div>
+                <div style="display:flex;gap:8px;align-items:flex-start;"><span style="font-size:14px;flex-shrink:0;">⚠️</span><p style="font-size:11px;font-weight:700;opacity:0.7;line-height:1.5;">美麗海版：每人需有各自 QR Code，<strong>不能共用</strong></p></div>
+                <div style="display:flex;gap:8px;align-items:flex-start;"><span style="font-size:14px;flex-shrink:0;">💡</span><p style="font-size:11px;font-weight:700;opacity:0.7;line-height:1.5;">兌換購物優惠券也算開始使用，注意效期</p></div>
+                <div style="display:flex;gap:8px;align-items:flex-start;"><span style="font-size:14px;flex-shrink:0;">📱</span><p style="font-size:11px;font-weight:700;opacity:0.7;line-height:1.5;">超值版需下載 APP；美麗海版直接用 QR Code 入場</p></div>
+              </div>
+            </div>
+
+          </div>
+          <div class="umodal-footer">
+            <button @click="showFunpassModal=false" class="umodal-close-btn">Close</button>
+          </div>
+        </div>
+      </div>
+    </transition>
+
     <!-- Modal: 美麗海水族館 -->
     <transition name="slide-up">
       <div v-if="showAquariumModal" class="umodal-backdrop">
@@ -4299,24 +4439,29 @@
           </div>
           <div class="umodal-body">
 
-            <!-- 訂單 QRcode -->
+            <!-- 訂單 QRcode（每人各自） -->
             <div class="info-block-lg" style="border:1.5px solid rgba(26,107,138,0.35);">
-              <p class="info-label">🎟 訂單 QRcode</p>
+              <p class="info-label">🎟 我的訂單 QRcode</p>
+              <!-- 一般用戶：顯示自己的 QR -->
               <div v-if="!canEdit">
-                <div v-if="aquariumQRCode" style="display:flex;justify-content:center;padding:8px 0;">
-                  <img :src="aquariumQRCode" style="width:180px;height:180px;object-fit:contain;border-radius:12px;">
+                <div v-if="memberQRCodes['aquarium_'+currentUser]" style="display:flex;justify-content:center;padding:8px 0;">
+                  <img :src="memberQRCodes['aquarium_'+currentUser]" style="width:200px;height:200px;object-fit:contain;border-radius:12px;">
                 </div>
                 <p v-else style="font-size:13px;opacity:0.35;text-align:center;padding:12px 0;">尚未上傳 QRcode</p>
               </div>
-              <div v-if="canEdit" style="display:flex;flex-direction:column;gap:10px;">
-                <div v-if="aquariumQRCode" style="display:flex;justify-content:center;position:relative;">
-                  <img :src="aquariumQRCode" style="width:180px;height:180px;object-fit:contain;border-radius:12px;">
-                  <button @click="aquariumQRCode=''" style="position:absolute;top:4px;right:calc(50% - 90px - 8px);background:rgba(0,0,0,0.55);color:white;border:none;border-radius:50%;width:24px;height:24px;font-size:12px;cursor:pointer;">✕</button>
+              <!-- 管理員：可為每個人上傳 -->
+              <div v-if="canEdit" style="display:flex;flex-direction:column;gap:12px;">
+                <div v-for="member in groupMembers" :key="member.name" style="border-radius:14px;background:rgba(26,107,138,0.05);border:1px solid rgba(26,107,138,0.15);padding:12px;">
+                  <p style="font-size:10px;font-weight:900;opacity:0.6;margin-bottom:8px;">{{ member.name }}</p>
+                  <div v-if="memberQRCodes['aquarium_'+member.name]" style="display:flex;justify-content:center;position:relative;margin-bottom:8px;">
+                    <img :src="memberQRCodes['aquarium_'+member.name]" style="width:120px;height:120px;object-fit:contain;border-radius:10px;">
+                    <button @click="deleteQR('aquarium_'+member.name)" style="position:absolute;top:2px;right:calc(50% - 60px - 6px);background:rgba(0,0,0,0.5);color:white;border:none;border-radius:50%;width:20px;height:20px;font-size:10px;cursor:pointer;">✕</button>
+                  </div>
+                  <label class="card-neo w-full py-2 flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition" style="border-radius:12px;display:flex;">
+                    <span style="font-size:11px;font-weight:900;color:#1a6b8a;">{{ qrUploading==='aquarium_'+member.name ? '⏳ 上傳中...' : (memberQRCodes['aquarium_'+member.name] ? '更換' : '📷 上傳') }}</span>
+                    <input type="file" accept="image/*" style="display:none;" @change="e=>handleMemberQR(e,'aquarium_',member.name)" :disabled="qrUploading">
+                  </label>
                 </div>
-                <label class="card-neo w-full py-3 flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition" style="border-radius:16px;display:flex;">
-                  <span style="font-size:12px;font-weight:900;color:#1a6b8a;">{{ aquariumQRUploading ? '⏳ 上傳中...' : (aquariumQRCode ? '更換 QRcode' : '📷 上傳 QRcode') }}</span>
-                  <input type="file" accept="image/*" style="display:none;" @change="handleAquariumQR" :disabled="aquariumQRUploading">
-                </label>
               </div>
             </div>
 
@@ -5321,19 +5466,30 @@
       const showFlightDetail = ref(false), activeFlight = ref({}), showPasscodeModal = ref(false), passcode = ref("");
       const showHotelModal = ref(false);
       const showCarModal = ref(false);
+      const showFunpassModal = ref(false);
       const showAquariumModal = ref(false);
-      const aquariumQRCode = ref('');
-      const aquariumQRUploading = ref(false);
-      const handleAquariumQR = (e) => {
+      // 通用每人 QRcode 系統（key 格式：'aquarium_名字' / 'funpass_名字'）
+      const memberQRCodes = ref({});
+      const qrUploading = ref('');
+      const handleMemberQR = (e, prefix, memberName) => {
         const file = e.target.files[0]; if (!file) return;
+        const key = prefix + memberName;
+        qrUploading.value = key;
         const reader = new FileReader();
         reader.onload = async (ev) => {
-          aquariumQRUploading.value = true;
-          try { aquariumQRCode.value = await uploadToCloudinary(await compressImage(ev.target.result)); }
-          catch (err) { aquariumQRCode.value = await compressImage(ev.target.result, 600, 0.9); }
-          finally { aquariumQRUploading.value = false; }
+          try {
+            const url = await uploadToCloudinary(await compressImage(ev.target.result, 800, 0.9));
+            memberQRCodes.value = { ...memberQRCodes.value, [key]: url };
+          } catch(err) {
+            memberQRCodes.value = { ...memberQRCodes.value, [key]: await compressImage(ev.target.result, 600, 0.9) };
+          } finally { qrUploading.value = ''; }
         };
         reader.readAsDataURL(file);
+      };
+      const deleteQR = (key) => {
+        const obj = { ...memberQRCodes.value };
+        delete obj[key];
+        memberQRCodes.value = obj;
       };
 
       // 吸菸區
@@ -6328,7 +6484,7 @@
         if (d.allTodos      && !_locked('allTodos'))             allTodos.value             = d.allTodos;
         if (d.groupMembers  && !_locked('groupMembers'))         groupMembers.value         = d.groupMembers;
         if (d.churasunOrderNo !== undefined) churasunOrderNo.value = d.churasunOrderNo;
-        if (d.aquariumQRCode)    aquariumQRCode.value    = d.aquariumQRCode;
+        if (d.memberQRCodes)    memberQRCodes.value    = d.memberQRCodes;
         if (d.itinerary     && !_locked('itinerary'))            itinerary.value            = d.itinerary;
         if (d.kokusaiPlaces           && !_locked('kokusaiPlaces'))           kokusaiPlaces.value           = d.kokusaiPlaces;
         if (d.parcoCityPlaces         && !_locked('parcoCityPlaces'))         parcoCityPlaces.value         = d.parcoCityPlaces;
@@ -6380,7 +6536,7 @@
       watch(allTodos,     v => { _lock('allTodos',2000);     saveToFirestore('allTodos',v); }, { deep:true });
       watch(itinerary, () => { setTimeout(refreshAllTransit, 500); }, { deep: true });
       watch(itinerary,    v => { _lock('itinerary',5000);    saveToFirestore('itinerary',v); }, { deep:true });
-      watch(aquariumQRCode, v => { _lock('aquariumQRCode',2000); saveToFirestore('aquariumQRCode',v); });
+      watch(memberQRCodes, v => { _lock('memberQRCodes',2000); saveToFirestore('memberQRCodes',v); }, { deep:true });
       watch(churasunOrderNo, v => { _lock('churasunOrderNo',2000); saveToFirestore('churasunOrderNo',v); });
       watch(groupMembers,   v => { _lock('groupMembers',2000);  saveToFirestore('groupMembers',v); }, { deep:true });
       watch(kokusaiPlaces,   v => { _lock('kokusaiPlaces',2000);   saveToFirestore('kokusaiPlaces',v); }, { deep:true });
@@ -6399,7 +6555,7 @@
 
       // 任何 modal 開啟時鎖定 body 滾動
       const anyModalOpen = computed(() =>
-        showHotelModal.value || showCarModal.value || showAquariumModal.value || showChurasunModal.value || showSmokingModal.value || showCalcModal.value || showCouponModal.value || showVjwModal.value || showKokusaiModal.value || showKokusaiEdit.value || showKokusaiDetail.value || showTomariPortModal.value || showTomariPortEdit.value || showTomariPortDetail.value || showTomariPortModal.value || showTomariPortEdit.value || showTomariPortDetail.value || showChuruamiGuideModal.value || showChuruamiGuideEdit.value || showChuruamiGuideDetail.value || showRyuboModal.value || showRyuboEdit.value || showRyuboDetail.value || showRyuboModal.value || showRyuboEdit.value || showRyuboDetail.value || showRyuboModal.value || showRyuboEdit.value || showRyuboDetail.value || showAshibinaaModal.value || showAshibinaaEdit.value || showAshibinaaDetail.value || showNakagusukuModal.value || showNakagusukuEdit.value || showNakagusukuDetail.value || showAeonMallModal.value || showAeonMallEdit.value || showAeonMallDetail.value || showAmericanVillageModal.value || showAmericanVillageEdit.value || showAmericanVillageDetail.value || showKouriModal.value || showKouriEdit.value || showKouriDetail.value || showNaminoueModal.value || showNaminoueEdit.value || showNaminoueDetail.value || showParcoCityModal.value || showParcoCityEdit.value || showParcoCityDetail.value || showNaminoueModal.value || showEsimModal.value ||
+        showHotelModal.value || showCarModal.value || showFunpassModal.value || showAquariumModal.value || showChurasunModal.value || showSmokingModal.value || showCalcModal.value || showCouponModal.value || showVjwModal.value || showKokusaiModal.value || showKokusaiEdit.value || showKokusaiDetail.value || showTomariPortModal.value || showTomariPortEdit.value || showTomariPortDetail.value || showTomariPortModal.value || showTomariPortEdit.value || showTomariPortDetail.value || showChuruamiGuideModal.value || showChuruamiGuideEdit.value || showChuruamiGuideDetail.value || showRyuboModal.value || showRyuboEdit.value || showRyuboDetail.value || showRyuboModal.value || showRyuboEdit.value || showRyuboDetail.value || showRyuboModal.value || showRyuboEdit.value || showRyuboDetail.value || showAshibinaaModal.value || showAshibinaaEdit.value || showAshibinaaDetail.value || showNakagusukuModal.value || showNakagusukuEdit.value || showNakagusukuDetail.value || showAeonMallModal.value || showAeonMallEdit.value || showAeonMallDetail.value || showAmericanVillageModal.value || showAmericanVillageEdit.value || showAmericanVillageDetail.value || showKouriModal.value || showKouriEdit.value || showKouriDetail.value || showNaminoueModal.value || showNaminoueEdit.value || showNaminoueDetail.value || showParcoCityModal.value || showParcoCityEdit.value || showParcoCityDetail.value || showNaminoueModal.value || showEsimModal.value ||
         showFlightDetail.value || showPasscodeModal.value || showMemberModal.value ||
         showExpenseModal.value || showProfileModal.value || showConfirmModal.value ||
         showEditModal.value || showCropper.value || showHotelLightbox.value
@@ -6496,7 +6652,7 @@
       return {
         appLoading, loadProgress, loadingMsg, currentUser, loginAs, loginDropOpen, loginSelected, showLoginPinSheet, loggingIn, loggingOut, pendingUser, doLogin, loginPin, loginPinVerified, loginPinError, loginPinPress, profilePinPress, allTodos, onPickerScroll, scrollPickerTo, currentTab, navCollapsed, tabs, btabs, weather, weatherBg, transitCache, transitEditIdx, getTransitInfo, refreshAllTransit, calcTransit, getTransitMode, setTransitMode,  timeObj, calcInput, calcMode, calcExpr, calcDisplayVal, calcPendingOp, switchCalcMode, pressCalc, pressCalcNum, pressCalcDot, pressCalcOp, pressCalcEqual, pressCalcClear, pressCalcBackspace, calcOutput, jpyRate, jpyBuyRate, jpySellRate, rateUpdatedAt, groupMembers, showMemberModal, newMember, showUserMenu, toggleUserMenu, closeUserMenu, showProfileModal, profileEdit, profileEditing, showProfilePinEdit, openProfile, currentPinDisplay, handleProfileAvatarUpload, avatarUploading, saveProfile, logout, handleAvatarUpload, addMember, getMemberAvatar, editingMember, openEditMember, handleEditAvatarUpload, saveEditMember, showAddMember, BLANK_AVATAR, expenseSubTab, expenses, memberStats, maxPaid, settlementAdvice, showExpenseModal, openExpenseModal, addExpense, newExpense, openEditExpense, editingExpenseIdx, expenseFilterMember, filteredExpenses, itinerary, activeDay, departureTrip, returnFlights, selectedReturnFlight, hotelData, carRental, showFlightDetail, activeFlight, triggerPasscode, showPasscodeModal, passcode, pressKey, passcodeMode, scheduleSubTab, guideRegion, planningSubTab, filteredTodos: computed(() => { const key = planningSubTab.value === 'essential' ? '_shared' : currentUser.value; return (allTodos.value[key]||[]).filter(t=>t.type===planningSubTab.value); }), newTodoText, addTodo, removeTodo, categories, showEditModal, eventPhotoUploading, isNewEvent, tempEvent, openEditModal, openAddModal, deleteEvent, saveEvent, showConfirmModal, confirmItemName, confirmDelete, executeDelete, bookingSubTab, globalCurrency, toggleAllCurrency,
         previewCanvas,hotelPhotos,showHotelLightbox,openEditExpense,editingExpenseIdx,showCropper,cropSrc,cropCanvas,cropBox,openCropper,startCropDrag,confirmCrop,currentHotelPhoto,openHotelPhoto,lbTouchStart,lbTouchEnd,
-        editMode, canEdit, showHotelModal, showCarModal, showAquariumModal, aquariumQRCode, aquariumQRUploading, handleAquariumQR, showChurasunModal, churasunOrderNo, churasunOrderNo, churasunEditOrder, saveChurasunOrder, showCalcModal, showCouponModal, couponZoom, showVjwModal, showKokusaiModal, showKokusaiEdit, showKokusaiDetail, showTomariPortModal, showTomariPortDetail, showTomariPortEdit, tomariPortTab, tomariPortPlaces, tomariPortSelected, tomariPortEditIdx, tomariPortForm, tomariPortUploading, tomariPortUploadProgress, tomariPortPhotoZoom, openAddTomariPort, openEditTomariPort, saveTomariPortPlace, removeTomariPortPlace, handleTomariPortPhoto, handleTomariPortPhotoMulti, showTomariPortModal, showTomariPortDetail, showTomariPortEdit, tomariPortTab, tomariPortPlaces, tomariPortSelected, tomariPortEditIdx, tomariPortForm, tomariPortUploading, tomariPortUploadProgress, tomariPortPhotoZoom, openAddTomariPort, openEditTomariPort, saveTomariPortPlace, removeTomariPortPlace, handleTomariPortPhoto, handleTomariPortPhotoMulti, showChuruamiGuideModal, showChuruamiGuideDetail, showChuruamiGuideEdit, churuamiGuideTab, churuamiGuidePlaces, churuamiGuideSelected, churuamiGuideEditIdx, churuamiGuideForm, churuamiGuideUploading, churuamiGuideUploadProgress, churuamiGuidePhotoZoom, openAddChuruamiGuide, openEditChuruamiGuide, saveChuruamiGuidePlace, removeChuruamiGuidePlace, handleChuruamiGuidePhoto, handleChuruamiGuidePhotoMulti, showRyuboModal, showRyuboDetail, showRyuboEdit, ryuboTab, ryuboPlaces, ryuboSelected, ryuboEditIdx, ryuboForm, ryuboUploading, ryuboUploadProgress, ryuboPhotoZoom, openAddRyubo, openEditRyubo, saveRyuboPlace, removeRyuboPlace, handleRyuboPhoto, handleRyuboPhotoMulti, showRyuboModal, showRyuboDetail, showRyuboEdit, ryuboTab, ryuboPlaces, ryuboSelected, ryuboEditIdx, ryuboForm, ryuboUploading, ryuboUploadProgress, ryuboPhotoZoom, openAddRyubo, openEditRyubo, saveRyuboPlace, removeRyuboPlace, handleRyuboPhoto, handleRyuboPhotoMulti, showRyuboModal, showRyuboDetail, showRyuboEdit, ryuboTab, ryuboPlaces, ryuboSelected, ryuboEditIdx, ryuboForm, ryuboUploading, ryuboUploadProgress, ryuboPhotoZoom, openAddRyubo, openEditRyubo, saveRyuboPlace, removeRyuboPlace, handleRyuboPhoto, handleRyuboPhotoMulti, showAshibinaaModal, showAshibinaaDetail, showAshibinaaEdit, ashibinaaTab, ashibinaaPlaces, ashibinaaSelected, ashibinaaEditIdx, ashibinaaForm, ashibinaaUploading, ashibinaaUploadProgress, ashibinaaPhotoZoom, openAddAshibinaa, openEditAshibinaa, saveAshibinaaPlace, removeAshibinaaPlace, handleAshibinaaPhoto, handleAshibinaaPhotoMulti, showNakagusukuModal, showNakagusukuDetail, showNakagusukuEdit, nakagusukuTab, nakagusukuPlaces, nakagusukuSelected, nakagusukuEditIdx, nakagusukuForm, nakagusukuUploading, nakagusukuUploadProgress, nakagusukuPhotoZoom, openAddNakagusuku, openEditNakagusuku, saveNakagusukuPlace, removeNakagusukuPlace, handleNakagusukuPhoto, handleNakagusukuPhotoMulti, showAeonMallModal, showAeonMallDetail, showAeonMallEdit, aeonMallTab, aeonMallPlaces, aeonMallSelected, aeonMallEditIdx, aeonMallForm, aeonMallUploading, aeonMallUploadProgress, aeonMallPhotoZoom, openAddAeonMall, openEditAeonMall, saveAeonMallPlace, removeAeonMallPlace, handleAeonMallPhoto, handleAeonMallPhotoMulti, showAmericanVillageModal, showAmericanVillageDetail, showAmericanVillageEdit, americanVillageTab, americanVillagePlaces, americanVillageSelected, americanVillageEditIdx, americanVillageForm, americanVillageUploading, openAddAmericanVillage, openEditAmericanVillage, saveAmericanVillagePlace, removeAmericanVillagePlace, handleAmericanVillagePhoto, handleAmericanVillagePhotoMulti, americanVillageUploadProgress, showKouriModal, showKouriDetail, showKouriEdit, kouriTab, kouriPlaces, kouriSelected, kouriEditIdx, kouriForm, kouriUploading, openAddKouri, openEditKouri, saveKouriPlace, removeKouriPlace, handleKouriPhoto, handleKouriPhotoMulti, kouriUploadProgress, showNaminoueModal, showNaminoueDetail, showNaminoueEdit, naminoueTab, naminouePlaces, naminoueSelected, naminoueEditIdx, naminoueForm, naminoueUploading, openAddNaminoue, openEditNaminoue, saveNaminouePlace, removeNaminouePlace, handleNaminouePhoto, handleNaminouePhotoMulti, naminoueUploadProgress, showParcoCityModal, showParcoCityDetail, showParcoCityEdit, showNaminoueModal, parcoCityTab, parcoCityPlaces, parcoCitySelected, parcoCityEditIdx, parcoCityForm, parcoCityUploading, openAddParcoCity, openEditParcoCity, saveParcoCityPlace, removeParcoCityPlace, handleParcoCityPhoto, handleParcoCityPhotoMulti, parcoCityUploadProgress, kokusaiSelected, kokusaiSelectedIdx, kokusaiTab, kokusaiPlaces, kokusaiEditIdx, kokusaiForm, openAddKokusai, openEditKokusai, saveKokusai, removeKokusai, handleKokusaiPhoto, handleKokusaiPhotoMulti, kokusaiUploadProgress, kokusaiUploading, kokusaiPhotoZoom, parcoCityPhotoZoom, naminouePhotoZoom, kouriPhotoZoom, americanVillagePhotoZoom, showEsimModal, showSmokingModal, smokingLat, smokingLng, smokingLocating, smokingMapSrc, openSmokingFinder, getSmokingLocation, aquariumPhotos, handleAquariumPhoto, openHotelModal, openCarModal, isAdmin,
+        editMode, canEdit, showHotelModal, showCarModal, showFunpassModal, showAquariumModal, memberQRCodes, qrUploading, handleMemberQR, deleteQR, showChurasunModal, churasunOrderNo, churasunOrderNo, churasunEditOrder, saveChurasunOrder, showCalcModal, showCouponModal, couponZoom, showVjwModal, showKokusaiModal, showKokusaiEdit, showKokusaiDetail, showTomariPortModal, showTomariPortDetail, showTomariPortEdit, tomariPortTab, tomariPortPlaces, tomariPortSelected, tomariPortEditIdx, tomariPortForm, tomariPortUploading, tomariPortUploadProgress, tomariPortPhotoZoom, openAddTomariPort, openEditTomariPort, saveTomariPortPlace, removeTomariPortPlace, handleTomariPortPhoto, handleTomariPortPhotoMulti, showTomariPortModal, showTomariPortDetail, showTomariPortEdit, tomariPortTab, tomariPortPlaces, tomariPortSelected, tomariPortEditIdx, tomariPortForm, tomariPortUploading, tomariPortUploadProgress, tomariPortPhotoZoom, openAddTomariPort, openEditTomariPort, saveTomariPortPlace, removeTomariPortPlace, handleTomariPortPhoto, handleTomariPortPhotoMulti, showChuruamiGuideModal, showChuruamiGuideDetail, showChuruamiGuideEdit, churuamiGuideTab, churuamiGuidePlaces, churuamiGuideSelected, churuamiGuideEditIdx, churuamiGuideForm, churuamiGuideUploading, churuamiGuideUploadProgress, churuamiGuidePhotoZoom, openAddChuruamiGuide, openEditChuruamiGuide, saveChuruamiGuidePlace, removeChuruamiGuidePlace, handleChuruamiGuidePhoto, handleChuruamiGuidePhotoMulti, showRyuboModal, showRyuboDetail, showRyuboEdit, ryuboTab, ryuboPlaces, ryuboSelected, ryuboEditIdx, ryuboForm, ryuboUploading, ryuboUploadProgress, ryuboPhotoZoom, openAddRyubo, openEditRyubo, saveRyuboPlace, removeRyuboPlace, handleRyuboPhoto, handleRyuboPhotoMulti, showRyuboModal, showRyuboDetail, showRyuboEdit, ryuboTab, ryuboPlaces, ryuboSelected, ryuboEditIdx, ryuboForm, ryuboUploading, ryuboUploadProgress, ryuboPhotoZoom, openAddRyubo, openEditRyubo, saveRyuboPlace, removeRyuboPlace, handleRyuboPhoto, handleRyuboPhotoMulti, showRyuboModal, showRyuboDetail, showRyuboEdit, ryuboTab, ryuboPlaces, ryuboSelected, ryuboEditIdx, ryuboForm, ryuboUploading, ryuboUploadProgress, ryuboPhotoZoom, openAddRyubo, openEditRyubo, saveRyuboPlace, removeRyuboPlace, handleRyuboPhoto, handleRyuboPhotoMulti, showAshibinaaModal, showAshibinaaDetail, showAshibinaaEdit, ashibinaaTab, ashibinaaPlaces, ashibinaaSelected, ashibinaaEditIdx, ashibinaaForm, ashibinaaUploading, ashibinaaUploadProgress, ashibinaaPhotoZoom, openAddAshibinaa, openEditAshibinaa, saveAshibinaaPlace, removeAshibinaaPlace, handleAshibinaaPhoto, handleAshibinaaPhotoMulti, showNakagusukuModal, showNakagusukuDetail, showNakagusukuEdit, nakagusukuTab, nakagusukuPlaces, nakagusukuSelected, nakagusukuEditIdx, nakagusukuForm, nakagusukuUploading, nakagusukuUploadProgress, nakagusukuPhotoZoom, openAddNakagusuku, openEditNakagusuku, saveNakagusukuPlace, removeNakagusukuPlace, handleNakagusukuPhoto, handleNakagusukuPhotoMulti, showAeonMallModal, showAeonMallDetail, showAeonMallEdit, aeonMallTab, aeonMallPlaces, aeonMallSelected, aeonMallEditIdx, aeonMallForm, aeonMallUploading, aeonMallUploadProgress, aeonMallPhotoZoom, openAddAeonMall, openEditAeonMall, saveAeonMallPlace, removeAeonMallPlace, handleAeonMallPhoto, handleAeonMallPhotoMulti, showAmericanVillageModal, showAmericanVillageDetail, showAmericanVillageEdit, americanVillageTab, americanVillagePlaces, americanVillageSelected, americanVillageEditIdx, americanVillageForm, americanVillageUploading, openAddAmericanVillage, openEditAmericanVillage, saveAmericanVillagePlace, removeAmericanVillagePlace, handleAmericanVillagePhoto, handleAmericanVillagePhotoMulti, americanVillageUploadProgress, showKouriModal, showKouriDetail, showKouriEdit, kouriTab, kouriPlaces, kouriSelected, kouriEditIdx, kouriForm, kouriUploading, openAddKouri, openEditKouri, saveKouriPlace, removeKouriPlace, handleKouriPhoto, handleKouriPhotoMulti, kouriUploadProgress, showNaminoueModal, showNaminoueDetail, showNaminoueEdit, naminoueTab, naminouePlaces, naminoueSelected, naminoueEditIdx, naminoueForm, naminoueUploading, openAddNaminoue, openEditNaminoue, saveNaminouePlace, removeNaminouePlace, handleNaminouePhoto, handleNaminouePhotoMulti, naminoueUploadProgress, showParcoCityModal, showParcoCityDetail, showParcoCityEdit, showNaminoueModal, parcoCityTab, parcoCityPlaces, parcoCitySelected, parcoCityEditIdx, parcoCityForm, parcoCityUploading, openAddParcoCity, openEditParcoCity, saveParcoCityPlace, removeParcoCityPlace, handleParcoCityPhoto, handleParcoCityPhotoMulti, parcoCityUploadProgress, kokusaiSelected, kokusaiSelectedIdx, kokusaiTab, kokusaiPlaces, kokusaiEditIdx, kokusaiForm, openAddKokusai, openEditKokusai, saveKokusai, removeKokusai, handleKokusaiPhoto, handleKokusaiPhotoMulti, kokusaiUploadProgress, kokusaiUploading, kokusaiPhotoZoom, parcoCityPhotoZoom, naminouePhotoZoom, kouriPhotoZoom, americanVillagePhotoZoom, showEsimModal, showSmokingModal, smokingLat, smokingLng, smokingLocating, smokingMapSrc, openSmokingFinder, getSmokingLocation, aquariumPhotos, handleAquariumPhoto, openHotelModal, openCarModal, isAdmin,
         getCategoryColor: (t) => ({ transport: 'bg-[#D94F4F]', spot: 'bg-[#98BDE3]', food: 'bg-[#E3A97C]', other: 'bg-[#C4A8D4]' }[t] || 'bg-[#DCC3A0]'),
         categoryDot: (id) => ({ spot:'#98BDE3', food:'#E3A97C', transport:'#D94F4F', other:'#C4A8D4' }[id] || '#DCC3A0'),
         categoryStyle: (id, active) => {
