@@ -631,7 +631,7 @@
     <!-- Modal: 吸菸區 -->
 
         <!-- 版本號 -->
-        <p style="font-size:9px;opacity:0.2;text-align:center;padding:8px 0 4px;letter-spacing:0.1em;">v1.24.10</p>
+        <p style="font-size:9px;opacity:0.2;text-align:center;padding:8px 0 4px;letter-spacing:0.1em;">v1.48.10</p>
 
       </section>
 
@@ -1044,7 +1044,7 @@
       <section v-if="currentTab === 'expense'" class="fade-in space-y-6 relative pb-48 font-black">
         <!-- 新增記帳按鈕置頂 -->
         <button @click="openExpenseModal" class="w-full py-4 rounded-3xl font-black text-base active:scale-95 transition" style="background:linear-gradient(145deg,#8ec4a1,#5a9070);color:white;box-shadow:-3px -3px 8px rgba(255,255,255,0.3),5px 5px 14px rgba(45,85,60,0.4);border:none;letter-spacing:0.12em;">＋ 新增記帳</button>
-        <div class="tab-bar sticky top-24 z-30" style="display:flex;">
+        <div class="tab-bar" style="display:flex;">
           <div class="tab-slider-pill" :style="{ width:'50%', transform: 'translateX('+(expenseSubTab==='history'?'0%':'100%')+')' }"></div>
           <button @click="expenseSubTab = 'history'" :class="['tab-btn', expenseSubTab === 'history' ? 'active' : 'inactive']">明細 🧾</button>
           <button @click="expenseSubTab = 'summary'" :class="['tab-btn', expenseSubTab === 'summary' ? 'active' : 'inactive']">結算 📊</button>
