@@ -181,6 +181,8 @@
     .day-btn-off { background:var(--bg-raised); box-shadow:var(--neo-out); border:var(--br); color:var(--tan); }
     .blue-pill .tab-slider-pill { background:linear-gradient(145deg,#60a5fa,#2563eb); box-shadow:-2px -2px 6px rgba(255,255,255,0.25),4px 4px 10px rgba(30,64,175,0.4); }
     .blue-pill .tab-btn.active { color:white; }
+    .coupon-pill .tab-slider-pill { background:linear-gradient(145deg,#e8443a,#b71c1c); box-shadow:-2px -2px 6px rgba(255,255,255,0.2),3px 3px 8px rgba(183,28,28,0.4); }
+    .coupon-pill .tab-btn.active { color:white; }
     .kokusai-pill .tab-slider-pill { background:linear-gradient(145deg,#5a9070,#3a6a50); box-shadow:-2px -2px 6px rgba(255,255,255,0.2),3px 3px 8px rgba(160,100,0,0.4); }
     .kokusai-pill .tab-btn.active { color:white; }
     .parcoCity-pill .tab-slider-pill { background:linear-gradient(145deg,#5a9070,#3a6a50); box-shadow:-2px -2px 6px rgba(255,255,255,0.2),3px 3px 8px rgba(160,100,0,0.4); }
@@ -1308,21 +1310,27 @@
     <transition name="slide-up">
       <div v-if="showCouponModal" class="fixed inset-0 z-[1500] flex flex-col justify-end font-black" style="padding-bottom:0;height:100dvh;">
         <div class="absolute inset-0" style="background:rgba(20,10,10,0.82);backdrop-filter:blur(6px);" @click="showCouponModal=false"></div>
-        <div class="relative card-neo-xl overflow-hidden" style="border-radius:40px 40px 0 0;max-height:88dvh;display:flex;flex-direction:column;padding-bottom:env(safe-area-inset-bottom,0px);">
+        <div class="relative card-neo-xl overflow-hidden" style="border-radius:40px 40px 0 0;height:88dvh;display:flex;flex-direction:column;padding-bottom:env(safe-area-inset-bottom,0px);">
           <!-- Header -->
-          <div style="background:linear-gradient(145deg,#b71c1c,#e8443a);padding:28px 28px 22px;flex-shrink:0;">
+          <div style="background:linear-gradient(145deg,#b71c1c,#e8443a);padding:24px 24px 16px;flex-shrink:0;">
             <p style="font-size:10px;letter-spacing:0.4em;text-transform:uppercase;color:rgba(255,255,255,0.6);margin-bottom:6px;">Discount Coupons</p>
             <p style="font-size:26px;font-weight:900;color:white;line-height:1.1;">🎟 各類優惠券</p>
-
+          </div>
+          <!-- 分類 Tab -->
+          <div style="padding:12px 16px 0;flex-shrink:0;">
+            <div class="tab-bar coupon-pill" style="display:flex;">
+              <div class="tab-slider-pill" style="width:25%;" :style="{ transform: 'translateX('+(couponTab==='electronics'?'0%':couponTab==='drug'?'100%':couponTab==='general'?'200%':'300%')+')' }"></div>
+              <button @click="couponTab='electronics'" :class="['tab-btn text-xs', couponTab==='electronics'?'active':'inactive']">🔌 家電</button>
+              <button @click="couponTab='drug'"        :class="['tab-btn text-xs', couponTab==='drug'       ?'active':'inactive']">💊 藥妝</button>
+              <button @click="couponTab='general'"     :class="['tab-btn text-xs', couponTab==='general'    ?'active':'inactive']">🏬 百貨</button>
+              <button @click="couponTab='sports'"      :class="['tab-btn text-xs', couponTab==='sports'     ?'active':'inactive']">⛷️ 運動</button>
+            </div>
           </div>
           <!-- 內容 -->
-          <div style="overflow-y:auto;padding:20px 20px 12px;flex:1;display:flex;flex-direction:column;gap:16px;">
+          <div style="overflow-y:auto;padding:16px 20px 12px;flex:1;display:flex;flex-direction:column;gap:14px;">
 
-                        <div style="display:flex;align-items:center;gap:10px;margin:4px 0;">
-              <div style="flex:1;height:1px;background:rgba(220,195,160,0.3);"></div>
-              <span style="font-size:9px;font-weight:900;letter-spacing:0.2em;text-transform:uppercase;color:#4A7DAE;">🔌 家電</span>
-              <div style="flex:1;height:1px;background:rgba(220,195,160,0.3);"></div>
-            </div>
+            <!-- 家電 -->
+            <template v-if="couponTab==='electronics'">
             <div style="background:var(--bg-raised);border-radius:24px;box-shadow:var(--neo-out);border:var(--br);">
               <div style="padding:14px 16px 12px;border-bottom:1px solid rgba(220,195,160,0.2);">
                 <p style="font-size:13px;font-weight:900;color:var(--text);">🏪 BicCamera / KOJIMA</p>
@@ -1331,8 +1339,8 @@
                 <img src="./images/coupon-biccamera.jpg" style="width:100%;max-width:100%;border-radius:16px;display:block;cursor:zoom-in;" @click="couponZoom='./images/coupon-biccamera.jpg'">
               </div>
               <div style="padding:0 12px 12px;">
-                <div style="display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;border-radius:14px;background:rgba(92,122,106,0.08);border:1px solid rgba(92,122,106,0.2);">
-                  <span style="font-size:10px;font-weight:900;color:var(--green);">📱 請直接出示此圖</span>
+                <div style="display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;border-radius:14px;background:rgba(232,68,58,0.08);border:1px solid rgba(232,68,58,0.2);">
+                  <span style="font-size:10px;font-weight:900;color:#e8443a;">📱 請直接出示此圖</span>
                 </div>
               </div>
             </div>
@@ -1344,8 +1352,8 @@
                 <img src="./images/coupon-edion.jpg" style="width:100%;max-width:100%;border-radius:16px;display:block;cursor:zoom-in;" @click="couponZoom='./images/coupon-edion.jpg'">
               </div>
               <div style="padding:0 12px 12px;">
-                <div style="display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;border-radius:14px;background:rgba(92,122,106,0.08);border:1px solid rgba(92,122,106,0.2);">
-                  <span style="font-size:10px;font-weight:900;color:var(--green);">📱 請直接出示此圖</span>
+                <div style="display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;border-radius:14px;background:rgba(232,68,58,0.08);border:1px solid rgba(232,68,58,0.2);">
+                  <span style="font-size:10px;font-weight:900;color:#e8443a;">📱 請直接出示此圖</span>
                 </div>
               </div>
             </div>
@@ -1357,16 +1365,14 @@
                 <img src="./images/coupon-yamada.jpg" style="width:100%;max-width:100%;border-radius:16px;display:block;cursor:zoom-in;" @click="couponZoom='./images/coupon-yamada.jpg'">
               </div>
               <div style="padding:0 12px 12px;">
-                <div style="display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;border-radius:14px;background:rgba(92,122,106,0.08);border:1px solid rgba(92,122,106,0.2);">
-                  <span style="font-size:10px;font-weight:900;color:var(--green);">📱 請直接出示此圖</span>
+                <div style="display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;border-radius:14px;background:rgba(232,68,58,0.08);border:1px solid rgba(232,68,58,0.2);">
+                  <span style="font-size:10px;font-weight:900;color:#e8443a;">📱 請直接出示此圖</span>
                 </div>
               </div>
             </div>
-                        <div style="display:flex;align-items:center;gap:10px;margin:4px 0;">
-              <div style="flex:1;height:1px;background:rgba(220,195,160,0.3);"></div>
-              <span style="font-size:9px;font-weight:900;letter-spacing:0.2em;text-transform:uppercase;color:#c0392b;">💊 藥妝</span>
-              <div style="flex:1;height:1px;background:rgba(220,195,160,0.3);"></div>
-            </div>
+            </template>
+            <!-- 藥妝 -->
+            <template v-if="couponTab==='drug'">
             <div style="background:var(--bg-raised);border-radius:24px;box-shadow:var(--neo-out);border:var(--br);">
               <div style="padding:14px 16px 12px;border-bottom:1px solid rgba(220,195,160,0.2);">
                 <p style="font-size:13px;font-weight:900;color:var(--text);">💊 Matsumoto Kiyoshi 松本清</p>
@@ -1375,8 +1381,8 @@
                 <img src="./images/coupon-matsumoto.jpg" style="width:100%;max-width:100%;border-radius:16px;display:block;cursor:zoom-in;" @click="couponZoom='./images/coupon-matsumoto.jpg'">
               </div>
               <div style="padding:0 12px 12px;">
-                <div style="display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;border-radius:14px;background:rgba(92,122,106,0.08);border:1px solid rgba(92,122,106,0.2);">
-                  <span style="font-size:10px;font-weight:900;color:var(--green);">📱 請直接出示此圖</span>
+                <div style="display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;border-radius:14px;background:rgba(232,68,58,0.08);border:1px solid rgba(232,68,58,0.2);">
+                  <span style="font-size:10px;font-weight:900;color:#e8443a;">📱 請直接出示此圖</span>
                 </div>
               </div>
             </div>
@@ -1388,16 +1394,14 @@
                 <img src="./images/coupon-daikoku.jpg" style="width:100%;max-width:100%;border-radius:16px;display:block;cursor:zoom-in;" @click="couponZoom='./images/coupon-daikoku.jpg'">
               </div>
               <div style="padding:0 12px 12px;">
-                <div style="display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;border-radius:14px;background:rgba(92,122,106,0.08);border:1px solid rgba(92,122,106,0.2);">
-                  <span style="font-size:10px;font-weight:900;color:var(--green);">📱 請直接出示此圖</span>
+                <div style="display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;border-radius:14px;background:rgba(232,68,58,0.08);border:1px solid rgba(232,68,58,0.2);">
+                  <span style="font-size:10px;font-weight:900;color:#e8443a;">📱 請直接出示此圖</span>
                 </div>
               </div>
             </div>
-                        <div style="display:flex;align-items:center;gap:10px;margin:4px 0;">
-              <div style="flex:1;height:1px;background:rgba(220,195,160,0.3);"></div>
-              <span style="font-size:9px;font-weight:900;letter-spacing:0.2em;text-transform:uppercase;color:#5a9070;">🏬 百貨 / 綜合</span>
-              <div style="flex:1;height:1px;background:rgba(220,195,160,0.3);"></div>
-            </div>
+            </template>
+            <!-- 百貨 -->
+            <template v-if="couponTab==='general'">
             <div style="background:var(--bg-raised);border-radius:24px;box-shadow:var(--neo-out);border:var(--br);">
               <div style="padding:14px 16px 12px;border-bottom:1px solid rgba(220,195,160,0.2);">
                 <p style="font-size:13px;font-weight:900;color:var(--text);">🐧 Don Quijote 唐吉訶德</p>
@@ -1427,6 +1431,25 @@
               </div>
             </div>
 
+            </template>
+            <!-- 運動 -->
+            <template v-if="couponTab==='sports'">
+            <div style="background:var(--bg-raised);border-radius:24px;box-shadow:var(--neo-out);border:var(--br);">
+                <div style="padding:14px 16px 12px;border-bottom:1px solid rgba(220,195,160,0.2);">
+                  <p style="font-size:13px;font-weight:900;color:var(--text);">⛷️ Sports Depo / Alpen Outdoors / Golf5</p>
+                  <p style="font-size:9px;opacity:0.45;margin-top:3px;">使用期限：2026/12/31・Code: 009C</p>
+                </div>
+                <div style="padding:12px;">
+                  <img src="./images/coupon_alpen.jpg" style="width:100%;max-width:100%;border-radius:16px;display:block;cursor:zoom-in;" @click="couponZoom='./images/coupon_alpen.jpg'">
+                </div>
+                <div style="padding:0 12px 12px;">
+                  <div style="display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;border-radius:14px;background:rgba(232,68,58,0.08);border:1px solid rgba(232,68,58,0.2);">
+                    <span style="font-size:10px;font-weight:900;color:#e8443a;">📱 請直接出示此圖</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            </template>
           </div>
 
                     <!-- 放大圖片 lightbox -->
@@ -4903,9 +4926,12 @@
           try {
             const compressed = await compressImage(ev.target.result, 400, 0.85);
             const url = await uploadToCloudinary(compressed);
-            profileEdit.value.avatar = url;
+            profileEdit.value = { ...profileEdit.value, avatar: url };
           } catch(err) {
-            profileEdit.value.avatar = await compressImage(ev.target.result, 300, 0.7);
+            alert('頭貼上傳失敗：' + err.message);
+            try {
+              profileEdit.value = { ...profileEdit.value, avatar: await compressImage(ev.target.result, 300, 0.7) };
+            } catch(e2) {}
           } finally {
             avatarUploading.value = false;
           }
@@ -4913,23 +4939,26 @@
         r.readAsDataURL(f);
       };
       const saveProfile = () => {
-        // 儲存 PIN
+        // PIN 在 splice 時一起處理
         if (profileEdit.value.pin && profileEdit.value.pin.length === 4) {
-          const pinIdx = groupMembers.value.findIndex(m => m.name === currentUser.value);
-          if (pinIdx !== -1) {
-            groupMembers.value[pinIdx].pinHash = hashPin(currentUser.value, profileEdit.value.pin);
-            groupMembers.value[pinIdx].pinPlain = profileEdit.value.pin; // 明文供本人查看
-          }
           localStorage.removeItem('okinawa_pin_' + currentUser.value);
         }
         const idx = groupMembers.value.findIndex(m => m.name === currentUser.value);
         if(idx !== -1) {
           const oldName = currentUser.value;
           // 用 splice 替換整個 member 物件，確保 Vue watch 觸發
-          const updated = { ...groupMembers.value[idx],
+          const updated = {
+            ...groupMembers.value[idx],
             name: profileEdit.value.name,
             avatar: profileEdit.value.avatar,
+            pinHash: groupMembers.value[idx].pinHash,
+            pinPlain: groupMembers.value[idx].pinPlain,
           };
+          // PIN 已在上方更新，一起帶入
+          if (profileEdit.value.pin && profileEdit.value.pin.length === 4) {
+            updated.pinHash = hashPin(profileEdit.value.name, profileEdit.value.pin);
+            updated.pinPlain = profileEdit.value.pin;
+          }
           groupMembers.value.splice(idx, 1, updated);
           // 更新 currentUser
           currentUser.value = profileEdit.value.name;
@@ -4950,6 +4979,9 @@
             }));
           }
         }
+        // 強制寫入 Firestore，不等 watch
+        _lock('groupMembers', 3000);
+        saveToFirestore('groupMembers', groupMembers.value);
         showProfileModal.value = false;
       };
       const addMember = () => { if(newMember.value.name){ groupMembers.value.push({...newMember.value}); newMember.value = {name:'', avatar: BLANK_AVATAR}; showAddMember.value = false; } };
@@ -5640,6 +5672,7 @@
       };
       const showCalcModal = ref(false);
       const showCouponModal = ref(false);
+      const couponTab = ref('electronics');
       const couponZoom = ref(null);
       const showVjwModal = ref(false);
       const showKokusaiModal = ref(false);
@@ -6765,7 +6798,7 @@
       return {
         appLoading, loadProgress, loadingMsg, currentUser, loginAs, loginDropOpen, loginSelected, showLoginPinSheet, loggingIn, loggingOut, pendingUser, doLogin, loginPin, loginPinVerified, loginPinError, loginPinPress, profilePinPress, allTodos, onPickerScroll, scrollPickerTo, currentTab, navCollapsed, tabs, btabs, weather, weatherBg, transitCache, transitEditIdx, getTransitInfo, refreshAllTransit, calcTransit, getTransitMode, setTransitMode,  timeObj, calcInput, calcMode, calcExpr, calcDisplayVal, calcPendingOp, switchCalcMode, pressCalc, pressCalcNum, pressCalcDot, pressCalcOp, pressCalcEqual, pressCalcClear, pressCalcBackspace, calcOutput, jpyRate, jpyBuyRate, jpySellRate, rateUpdatedAt, groupMembers, showMemberModal, newMember, showUserMenu, toggleUserMenu, closeUserMenu, showProfileModal, profileEdit, profileEditing, showProfilePinEdit, openProfile, currentPinDisplay, handleProfileAvatarUpload, avatarUploading, saveProfile, logout, handleAvatarUpload, addMember, getMemberAvatar, editingMember, openEditMember, handleEditAvatarUpload, saveEditMember, showAddMember, BLANK_AVATAR, expenseSubTab, expenses, memberStats, maxPaid, settlementAdvice, showExpenseModal, openExpenseModal, addExpense, newExpense, openEditExpense, editingExpenseIdx, expenseFilterMember, filteredExpenses, itinerary, activeDay, departureTrip, returnFlights, selectedReturnFlight, hotelData, carRental, showFlightDetail, activeFlight, triggerPasscode, showPasscodeModal, passcode, pressKey, passcodeMode, scheduleSubTab, guideRegion, planningSubTab, filteredTodos: computed(() => { const key = planningSubTab.value === 'essential' ? '_shared' : currentUser.value; return (allTodos.value[key]||[]).filter(t=>t.type===planningSubTab.value); }), newTodoText, addTodo, removeTodo, categories, showEditModal, eventPhotoUploading, isNewEvent, tempEvent, openEditModal, openAddModal, deleteEvent, saveEvent, showConfirmModal, confirmItemName, confirmDelete, executeDelete, bookingSubTab, globalCurrency, toggleAllCurrency,
         previewCanvas,hotelPhotos,showHotelLightbox,openEditExpense,editingExpenseIdx,showCropper,cropSrc,cropCanvas,cropBox,openCropper,startCropDrag,confirmCrop,currentHotelPhoto,openHotelPhoto,lbTouchStart,lbTouchEnd,
-        editMode, canEdit, showHotelModal, showCarModal, showFunpassModal, showAquariumModal, memberQRCodes, qrUploading, handleMemberQR, deleteQR, qrZoom, showQRCropper, qrCropSrc, qrCropCanvas, qrCropBox, openQRCropper, startQRCropDrag, confirmQRCrop, showChurasunModal, churasunOrderNo, churasunOrderNo, churasunEditOrder, saveChurasunOrder, showCalcModal, showCouponModal, couponZoom, showVjwModal, showKokusaiModal, showKokusaiEdit, showKokusaiDetail, showTomariPortModal, showTomariPortDetail, showTomariPortEdit, tomariPortTab, tomariPortPlaces, tomariPortSelected, tomariPortEditIdx, tomariPortForm, tomariPortUploading, tomariPortUploadProgress, tomariPortPhotoZoom, openAddTomariPort, openEditTomariPort, saveTomariPortPlace, removeTomariPortPlace, handleTomariPortPhoto, handleTomariPortPhotoMulti, showChuruamiGuideModal, showChuruamiGuideDetail, showChuruamiGuideEdit, churuamiGuideTab, churuamiGuidePlaces, churuamiGuideSelected, churuamiGuideEditIdx, churuamiGuideForm, churuamiGuideUploading, churuamiGuideUploadProgress, churuamiGuidePhotoZoom, openAddChuruamiGuide, openEditChuruamiGuide, saveChuruamiGuidePlace, removeChuruamiGuidePlace, handleChuruamiGuidePhoto, handleChuruamiGuidePhotoMulti, showRyuboModal, showRyuboDetail, showRyuboEdit, ryuboTab, ryuboPlaces, ryuboSelected, ryuboEditIdx, ryuboForm, ryuboUploading, ryuboUploadProgress, ryuboPhotoZoom, openAddRyubo, openEditRyubo, saveRyuboPlace, removeRyuboPlace, handleRyuboPhoto, handleRyuboPhotoMulti, showAshibinaaModal, showAshibinaaDetail, showAshibinaaEdit, ashibinaaTab, ashibinaaPlaces, ashibinaaSelected, ashibinaaEditIdx, ashibinaaForm, ashibinaaUploading, ashibinaaUploadProgress, ashibinaaPhotoZoom, openAddAshibinaa, openEditAshibinaa, saveAshibinaaPlace, removeAshibinaaPlace, handleAshibinaaPhoto, handleAshibinaaPhotoMulti, showNakagusukuModal, showNakagusukuDetail, showNakagusukuEdit, nakagusukuTab, nakagusukuPlaces, nakagusukuSelected, nakagusukuEditIdx, nakagusukuForm, nakagusukuUploading, nakagusukuUploadProgress, nakagusukuPhotoZoom, openAddNakagusuku, openEditNakagusuku, saveNakagusukuPlace, removeNakagusukuPlace, handleNakagusukuPhoto, handleNakagusukuPhotoMulti, showAeonMallModal, showAeonMallDetail, showAeonMallEdit, aeonMallTab, aeonMallPlaces, aeonMallSelected, aeonMallEditIdx, aeonMallForm, aeonMallUploading, aeonMallUploadProgress, aeonMallPhotoZoom, openAddAeonMall, openEditAeonMall, saveAeonMallPlace, removeAeonMallPlace, handleAeonMallPhoto, handleAeonMallPhotoMulti, showAmericanVillageModal, showAmericanVillageDetail, showAmericanVillageEdit, americanVillageTab, americanVillagePlaces, americanVillageSelected, americanVillageEditIdx, americanVillageForm, americanVillageUploading, openAddAmericanVillage, openEditAmericanVillage, saveAmericanVillagePlace, removeAmericanVillagePlace, handleAmericanVillagePhoto, handleAmericanVillagePhotoMulti, americanVillageUploadProgress, showKouriModal, showKouriDetail, showKouriEdit, kouriTab, kouriPlaces, kouriSelected, kouriEditIdx, kouriForm, kouriUploading, openAddKouri, openEditKouri, saveKouriPlace, removeKouriPlace, handleKouriPhoto, handleKouriPhotoMulti, kouriUploadProgress, showNaminoueModal, showNaminoueDetail, showNaminoueEdit, naminoueTab, naminouePlaces, naminoueSelected, naminoueEditIdx, naminoueForm, naminoueUploading, openAddNaminoue, openEditNaminoue, saveNaminouePlace, removeNaminouePlace, handleNaminouePhoto, handleNaminouePhotoMulti, naminoueUploadProgress, showParcoCityModal, showParcoCityDetail, showParcoCityEdit, showNaminoueModal, parcoCityTab, parcoCityPlaces, parcoCitySelected, parcoCityEditIdx, parcoCityForm, parcoCityUploading, openAddParcoCity, openEditParcoCity, saveParcoCityPlace, removeParcoCityPlace, handleParcoCityPhoto, handleParcoCityPhotoMulti, parcoCityUploadProgress, kokusaiSelected, kokusaiSelectedIdx, kokusaiTab, kokusaiPlaces, kokusaiEditIdx, kokusaiForm, openAddKokusai, openEditKokusai, saveKokusai, removeKokusai, handleKokusaiPhoto, handleKokusaiPhotoMulti, kokusaiUploadProgress, kokusaiUploading, kokusaiPhotoZoom, parcoCityPhotoZoom, naminouePhotoZoom, kouriPhotoZoom, americanVillagePhotoZoom, showEsimModal, showSmokingModal, smokingLat, smokingLng, smokingLocating, smokingMapSrc, openSmokingFinder, getSmokingLocation, aquariumPhotos, handleAquariumPhoto, openHotelModal, openCarModal, isAdmin,
+        editMode, canEdit, showHotelModal, showCarModal, showFunpassModal, showAquariumModal, memberQRCodes, qrUploading, handleMemberQR, deleteQR, qrZoom, showQRCropper, qrCropSrc, qrCropCanvas, qrCropBox, openQRCropper, startQRCropDrag, confirmQRCrop, showChurasunModal, churasunOrderNo, churasunOrderNo, churasunEditOrder, saveChurasunOrder, showCalcModal, showCouponModal, couponTab, couponZoom, showVjwModal, showKokusaiModal, showKokusaiEdit, showKokusaiDetail, showTomariPortModal, showTomariPortDetail, showTomariPortEdit, tomariPortTab, tomariPortPlaces, tomariPortSelected, tomariPortEditIdx, tomariPortForm, tomariPortUploading, tomariPortUploadProgress, tomariPortPhotoZoom, openAddTomariPort, openEditTomariPort, saveTomariPortPlace, removeTomariPortPlace, handleTomariPortPhoto, handleTomariPortPhotoMulti, showChuruamiGuideModal, showChuruamiGuideDetail, showChuruamiGuideEdit, churuamiGuideTab, churuamiGuidePlaces, churuamiGuideSelected, churuamiGuideEditIdx, churuamiGuideForm, churuamiGuideUploading, churuamiGuideUploadProgress, churuamiGuidePhotoZoom, openAddChuruamiGuide, openEditChuruamiGuide, saveChuruamiGuidePlace, removeChuruamiGuidePlace, handleChuruamiGuidePhoto, handleChuruamiGuidePhotoMulti, showRyuboModal, showRyuboDetail, showRyuboEdit, ryuboTab, ryuboPlaces, ryuboSelected, ryuboEditIdx, ryuboForm, ryuboUploading, ryuboUploadProgress, ryuboPhotoZoom, openAddRyubo, openEditRyubo, saveRyuboPlace, removeRyuboPlace, handleRyuboPhoto, handleRyuboPhotoMulti, showAshibinaaModal, showAshibinaaDetail, showAshibinaaEdit, ashibinaaTab, ashibinaaPlaces, ashibinaaSelected, ashibinaaEditIdx, ashibinaaForm, ashibinaaUploading, ashibinaaUploadProgress, ashibinaaPhotoZoom, openAddAshibinaa, openEditAshibinaa, saveAshibinaaPlace, removeAshibinaaPlace, handleAshibinaaPhoto, handleAshibinaaPhotoMulti, showNakagusukuModal, showNakagusukuDetail, showNakagusukuEdit, nakagusukuTab, nakagusukuPlaces, nakagusukuSelected, nakagusukuEditIdx, nakagusukuForm, nakagusukuUploading, nakagusukuUploadProgress, nakagusukuPhotoZoom, openAddNakagusuku, openEditNakagusuku, saveNakagusukuPlace, removeNakagusukuPlace, handleNakagusukuPhoto, handleNakagusukuPhotoMulti, showAeonMallModal, showAeonMallDetail, showAeonMallEdit, aeonMallTab, aeonMallPlaces, aeonMallSelected, aeonMallEditIdx, aeonMallForm, aeonMallUploading, aeonMallUploadProgress, aeonMallPhotoZoom, openAddAeonMall, openEditAeonMall, saveAeonMallPlace, removeAeonMallPlace, handleAeonMallPhoto, handleAeonMallPhotoMulti, showAmericanVillageModal, showAmericanVillageDetail, showAmericanVillageEdit, americanVillageTab, americanVillagePlaces, americanVillageSelected, americanVillageEditIdx, americanVillageForm, americanVillageUploading, openAddAmericanVillage, openEditAmericanVillage, saveAmericanVillagePlace, removeAmericanVillagePlace, handleAmericanVillagePhoto, handleAmericanVillagePhotoMulti, americanVillageUploadProgress, showKouriModal, showKouriDetail, showKouriEdit, kouriTab, kouriPlaces, kouriSelected, kouriEditIdx, kouriForm, kouriUploading, openAddKouri, openEditKouri, saveKouriPlace, removeKouriPlace, handleKouriPhoto, handleKouriPhotoMulti, kouriUploadProgress, showNaminoueModal, showNaminoueDetail, showNaminoueEdit, naminoueTab, naminouePlaces, naminoueSelected, naminoueEditIdx, naminoueForm, naminoueUploading, openAddNaminoue, openEditNaminoue, saveNaminouePlace, removeNaminouePlace, handleNaminouePhoto, handleNaminouePhotoMulti, naminoueUploadProgress, showParcoCityModal, showParcoCityDetail, showParcoCityEdit, showNaminoueModal, parcoCityTab, parcoCityPlaces, parcoCitySelected, parcoCityEditIdx, parcoCityForm, parcoCityUploading, openAddParcoCity, openEditParcoCity, saveParcoCityPlace, removeParcoCityPlace, handleParcoCityPhoto, handleParcoCityPhotoMulti, parcoCityUploadProgress, kokusaiSelected, kokusaiSelectedIdx, kokusaiTab, kokusaiPlaces, kokusaiEditIdx, kokusaiForm, openAddKokusai, openEditKokusai, saveKokusai, removeKokusai, handleKokusaiPhoto, handleKokusaiPhotoMulti, kokusaiUploadProgress, kokusaiUploading, kokusaiPhotoZoom, parcoCityPhotoZoom, naminouePhotoZoom, kouriPhotoZoom, americanVillagePhotoZoom, showEsimModal, showSmokingModal, smokingLat, smokingLng, smokingLocating, smokingMapSrc, openSmokingFinder, getSmokingLocation, aquariumPhotos, handleAquariumPhoto, openHotelModal, openCarModal, isAdmin,
         getCategoryColor: (t) => ({ transport: 'bg-[#D94F4F]', spot: 'bg-[#98BDE3]', food: 'bg-[#E3A97C]', other: 'bg-[#C4A8D4]' }[t] || 'bg-[#DCC3A0]'),
         categoryDot: (id) => ({ spot:'#98BDE3', food:'#E3A97C', transport:'#D94F4F', other:'#C4A8D4' }[id] || '#DCC3A0'),
         categoryStyle: (id, active) => {
