@@ -656,7 +656,7 @@
 
           <template v-for="(item, idx) in itinerary[activeDay].events" :key="idx">
             <!-- 交通連接器 -->
-            <div v-if="idx > 0 && (!itinerary[activeDay].events.filter(e=>true)[idx].transitHidden || canEdit)" class="transit-connector">
+            <div v-if="idx > 0 && (!itinerary[activeDay].events[idx]?.transitHidden || canEdit)" class="transit-connector">
               <div class="transit-line"></div>
               <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;">
                 <!-- 顯示區：點擊展開編輯 -->
@@ -726,14 +726,14 @@
                     <template v-if="getTransitMode(activeDay, idx)!=='transit'">
                       <div>
                         <p style="font-size:9px;opacity:0.4;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:4px;">上個景點座標連結</p>
-                        <input :value="itinerary[activeDay].events[itinerary[activeDay].events.indexOf(itinerary[activeDay].events.filter(e=>true)[idx-1])].transitUrl||''"
-                               @change="itinerary[activeDay].events[itinerary[activeDay].events.indexOf(itinerary[activeDay].events.filter(e=>true)[idx-1])].transitUrl=$event.target.value"
+                        <input :value="itinerary[activeDay].events[idx-1]?.transitUrl||''"
+                               @input="itinerary[activeDay].events[idx-1].transitUrl=$event.target.value"
                                type="url" placeholder="https://maps.google.com/..." class="card-neo w-full px-3 py-2 text-xs font-black outline-none bg-transparent border-none" style="border-radius:12px;">
                       </div>
                       <div>
                         <p style="font-size:9px;opacity:0.4;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:4px;">下個景點座標連結</p>
-                        <input :value="itinerary[activeDay].events[itinerary[activeDay].events.indexOf(itinerary[activeDay].events.filter(e=>true)[idx])].transitUrl||''"
-                               @change="itinerary[activeDay].events[itinerary[activeDay].events.indexOf(itinerary[activeDay].events.filter(e=>true)[idx])].transitUrl=$event.target.value"
+                        <input :value="itinerary[activeDay].events[idx]?.transitUrl||''"
+                               @input="itinerary[activeDay].events[idx].transitUrl=$event.target.value"
                                type="url" placeholder="https://maps.google.com/..." class="card-neo w-full px-3 py-2 text-xs font-black outline-none bg-transparent border-none" style="border-radius:12px;">
                       </div>
                       <p style="font-size:8px;opacity:0.3;text-align:center;">Google Maps → 分享 → 複製連結</p>
@@ -5292,15 +5292,17 @@
       };
 
       const calcTransit = async (dayIdx, filtIdx) => {
-        const filtEvs = itinerary.value[dayIdx].events.filter(
-          e => (e.weather || 'sunny') === (itinerary.value[dayIdx].weatherMode || 'sunny')
-        );
-        const prevEv = filtEvs[filtIdx - 1];
-        const currEv = filtEvs[filtIdx];
-        const c1 = parseGoogleMapsUrl(prevEv?.transitUrl || prevEv?.url);
-        const c2 = parseGoogleMapsUrl(currEv?.transitUrl || currEv?.url);
+        const events = itinerary.value[dayIdx]?.events || [];
+        const prevEv = events[filtIdx - 1];
+        const currEv = events[filtIdx];
+        if (!prevEv || !currEv) {
+          alert('找不到行程資料，請確認行程已儲存');
+          return;
+        }
+        const c1 = parseGoogleMapsUrl(prevEv.transitUrl || prevEv.url);
+        const c2 = parseGoogleMapsUrl(currEv.transitUrl || currEv.url);
         if (!c1 || !c2) {
-          alert('無法解析座標！\n上個transitUrl: ' + (prevEv?.transitUrl||'空') + '\n下個transitUrl: ' + (currEv?.transitUrl||'空'));
+          alert('無法解析座標！\n上個: ' + (prevEv.transitUrl||prevEv.url||'空') + '\n下個: ' + (currEv.transitUrl||currEv.url||'空'));
           return;
         }
         const mode = currEv?.transitMode || 'driving';
