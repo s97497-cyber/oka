@@ -726,14 +726,14 @@
                     <template v-if="getTransitMode(activeDay, idx)!=='transit'">
                       <div>
                         <p style="font-size:9px;opacity:0.4;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:4px;">上個景點座標連結</p>
-                        <input :value="itinerary[activeDay].events.filter(e=>true)[idx-1].transitUrl||''"
-                               @input="itinerary[activeDay].events.filter(e=>true)[idx-1].transitUrl=$event.target.value"
+                        <input :value="itinerary[activeDay].events[itinerary[activeDay].events.indexOf(itinerary[activeDay].events.filter(e=>true)[idx-1])].transitUrl||''"
+                               @change="itinerary[activeDay].events[itinerary[activeDay].events.indexOf(itinerary[activeDay].events.filter(e=>true)[idx-1])].transitUrl=$event.target.value"
                                type="url" placeholder="https://maps.google.com/..." class="card-neo w-full px-3 py-2 text-xs font-black outline-none bg-transparent border-none" style="border-radius:12px;">
                       </div>
                       <div>
                         <p style="font-size:9px;opacity:0.4;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:4px;">下個景點座標連結</p>
-                        <input :value="itinerary[activeDay].events.filter(e=>true)[idx].transitUrl||''"
-                               @input="itinerary[activeDay].events.filter(e=>true)[idx].transitUrl=$event.target.value"
+                        <input :value="itinerary[activeDay].events[itinerary[activeDay].events.indexOf(itinerary[activeDay].events.filter(e=>true)[idx])].transitUrl||''"
+                               @change="itinerary[activeDay].events[itinerary[activeDay].events.indexOf(itinerary[activeDay].events.filter(e=>true)[idx])].transitUrl=$event.target.value"
                                type="url" placeholder="https://maps.google.com/..." class="card-neo w-full px-3 py-2 text-xs font-black outline-none bg-transparent border-none" style="border-radius:12px;">
                       </div>
                       <p style="font-size:8px;opacity:0.3;text-align:center;">Google Maps → 分享 → 複製連結</p>
@@ -5300,7 +5300,7 @@
         const c1 = parseGoogleMapsUrl(prevEv?.transitUrl || prevEv?.url);
         const c2 = parseGoogleMapsUrl(currEv?.transitUrl || currEv?.url);
         if (!c1 || !c2) {
-          alert('無法解析座標！請確認連結格式。');
+          alert('無法解析座標！\n上個transitUrl: ' + (prevEv?.transitUrl||'空') + '\n下個transitUrl: ' + (currEv?.transitUrl||'空'));
           return;
         }
         const mode = currEv?.transitMode || 'driving';
