@@ -725,15 +725,15 @@
                     <!-- 開車/步行：Google Maps 連結 + 計算 -->
                     <template v-if="getTransitMode(activeDay, idx)!=='transit'">
                       <div>
-                        <p style="font-size:9px;opacity:0.4;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:4px;">上個景點連結</p>
-                        <input :value="itinerary[activeDay].events.filter(e=>true)[idx-1].url"
-                               @input="itinerary[activeDay].events.filter(e=>true)[idx-1].url=$event.target.value"
+                        <p style="font-size:9px;opacity:0.4;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:4px;">上個景點座標連結</p>
+                        <input :value="itinerary[activeDay].events.filter(e=>true)[idx-1].transitUrl||''"
+                               @input="itinerary[activeDay].events.filter(e=>true)[idx-1].transitUrl=$event.target.value"
                                type="url" placeholder="https://maps.google.com/..." class="card-neo w-full px-3 py-2 text-xs font-black outline-none bg-transparent border-none" style="border-radius:12px;">
                       </div>
                       <div>
-                        <p style="font-size:9px;opacity:0.4;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:4px;">下個景點連結</p>
-                        <input :value="itinerary[activeDay].events.filter(e=>true)[idx].url"
-                               @input="itinerary[activeDay].events.filter(e=>true)[idx].url=$event.target.value"
+                        <p style="font-size:9px;opacity:0.4;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:4px;">下個景點座標連結</p>
+                        <input :value="itinerary[activeDay].events.filter(e=>true)[idx].transitUrl||''"
+                               @input="itinerary[activeDay].events.filter(e=>true)[idx].transitUrl=$event.target.value"
                                type="url" placeholder="https://maps.google.com/..." class="card-neo w-full px-3 py-2 text-xs font-black outline-none bg-transparent border-none" style="border-radius:12px;">
                       </div>
                       <p style="font-size:8px;opacity:0.3;text-align:center;">Google Maps → 分享 → 複製連結</p>
@@ -5241,8 +5241,8 @@
         const curr = filteredEvents[eventIdx];
         // 檢查是否隱藏
         if (curr?.transitHidden) return 'hidden';
-        const c1 = parseGoogleMapsUrl(prev?.url);
-        const c2 = parseGoogleMapsUrl(curr?.url);
+        const c1 = parseGoogleMapsUrl(prev?.transitUrl || prev?.url);
+        const c2 = parseGoogleMapsUrl(curr?.transitUrl || curr?.url);
         if (!c1 || !c2) return null;
         const mode = curr?.transitMode || 'driving';
         // 大眾運輸：顯示手動輸入的時間
@@ -5297,8 +5297,8 @@
         );
         const prevEv = filtEvs[filtIdx - 1];
         const currEv = filtEvs[filtIdx];
-        const c1 = parseGoogleMapsUrl(prevEv?.url);
-        const c2 = parseGoogleMapsUrl(currEv?.url);
+        const c1 = parseGoogleMapsUrl(prevEv?.transitUrl || prevEv?.url);
+        const c2 = parseGoogleMapsUrl(currEv?.transitUrl || currEv?.url);
         if (!c1 || !c2) {
           alert('無法解析座標！請確認連結格式。');
           return;
@@ -5338,8 +5338,8 @@
           for (let i = 1; i < events.length; i++) {
             if (events[i].transitHidden) continue;
             if ((events[i].transitMode||'driving') === 'transit') continue;
-            const c1 = parseGoogleMapsUrl(events[i-1].url);
-            const c2 = parseGoogleMapsUrl(events[i].url);
+            const c1 = parseGoogleMapsUrl(events[i-1].transitUrl || events[i-1].url);
+            const c2 = parseGoogleMapsUrl(events[i].transitUrl || events[i].url);
             if (c1 && c2) fetchTransitBetween(c1, c2, events[i].transitMode || 'driving');
           }
         }
