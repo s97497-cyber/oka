@@ -4921,9 +4921,9 @@
           try {
             const compressed = await compressImage(ev.target.result, 400, 0.85);
             const url = await uploadToCloudinary(compressed);
-            profileEdit.value.avatar = url;
+            profileEdit.value = { ...profileEdit.value, avatar: url };
           } catch(err) {
-            profileEdit.value.avatar = await compressImage(ev.target.result, 300, 0.7);
+            alert('頭貼上傳失敗，請稍後再試');
           } finally {
             avatarUploading.value = false;
           }
@@ -4968,10 +4968,23 @@
             }));
           }
         }
+        // 強制寫入 Firestore
+        _lock('groupMembers', 3000);
+        saveToFirestore('groupMembers', groupMembers.value);
         showProfileModal.value = false;
       };
       const addMember = () => { if(newMember.value.name){ groupMembers.value.push({...newMember.value}); newMember.value = {name:'', avatar: BLANK_AVATAR}; showAddMember.value = false; } };
-      const handleAvatarUpload = (e) => { const f = e.target.files[0]; if(f){ const r = new FileReader(); r.onload=(ev)=>newMember.value.avatar=ev.target.result; r.readAsDataURL(f); } };
+      const handleAvatarUpload = (e) => {
+        const f = e.target.files[0]; if(!f) return;
+        const r = new FileReader();
+        r.onload = async (ev) => {
+          try {
+            const url = await uploadToCloudinary(await compressImage(ev.target.result, 400, 0.85));
+            newMember.value.avatar = url;
+          } catch(err) { alert('頭貼上傳失敗'); }
+        };
+        r.readAsDataURL(f);
+      };
       const getMemberAvatar = (n) => groupMembers.value.find(m=>m.name===n)?.avatar || BLANK_AVATAR;
 
       // 編輯成員
@@ -4983,8 +4996,15 @@
         editingMember.value = { idx, name: m.name, avatar: m.avatar };
       };
       const handleEditAvatarUpload = (e) => {
-        const f = e.target.files[0];
-        if(f){ const r = new FileReader(); r.onload=(ev)=>{ if(editingMember.value) editingMember.value.avatar=ev.target.result; }; r.readAsDataURL(f); }
+        const f = e.target.files[0]; if(!f) return;
+        const r = new FileReader();
+        r.onload = async (ev) => {
+          try {
+            const url = await uploadToCloudinary(await compressImage(ev.target.result, 400, 0.85));
+            if(editingMember.value) editingMember.value.avatar = url;
+          } catch(err) { alert('頭貼上傳失敗'); }
+        };
+        r.readAsDataURL(f);
       };
       const saveEditMember = () => {
         if(!editingMember.value || !editingMember.value.name.trim()) return;
@@ -6621,7 +6641,20 @@
         const d = snap.data();
         if (d.expenses      && !_locked('expenses'))             expenses.value             = d.expenses;
         if (d.allTodos      && !_locked('allTodos'))             allTodos.value             = d.allTodos;
-        if (d.groupMembers  && !_locked('groupMembers'))         groupMembers.value         = d.groupMembers;
+        if (d.groupMembers && !_locked('groupMembers')) {
+          groupMembers.value = d.groupMembers;
+          // 自動把 base64 avatar 遷移到 Cloudinary
+          d.groupMembers.forEach(async (m, idx) => {
+            if (m.avatar && m.avatar.startsWith('data:')) {
+              try {
+                const url = await uploadToCloudinary(await compressImage(m.avatar, 400, 0.85));
+                const updated = [...groupMembers.value];
+                updated[idx] = { ...updated[idx], avatar: url };
+                groupMembers.value = updated;
+              } catch(e) {}
+            }
+          });
+        }
         if (d.churasunOrderNo !== undefined) churasunOrderNo.value = d.churasunOrderNo;
         if (d.memberQRCodes)    memberQRCodes.value    = d.memberQRCodes;
         if (d.itinerary     && !_locked('itinerary'))            itinerary.value            = d.itinerary;
