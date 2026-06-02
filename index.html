@@ -283,6 +283,7 @@
       pointer-events: auto;
     }
     input[type=checkbox] { accent-color:var(--green); }
+    .no-spinner::-webkit-outer-spin-button, .no-spinner::-webkit-inner-spin-button { -webkit-appearance:none; margin:0; }
     .cropper-wrap { position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.92);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px; }
     .cropper-canvas-wrap { position:relative;touch-action:none; }
     .crop-overlay { position:absolute;inset:0;background:rgba(0,0,0,0.5);pointer-events:none; }
@@ -312,8 +313,9 @@
       100% { transform:translateX(0%) translateY(0px) rotate(0deg); opacity:1; }
     }
     @keyframes shimmer {
-      0%   { background-position: -200% center; }
-      100% { background-position:  200% center; }
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
     @keyframes timeline-fill {
       from { width:0%; }
@@ -337,12 +339,11 @@
     }
     .time-label { font-size:8px; text-transform:uppercase; letter-spacing:0.15em; opacity:0.75; display:block; margin-top:4px; }
     .enjoy-card {
-      animation: enjoy-pop 0.7s cubic-bezier(0.34,1.3,0.64,1) forwards;
-      border-radius:40px; padding:2rem 1.5rem; color:white; font-weight:900;
-      background:linear-gradient(135deg,#7bbf96,#4a8060,#7bbf96);
-      background-size:200% auto;
-      animation: enjoy-pop 0.7s cubic-bezier(0.34,1.3,0.64,1) forwards, shimmer 3s linear infinite 0.7s;
-      border:1px solid rgba(255,255,255,0.3);
+      border-radius:40px; padding:1.5rem; color:white; font-weight:900;
+      background:linear-gradient(135deg,#a8d9b8,#7bbf96,#5a9a75,#7bbf96,#a8d9b8);
+      background-size:400% 400%;
+      animation: enjoy-pop 0.7s cubic-bezier(0.34,1.3,0.64,1) forwards, shimmer 6s ease infinite 0.7s;
+      border:1px solid rgba(255,255,255,0.4);
       text-align:center;
     }
     .plane-anim { animation: plane-fly 1s cubic-bezier(0.34,1.1,0.64,1) forwards; display:inline-block; }
@@ -524,10 +525,9 @@
         <!-- 倒數計時 -->
         <!-- 結束狀態：ENJOY YOUR TRIP -->
         <div v-if="timeObj.isDone" class="enjoy-card">
-          <div class="plane-anim text-6xl mb-3">✈️</div>
-          <h2 class="text-3xl font-black tracking-widest uppercase mb-1">Enjoy Your</h2>
-          <h2 class="text-4xl font-black tracking-widest uppercase" style="text-shadow:0 2px 12px rgba(0,0,0,0.2)">Trip! 🌴</h2>
-          <p class="text-[10px] opacity-60 mt-3 tracking-widest">2026.06.03 — 06.07 · OKINAWA</p>
+          <div class="plane-anim text-4xl mb-2">✈️</div>
+          <h2 class="text-2xl font-black tracking-widest uppercase" style="text-shadow:0 2px 12px rgba(0,0,0,0.2)">Enjoy Your Trip! 🌴</h2>
+          <p class="text-[9px] opacity-60 mt-2 tracking-widest">2026.06.03 — 06.07 · OKINAWA</p>
         </div>
 
         <!-- 倒數狀態 -->
@@ -631,7 +631,7 @@
     <!-- Modal: 吸菸區 -->
 
         <!-- 版本號 -->
-        <p style="font-size:9px;opacity:0.2;text-align:center;padding:8px 0 4px;letter-spacing:0.1em;">v1.48.10</p>
+        <p style="font-size:9px;opacity:0.2;text-align:center;padding:8px 0 4px;letter-spacing:0.1em;">v1.48.80</p>
 
       </section>
 
@@ -4683,7 +4683,10 @@
               </div>
               <div>
                 <label class="text-[10px] text-[#DCC3A0] mb-1 block tracking-widest uppercase font-black">Amount</label>
-                <input v-model="newExpense.amount" type="number" class="w-full rounded-xl p-3 outline-none font-black text-[#5C7A6A]" style="background:var(--bg);box-shadow:var(--neo-in);border:1px solid rgba(255,255,255,0.5);">
+                <input v-model="newExpense.amount" type="number"
+                  :disabled="newExpense.splitMode==='custom'"
+                  class="w-full rounded-xl p-3 outline-none font-black text-[#5C7A6A]"
+                  :style="newExpense.splitMode==='custom' ? 'background:rgba(220,195,160,0.08);box-shadow:var(--neo-in);border:1px solid rgba(255,255,255,0.2);opacity:0.4;cursor:not-allowed;' : 'background:var(--bg);box-shadow:var(--neo-in);border:1px solid rgba(255,255,255,0.5);'">
               </div>
             </div>
             <div>
@@ -4691,6 +4694,13 @@
               <div class="flex gap-2 p-1.5 rounded-xl" style="background:#E5DDD0;box-shadow:var(--neo-in);">
                 <button @click="newExpense.currency = 'TWD'" :class="['flex-1 py-2 text-xs rounded-lg transition font-black', newExpense.currency === 'TWD' ? 'tab-active' : 'tab-inactive']">TWD</button>
                 <button @click="newExpense.currency = 'JPY'" :class="['flex-1 py-2 text-xs rounded-lg transition font-black', newExpense.currency === 'JPY' ? 'tab-active' : 'tab-inactive']">JPY</button>
+              </div>
+            </div>
+            <div>
+              <label class="text-[10px] text-[#DCC3A0] mb-2 block uppercase font-black">Split Mode</label>
+              <div class="flex gap-2 p-1.5 rounded-xl" style="background:#E5DDD0;box-shadow:var(--neo-in);">
+                <button @click="newExpense.splitMode='equal'" :class="['flex-1 py-2 text-xs rounded-lg transition font-black', newExpense.splitMode!=='custom' ? 'tab-active' : 'tab-inactive']">÷ 平均</button>
+                <button @click="newExpense.splitMode='custom'" :class="['flex-1 py-2 text-xs rounded-lg transition font-black', newExpense.splitMode==='custom' ? 'tab-active' : 'tab-inactive']">✎ 自訂</button>
               </div>
             </div>
             <div>
@@ -4705,9 +4715,10 @@
             <div>
               <div class="flex items-center justify-between mb-2">
                 <label class="text-[10px] text-[#DCC3A0] font-black uppercase tracking-widest">Split With</label>
-                <button @click="newExpense.splitWith = newExpense.splitWith.length === groupMembers.length ? [] : groupMembers.map(m=>m.name)" style="font-size:9px;font-weight:900;color:var(--green);background:none;border:none;cursor:pointer;letter-spacing:0.08em;">{{ newExpense.splitWith.length === groupMembers.length ? '全部取消' : '全選' }}</button>
+                <button v-if="newExpense.splitMode!=='custom'" @click="newExpense.splitWith = newExpense.splitWith.length === groupMembers.length ? [] : groupMembers.map(m=>m.name)" style="font-size:9px;font-weight:900;color:var(--green);background:none;border:none;cursor:pointer;letter-spacing:0.08em;">{{ newExpense.splitWith.length === groupMembers.length ? '全取消' : '全選' }}</button>
               </div>
-              <div class="flex gap-3 overflow-x-auto py-2 hide-scrollbar">
+              <!-- 平均分帳：人頭選擇 -->
+              <div v-if="newExpense.splitMode !== 'custom'" class="flex gap-3 overflow-x-auto py-2 hide-scrollbar">
                 <div v-for="m in groupMembers" :key="m.name" @click="newExpense.splitWith.includes(m.name) ? newExpense.splitWith.splice(newExpense.splitWith.indexOf(m.name),1) : newExpense.splitWith.push(m.name)"
                   :class="['flex-shrink-0 flex flex-col items-center gap-2 p-2 rounded-2xl border-2 transition font-black cursor-pointer', newExpense.splitWith.includes(m.name) ? 'border-[#5C7A6A]' : 'border-transparent']">
                   <div style="position:relative;">
@@ -4719,8 +4730,31 @@
                   <span class="text-[9px] font-black uppercase tracking-tighter" :style="newExpense.splitWith.includes(m.name) ? 'color:var(--green)' : 'opacity:0.35;'">{{ m.name }}</span>
                 </div>
               </div>
-              <p v-if="newExpense.splitWith.length > 0 && newExpense.amount > 0" class="text-[10px] text-center mt-2 opacity-50">
-                每人 {{ newExpense.originalCurrency === 'TWD' ? 'NT$' : '¥' }}{{ Math.round(newExpense.amount / newExpense.splitWith.length) }}
+              <!-- 自訂金額 -->
+              <div v-if="newExpense.splitMode === 'custom'" style="display:flex;flex-direction:column;gap:8px;margin-top:4px;">
+                <div v-for="m in groupMembers" :key="m.name" style="display:flex;align-items:center;gap:10px;">
+                  <img :src="m.avatar" style="width:32px;height:32px;border-radius:50%;object-fit:cover;flex-shrink:0;">
+                  <span style="font-size:11px;font-weight:900;flex:1;">{{ m.name }}</span>
+                  <div style="display:flex;align-items:center;gap:4px;">
+                    <span style="font-size:10px;opacity:0.5;">{{ newExpense.currency==='TWD'?'NT$':'¥' }}</span>
+                    <input type="number" :value="newExpense.customAmounts[m.name]||''"
+                      @focus="$event.target.select()"
+                      @input="newExpense.customAmounts[m.name]=Number($event.target.value)||0"
+                      placeholder="0"
+                      style="width:80px;padding:6px 8px;border-radius:10px;background:var(--bg);box-shadow:var(--neo-in);border:1px solid rgba(255,255,255,0.5);font-size:12px;font-weight:900;color:var(--green);text-align:right;outline:none;-moz-appearance:textfield;" class="no-spinner">
+                  </div>
+                </div>
+                <!-- 合計對比 -->
+                <div style="display:flex;justify-content:space-between;padding:8px 4px;border-top:1px solid rgba(220,195,160,0.2);margin-top:4px;">
+                  <span style="font-size:10px;opacity:0.5;">自訂合計</span>
+                  <span style="font-size:11px;font-weight:900;" :style="Math.abs(Object.values(newExpense.customAmounts||{}).reduce((a,b)=>a+b,0) - (newExpense.amount||0)) < 1 ? 'color:var(--green)' : 'color:#f87171;'">
+                    {{ newExpense.currency==='TWD'?'NT$':'¥' }}{{ Object.values(newExpense.customAmounts||{}).reduce((a,b)=>a+b,0) }}
+                    / {{ newExpense.currency==='TWD'?'NT$':'¥' }}{{ newExpense.amount||0 }}
+                  </span>
+                </div>
+              </div>
+              <p v-if="newExpense.splitMode!=='custom' && newExpense.splitWith.length > 0 && newExpense.amount > 0" class="text-[10px] text-center mt-2 opacity-50">
+                每人 {{ newExpense.currency === 'TWD' ? 'NT$' : '¥' }}{{ Math.round(newExpense.amount / newExpense.splitWith.length) }}
               </p>
             </div>
             <button @click="addExpense" class="w-full py-5 text-white rounded-full font-black uppercase active:scale-95 transition" style="background:linear-gradient(145deg,#8ec4a1,#5a9070);box-shadow:-3px -3px 8px rgba(255,255,255,0.28),6px 6px 16px rgba(45,85,60,0.45);">{{ editingExpenseIdx >= 0 ? "Update ✓" : "Save" }}</button>
@@ -5139,8 +5173,18 @@
         expenses.value.forEach(e => {
           const amtG = (e.currency !== globalCurrency.value ? (globalCurrency.value === 'TWD' ? e.amount * jpyRate.value : e.amount / jpyRate.value) : e.amount);
           if(stats[e.payer]) stats[e.payer].paid += amtG;
-          const splitAmt = amtG / (e.splitWith.length || 1);
-          e.splitWith.forEach(n => { if(stats[n]) stats[n].share += splitAmt; });
+          if (e.splitMode === 'custom' && e.customAmounts) {
+            // 自訂金額：每人各自的金額，依貨幣轉換
+            Object.entries(e.customAmounts).forEach(([n, amt]) => {
+              if (stats[n]) {
+                const amtGCustom = (e.currency !== globalCurrency.value ? (globalCurrency.value === 'TWD' ? amt * jpyRate.value : amt / jpyRate.value) : amt);
+                stats[n].share += amtGCustom;
+              }
+            });
+          } else {
+            const splitAmt = amtG / (e.splitWith.length || 1);
+            e.splitWith.forEach(n => { if(stats[n]) stats[n].share += splitAmt; });
+          }
         });
         return stats;
       });
@@ -6473,14 +6517,21 @@
           .map((e, i) => ({...e, _idx: i}))
           .filter(e => expenseFilterMember.value === '' || e.payer === expenseFilterMember.value)
       );
-      const openExpenseModal = () => { editingExpenseIdx.value = -1; newExpense.value = { title: '', amount: 0, currency: 'JPY', payer: groupMembers.value[0].name, splitWith: groupMembers.value.map(m=>m.name) }; showExpenseModal.value = true; };
+      const openExpenseModal = () => { editingExpenseIdx.value = -1; newExpense.value = { title: '', amount: 0, currency: 'JPY', payer: groupMembers.value[0].name, splitWith: groupMembers.value.map(m=>m.name), splitMode: 'equal', customAmounts: {} }; showExpenseModal.value = true; };
       const openEditExpense = (idx) => {
         editingExpenseIdx.value = idx;
         const e = expenses.value[idx];
-        newExpense.value = { title: e.title, amount: e.originalAmount, currency: e.originalCurrency, payer: e.payer, splitWith: [...e.splitWith] };
+        newExpense.value = { title: e.title, amount: e.originalAmount, currency: e.originalCurrency, payer: e.payer, splitWith: [...e.splitWith], splitMode: e.splitMode||'equal', customAmounts: e.customAmounts||{} };
         showExpenseModal.value = true;
       };
       const addExpense = () => {
+        // 自訂模式：自動把有金額的人加入 splitWith，並計算總金額
+        if (newExpense.value.splitMode === 'custom') {
+          const customTotal = Object.values(newExpense.value.customAmounts || {}).reduce((a, b) => a + (Number(b)||0), 0);
+          if (customTotal > 0) newExpense.value.amount = customTotal;
+          newExpense.value.splitWith = Object.entries(newExpense.value.customAmounts || {})
+            .filter(([, v]) => v > 0).map(([k]) => k);
+        }
         if(newExpense.value.title && newExpense.value.amount > 0){
           const entry = { ...newExpense.value, originalAmount: newExpense.value.amount, originalCurrency: newExpense.value.currency };
           if(editingExpenseIdx.value >= 0) {
